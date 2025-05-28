@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,100..900;1,100..900&family=Donegal+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+@font-face {
+  font-family: Source-Sans-3;
+  src : url('/src/assets/fonts/SourceSans3-SemiBold.ttf')
+}
+
+@import "tailwindcss";
+
+@theme {
+    --color-primaryButtonBlue : #6056AA;
+    --color-hover1 : #7569B3;
+    --color-secondaryButtonBlue : #D2D8F3;
+    --color-hover2 : #C5CCE9;
+    --color-primaryButtonText : #E5E8EF;
+    --color-Secondarybuttontext : #51488C;    
+    --color-primaryButtonicon : #B7BBE8;
+    --color-secondaryButtonIcon : #53488E;
+
+    --font-inter : Inter , "sans-serif";
+    --font-cardTitleHeading : "Source-Sans-3", "sans-serif";
+    --font-head: Bitter, "sans-serif";
+    
+    --color-sidebarBg : #F5F5F6;
+    --color-secondBrainHeading: #2A2E40; 
+    --color-sidebarTabHeading : #666E77;
+    --color-sidebaricon:#404D57;
+
+
+    --color-mainComponentBg : #E6EAEA;
+    --color-dashboardHeading: #212730;
+    --color-cardBackground : #F2F3F3;
+    --color-cardTitle: #2B2E3C;
+    --color-tagBg : #DEE2F0;
+    --color-tagText : #564E98; 
+    --color-shareDeletIcon : #9EA3A4;
+    --color-cardTypeicon : #707281;
+
+    --color-modalCard : #EDEDED;
+    --color-modalHead: #2E394A;
+}
+ 
+.scrollbar-hidden {
+    scrollbar-width: none;  
+    -ms-overflow-style: none;   
+  } 
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none; 
+  }
+  
+
+@layer utilities {
+  .scrollbarSB::-webkit-scrollbar {
+    width: 13px; 
+    height: 1px;
+  }
+
+  .scrollbarSB::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: #F5F5F6;
+  }
+
+  .scrollbarSB::-webkit-scrollbar-thumb {
+    background: #d6d6d9;
+    border-radius: 100vh;
+    border: 3px solid #f6f7ed;
+  }
+
+  .scrollbarSB::-webkit-scrollbar-thumb:hover {
+    background: #A5A5AA;
+    transition: background 8s ease-in-out;
+  }
+}
+ 
+
+@layer utilities {
+  .scrollbarMC::-webkit-scrollbar {
+    width: 14px; 
+    height: 5px;
+  }
+
+  .scrollbarMC::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: #E6EAEA;
+  }
+
+  .scrollbarMC::-webkit-scrollbar-thumb {
+    background: #bcc0c3;
+    border-radius: 100vh;
+    border: 3px solid #E6EAEA;
+  }
+
+  .scrollbarMC::-webkit-scrollbar-thumb:hover {
+    background: #9c9ca0;
+    transition: background-color 300ms ease-in-out;
+  }
+}
