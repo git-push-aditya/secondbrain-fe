@@ -1,8 +1,8 @@
-import { CopyIcon, CrossIcon, DropUpIcon } from "../icons/commonIcons"; 
+import { CopyIcon, CrossIcon } from "../icons/commonIcons"; 
 import { ButtonEl } from "./button"; 
 import {motion, AnimatePresence} from "framer-motion";
 import Dropdown from "./dropdown";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface props{
     cause : "addContent" | "shareBrain" | "logout" |"addCollection"| "addCommunity"|"joinCommunity" |"close";
@@ -65,8 +65,8 @@ const AddContent = ({closeCard} : cardComponent ) => {
 
 const ShareBrain = ({closeCard} : cardComponent ) => { 
 
-  return <motion.div initial={{y:8,scale:0.99}} animate={{y:0,scale:1}} transition={{ duration: 0.2  }}className={`h-[65%] md:h-[57%] xl:h-[48%] w-[70%] xl:w-[40%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB `} >
-            <div className="flex justify-between mx-8 nd:mx-10 xl:mx-12 mt-8"> 
+  return <motion.div initial={{y:8,scale:0.99}} animate={{y:0,scale:1}} transition={{ duration: 0.2  }}className={`h-[65%] md:h-[57%] xl:h-[42%] w-[70%] xl:w-[40%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB `} >
+            <div className="flex justify-between mx-8 md:mx-10 xl:mx-12 mt-10"> 
                 <div className="font-[650]  text-3xl text-modalHead font-inter ">Share your Second Brain</div>
                 <ButtonEl buttonType=""   onClickHandler={closeCard} startIcon={<CrossIcon dim="40" style="text-gray" />} />
             </div>
@@ -109,9 +109,13 @@ const AddCollection = ({closeCard} : cardComponent ) => {
 
 //add community == starting a new community
 const AddCommunity = ({closeCard} : cardComponent ) => {
+    const messageRef = useRef(null);
+    const postRef = useRef(null);
+
+    const checkboxStyle = "flex items-center mt-2 pl-16 text-2xl font-cardTitleHeading font-[400] text-slate-700 "
     const inputStyle = "w-[85%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-2xl font-cardTitleHeading border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-700 focus:outline-none";
 
-    return <motion.div initial={{y:8,scale:0.99}} animate={{y:0,scale:1}} transition={{ duration: 0.2  }}className={`h-[65%] md:h-[57%] xl:h-[58%] w-[70%] xl:w-[45%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB `} >
+    return <motion.div initial={{y:8,scale:0.99}} animate={{y:0,scale:1}} transition={{ duration: 0.2  }}className={`h-[65%] md:h-[57%] xl:h-[58%] w-[70%] xl:w-[45%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflopointerw-y-hidden scrollbarSB `} >
             <div className="flex justify-between mx-8 nd:mx-10 xl:mx-16 mt-8"> 
                 <div className="font-[650]  text-3xl text-modalHead font-inter ">Start your Community!!</div>
                 <ButtonEl buttonType=""   onClickHandler={closeCard} startIcon={<CrossIcon dim="40" style="text-gray" />} />
@@ -121,8 +125,19 @@ const AddCommunity = ({closeCard} : cardComponent ) => {
             </div> 
             <div className="text-center mt-1">
                 <input type="text" placeholder="Name your community" className={inputStyle + ""}  /> 
-                <textarea placeholder="Describe you community.." className={inputStyle}  /> 
+                <textarea placeholder="Describe you community.." className={inputStyle}  />  
             </div>
+            <div className={checkboxStyle}>
+                    <label className="flex items-center cursor-pointer">
+                            <input type="checkbox" className="size-6 mr-4 cursor-pointer" ref={postRef}></input>Allow member post
+                    </label>
+            </div>
+            <div className={checkboxStyle}>
+                    <label className="flex items-center cursor-pointer">
+                            <input type="checkbox" className="size-6 mr-4 cursor-pointer" ref={messageRef}></input>Allow community chat
+                    </label>cursor-pointer
+            </div>
+            
             <ButtonEl buttonType="primary" onClickHandler={clicked} particularStyle="w-[85%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter " placeholder="Start your Community"  />
         </motion.div>  
 }
