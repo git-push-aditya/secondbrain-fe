@@ -1,7 +1,8 @@
-import { type ReactElement } from "react";
+import { useState, type ReactElement } from "react";
 import { InstagramIcon, RedditIcon, TwitterIcon, WebIcon, WebPageDisplay, YoutubeIcon } from "../icons/particularIcons";
 import { DeleteIcon, ShareIcon } from "../icons/commonIcons";
 import Tag from "./tags"; 
+import { ButtonEl } from "./button";
  
 
 export interface cardProp{
@@ -11,6 +12,7 @@ export interface cardProp{
     tags?: {title : string, id: number}[];
     createdAt?: string;
     link : string; 
+    setPopUpLive : React.Dispatch<React.SetStateAction<Boolean>>;
 }
 
 const minEndingIndex = (link: string) : number=> {
@@ -30,7 +32,9 @@ const minEndingIndex = (link: string) : number=> {
       
 }
 
-
+    const clicked = () => {
+        alert("clikced");
+    }
 
 const typeIcon:{[key:string]:ReactElement}={
     'twitter' : <TwitterIcon dim="45" />,
@@ -39,9 +43,20 @@ const typeIcon:{[key:string]:ReactElement}={
     'reddit' : <RedditIcon dim="50" />,  
     'instagram' : <InstagramIcon dim="50" />
 }
-const defaultStyle:string = "w-88 font-source hover:border-slate-500  transition-hover duration-300 max-h-145  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md ";
-//trmovrf relative from car defaultStyle and overflow-y-hidden
-export const CardElement = ({title,cardType,note,tags,createdAt,link} : cardProp) => {  
+
+
+
+const defaultStyle:string = "w-88 font-source hover:border-slate-500  transition-hover duration-300 max-h-145  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md "; 
+
+export const CardElement = ({title,cardType,note,setPopUpLive,tags,createdAt,link} : cardProp) => {  
+
+    const [deletClicked, setDeleteClicked] = useState<Boolean>(false);
+    const shareClicked = (link :string ) => {
+        navigator.clipboard.writeText(link);
+        setPopUpLive((prev) => !prev);
+
+    }
+
     return<div className={defaultStyle}> 
             <div className="flex justify-between gap-2 px-6 pt-1" >
                 <div className="flex justify-around gap-2 items-center">
@@ -49,12 +64,19 @@ export const CardElement = ({title,cardType,note,tags,createdAt,link} : cardProp
                     <div className="font-[550] cursor-default font-cardTitleFont text-xl ont-cardTitleHeading ">{title}</div>
                 </div>
                 <div className="flex justify-around gap-4 items-center">
-                    <ShareIcon style="size-7 " />
-                    <DeleteIcon style="size-7.5" />
+                    <ShareIcon style="size-7 hover:text-slate-600 transition-hover duration-300 ease-in-out" onClickHandler={() => shareClicked(link)} />
+                    <DeleteIcon  onClickHandler={() => setDeleteClicked((prev) => !prev)} style="size-7.5 hover:text-slate-600 transition-hover duration-300 ease-in-out" />
                 </div> 
             </div>
-            <div >  
-                <div className= "px-2 max-h-[321px] overflow-y-auto scrollbar-hidden scroll-smooth overscroll-auto">
+            <div > 
+                <div className= "px-2 max-h-[321px] overflow-y-auto scrollbar-hidden scroll-smooth overscroll-auto relative">
+                    {deletClicked ? <div className="px-2 bg-cardBackground/90 mb-2 h-[75px] text-gray-700 text-center text-xl font-[580] sticky left-0 top-0  ">
+                    Delete this Link ? 
+                        <div className=" flex items-center justify-around gap-4 mb-4">
+                            <ButtonEl onClickHandler={()=> setDeleteClicked((prev) => !prev)} placeholder="Cancel" buttonType={"cardButton"} particularStyle=" hover:bg-green-400 bg-green-300 text-white w-30 h-9 " />  
+                            <ButtonEl onClickHandler={clicked} placeholder="Delete" buttonType={"cardButton"} particularStyle=" text-white hover:bg-red-400 bg-red-300  w-30 h-9 " />     
+                        </div>
+                    </div> : null }
                 
                     {cardType === "youtube" &&  <iframe  className="w-[99%] mx-auto h-50  rounded-lg  "  title="YouTube video player" src={link.includes('youtu.be') ? link.replace('youtu.be', 'youtube.com/embed') : link}  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe> }
                     
@@ -96,7 +118,7 @@ export const CardElement = ({title,cardType,note,tags,createdAt,link} : cardProp
                         {note}
                     </div>}
                     
-                </div>
+                </div> 
                 <div className="flex items-center gap-2 justify-center my-3">
                     <Tag name="science" id="hehe" />
                     <Tag name="science and technology" id="hehe" />

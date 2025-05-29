@@ -4,7 +4,7 @@
   font-family: Source-Sans-3;
   src : url('/src/assets/fonts/SourceSans3-SemiBold.ttf')
 }
-
+ 
 @import "tailwindcss";
 
 @theme {

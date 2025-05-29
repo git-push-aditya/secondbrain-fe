@@ -7,7 +7,7 @@ import { GridIcon, ListIcon, PlusIcon ,ShareIcon} from "../icons/commonIcons";
 import type { ChildProps } from "../pages/dashboard";
 
 
-const MainBlock = ({setModalNeededBy} : ChildProps) => {
+const MainBlock = ({setModalNeededBy, setPopUpLive } : ChildProps) => {
     const [tweetCount, setTweetCount] = useState<number>(0);//no. of tweets card among all cards
     const [tweetScriptNeeded,setTweetScriptNeeded] = useState<boolean>(false);   // if tweets needed
     
@@ -114,8 +114,7 @@ const MainBlock = ({setModalNeededBy} : ChildProps) => {
         </div> 
         <div  className="flex justify-end mr-7">
             <div className="text-center font-head font-[500] p-4">
-                 //NOTE: fixed placing to adjust placement of component irrerspective of other component and along with this using z value to maintain who stays on top of whom when times call for it
-                 //in join a xommunity add checkboxes to ask if members can chat and if memebers can add link
+                 //NOTE: fixed placing to adjust placement of component irrerspective of other component and along with this using z value to maintain who stays on top of whom when times call for it 
                  // add delete button functionality and on share button adn function call that saves the link to users clipboard
                  //understood how to implement tags feature: ui = enter the tags at every enter (or click of add buttons) input box is cleared and a bubble of that tag appears with a cross icon;
                  //at initial fietch req with paginationlimitonl10 cards at a timee; you also get a complete list of all tags prev.used by user and at time of add content browser compares orignal list for old tags and new tags; db only stores tags for specific user(if its toomuch than make user id to tags as array and try n manage) </div>
@@ -126,17 +125,17 @@ const MainBlock = ({setModalNeededBy} : ChildProps) => {
         </div>
         <div className=" mt-6  w-full flex justify-center ">
             <div className="grid 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 xl:gap-6  lg:gap-4 gap-2 gap-y-6"> 
-                <CardElement title="wassup people this is crazy" note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" createdAt="11/12/2004" cardType="twitter" link="https://twitter.com/narendramodi/status/1919736905115054505"></CardElement>
-                <CardElement title="wassup people this is crazy" note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" createdAt="11/12/2004" cardType="reddit" link="https://www.reddit.com/r/TheWhiteLotusHBO/comments/1is3or1/who_do_you_think_is_the_murderer_or_murderers_of/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button"></CardElement>
-                <CardElement title="wassup people this is crazy" note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" createdAt="11/12/2004" cardType="instagram" link="https://www.instagram.com/p/DJVJJkktapz/?utm_source=ig_web_copy_link"></CardElement>
+                <CardElement setPopUpLive={setPopUpLive} title="wassup people this is crazy" note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" createdAt="11/12/2004" cardType="twitter" link="https://twitter.com/narendramodi/status/1919736905115054505"></CardElement>
+                <CardElement setPopUpLive={setPopUpLive} title="wassup people this is crazy" note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" createdAt="11/12/2004" cardType="reddit" link="https://www.reddit.com/r/TheWhiteLotusHBO/comments/1is3or1/who_do_you_think_is_the_murderer_or_murderers_of/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button"></CardElement>
+                <CardElement setPopUpLive={setPopUpLive} title="wassup people this is crazy" note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" createdAt="11/12/2004" cardType="instagram" link="https://www.instagram.com/p/DJVJJkktapz/?utm_source=ig_web_copy_link"></CardElement>
                 
-                <CardElement title=" " note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" cardType="web" createdAt="11/12/2004" link="https://x.com/arunpudur/status/1919789338981712121" ></CardElement>
-                <CardElement title=" " note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" createdAt="11/12/2004" cardType="youtube" link="https://www.youtube.com/embed/Eo4X1xBt4P0?si=rRY13NFAVXYhApRY"></CardElement>
-                <CardElement title=" " note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" createdAt="11/12/2004" cardType="twitter" link="https://twitter.com/narendramodi/status/1919736905115054505"></CardElement>
-                <CardElement title=" " note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" createdAt="11/12/2004" cardType="reddit" link="https://www.reddit.com/r/TheWhiteLotusHBO/comments/1is3or1/who_do_you_think_is_the_murderer_or_murderers_of/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button"></CardElement>
-                <CardElement title="  " note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" createdAt="11/12/2004" cardType="instagram" link="https://www.instagram.com/p/DJVJJkktapz/?utm_source=ig_web_copy_link"></CardElement>
+                <CardElement setPopUpLive={setPopUpLive} title=" " note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" cardType="web" createdAt="11/12/2004" link="https://x.com/arunpudur/status/1919789338981712121" ></CardElement>
+                <CardElement setPopUpLive={setPopUpLive} title=" " note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" createdAt="11/12/2004" cardType="youtube" link="https://www.youtube.com/embed/Eo4X1xBt4P0?si=rRY13NFAVXYhApRY"></CardElement>
+                <CardElement setPopUpLive={setPopUpLive} title=" " note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" createdAt="11/12/2004" cardType="twitter" link="https://twitter.com/narendramodi/status/1919736905115054505"></CardElement>
+                <CardElement setPopUpLive={setPopUpLive} title=" " note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" createdAt="11/12/2004" cardType="reddit" link="https://www.reddit.com/r/TheWhiteLotusHBO/comments/1is3or1/who_do_you_think_is_the_murderer_or_murderers_of/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button"></CardElement>
+                <CardElement setPopUpLive={setPopUpLive} title="  " note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" createdAt="11/12/2004" cardType="instagram" link="https://www.instagram.com/p/DJVJJkktapz/?utm_source=ig_web_copy_link"></CardElement>
                 
-                <CardElement createdAt="11/12/2004" title="wassup people heheh this is crazy" note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" cardType="web" link="https://x.com/arunpudur/status/1919789338981712121" ></CardElement>
+                <CardElement setPopUpLive={setPopUpLive} createdAt="11/12/2004" title="wassup people heheh this is crazy" note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" cardType="web" link="https://x.com/arunpudur/status/1919789338981712121" ></CardElement>
             </div> 
         </div>
     </div>

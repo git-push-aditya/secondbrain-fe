@@ -1,5 +1,5 @@
 export interface genIconStyle{
-  dim : string;
+  dim ?: string;
   style?: string;
   onClickHandler?: () => void;
   link?: string;

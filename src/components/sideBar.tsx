@@ -19,7 +19,7 @@ const SideBar = ({setModalNeededBy} : ChildProps) => {
     }
 
 
-    return <div className="w-[18%] border-r-2 border-slate-300 bg-sidebarBg h-[90.8%] overflow-y-scroll scrollbarSB relative z-10 scroll-smooth"> 
+    return <div className="w-[18%] border-r-2 border-slate-300 bg-sidebarBg h-[90.9%] overflow-y-scroll scrollbarSB relative z-10 scroll-smooth"> 
         <div className="flex justify-start gap-2 cursor-pointer items-center  px-2 pt-6 left-0 top-0 sticky z-10 bg-sidebarBg  ">
             <LogoIcon dim="40" />
             <div>
@@ -71,7 +71,7 @@ const SideBar = ({setModalNeededBy} : ChildProps) => {
                 </div>
             
         </div>
-        <div className=" fixed left-right bottom-0 w-[18%] py-4 z-20 bg-sidebarBg  border-r-2 border-slate-300">
+        <div className=" fixed left-right bottom-0 w-[18%] py-4 z-20 bg-sidebarBg  border-r-2 border-slate-300 ">
             <ButtonEl onClickHandler={() => setModalNeededBy("logout")}   particularStyle="  h-10 mx-auto " buttonType="primary" placeholder="User Profile"/>           
         </div>
 
