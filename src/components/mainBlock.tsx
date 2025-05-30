@@ -107,7 +107,7 @@ const MainBlock = ({setModalNeededBy, setPopUpLive } : ChildProps) => {
         <div className="flex justify-between gap-4 p-6 left-0 top-0 sticky z-10 items-center bg-gradient-to-b from-mainComponentBg via-mainComponentBg to-transparent">
             <div className="text-5xl text-dashboardHeading font-extrabold cursor-default">Welcome, Aditya Dubey</div>
             <div className="flex justify-around gap-6">
-                <ButtonEl onClickHandler={() => setModalNeededBy("shareBrain")} placeholder="Share Brain" buttonType="secondary" startIcon={<ShareIcon style="size-8.5 " />}></ButtonEl>
+                <ButtonEl onClickHandler={() => setModalNeededBy("shareBrain")} placeholder="Share Brain" particularStyle=" h-14 " buttonType="secondary" startIcon={<ShareIcon style="size-8.5 " />}></ButtonEl>
                 <ButtonEl onClickHandler={() => setModalNeededBy("addContent")} placeholder="Add Content" buttonType="primary" startIcon={<PlusIcon style="size-8.5 " />}></ButtonEl>
                 
             </div>
@@ -115,8 +115,6 @@ const MainBlock = ({setModalNeededBy, setPopUpLive } : ChildProps) => {
         <div  className="flex justify-end mr-7">
             <div className="text-center font-head font-[500] p-4">
                  //NOTE: fixed placing to adjust placement of component irrerspective of other component and along with this using z value to maintain who stays on top of whom when times call for it 
-                 // add delete button functionality and on share button adn function call that saves the link to users clipboard
-                 //understood how to implement tags feature: ui = enter the tags at every enter (or click of add buttons) input box is cleared and a bubble of that tag appears with a cross icon;
                  //at initial fietch req with paginationlimitonl10 cards at a timee; you also get a complete list of all tags prev.used by user and at time of add content browser compares orignal list for old tags and new tags; db only stores tags for specific user(if its toomuch than make user id to tags as array and try n manage) </div>
             <div className="flex items-center justify-around ml-6 w-26 gap-2 rounded-lg "> 
                 <GridIcon dim="50" onClickHandler={() => setLayout("grid")} style={layoutStyle}/> 

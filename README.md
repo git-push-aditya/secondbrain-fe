@@ -1,6 +1,6 @@
 # SecondBrain — Frontend
 
-**SecondBrain** is a second-brain web application that helps users store, organize, and intelligently interact with personal links. This repository contains the **frontend** codebase, designed for a smooth and focused user experience.
+**SecondBrain** is a web application that helps users store, organize, and intelligently interact with personal links. This repository contains the **frontend** codebase, designed for a smooth and focused user experience.
 
 ## ✨ Features
 
@@ -14,5 +14,5 @@
 - **React** with **TypeScript**
 - **Tailwind CSS** for styling
 - **React Router** for page routing
-- **Axios** for API requests
+- **Tanstack Query** for API requests
 - **Context API** for state management

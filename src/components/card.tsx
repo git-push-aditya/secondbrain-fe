@@ -3,6 +3,7 @@ import { InstagramIcon, RedditIcon, TwitterIcon, WebIcon, WebPageDisplay, Youtub
 import { DeleteIcon, ShareIcon } from "../icons/commonIcons";
 import Tag from "./tags"; 
 import { ButtonEl } from "./button";
+import { AnimatePresence, easeInOut, motion } from "framer-motion";
  
 
 export interface cardProp{
@@ -12,7 +13,7 @@ export interface cardProp{
     tags?: {title : string, id: number}[];
     createdAt?: string;
     link : string; 
-    setPopUpLive : React.Dispatch<React.SetStateAction<Boolean>>;
+    setPopUpLive ?: React.Dispatch<React.SetStateAction<Boolean>>;
 }
 
 const minEndingIndex = (link: string) : number=> {
@@ -53,8 +54,7 @@ export const CardElement = ({title,cardType,note,setPopUpLive,tags,createdAt,lin
     const [deletClicked, setDeleteClicked] = useState<Boolean>(false);
     const shareClicked = (link :string ) => {
         navigator.clipboard.writeText(link);
-        setPopUpLive((prev) => !prev);
-
+        setPopUpLive?.((prev) => !prev);
     }
 
     return<div className={defaultStyle}> 
@@ -64,24 +64,32 @@ export const CardElement = ({title,cardType,note,setPopUpLive,tags,createdAt,lin
                     <div className="font-[550] cursor-default font-cardTitleFont text-xl ont-cardTitleHeading ">{title}</div>
                 </div>
                 <div className="flex justify-around gap-4 items-center">
-                    <ShareIcon style="size-7 hover:text-slate-600 transition-hover duration-300 ease-in-out" onClickHandler={() => shareClicked(link)} />
-                    <DeleteIcon  onClickHandler={() => setDeleteClicked((prev) => !prev)} style="size-7.5 hover:text-slate-600 transition-hover duration-300 ease-in-out" />
+                    <ShareIcon style="size-7 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" onClickHandler={() => shareClicked(link)} />
+                    <DeleteIcon  onClickHandler={() => setDeleteClicked((prev) => !prev)} style={`size-7.5 transition-translate duration-300 ease-in-out hover:-translate-y-0.5 ${deletClicked ? " text-red-600 " : " "}`} />
                 </div> 
             </div>
             <div > 
                 <div className= "px-2 max-h-[321px] overflow-y-auto scrollbar-hidden scroll-smooth overscroll-auto relative">
-                    {deletClicked ? <div className="px-2 bg-cardBackground/90 mb-2 h-[75px] text-gray-700 text-center text-xl font-[580] sticky left-0 top-0  ">
-                    Delete this Link ? 
-                        <div className=" flex items-center justify-around gap-4 mb-4">
-                            <ButtonEl onClickHandler={()=> setDeleteClicked((prev) => !prev)} placeholder="Cancel" buttonType={"cardButton"} particularStyle=" hover:bg-green-400 bg-green-300 text-white w-30 h-9 " />  
-                            <ButtonEl onClickHandler={clicked} placeholder="Delete" buttonType={"cardButton"} particularStyle=" text-white hover:bg-red-400 bg-red-300  w-30 h-9 " />     
-                        </div>
-                    </div> : null }
+                    {deletClicked ? <AnimatePresence>
+                        <motion.div key="deletePopUp" 
+                        initial={{y:-40, opacity:0}} 
+                        animate={{y:0, opacity:1}} 
+                        exit={{y:-40, opacity:0}} 
+                        transition={{duration:0.1, ease:"linear"}}  className="mt-1">
+                            <div className="px-5 cursor-pointer bg-red-100 rounded-2xl border-1 border-red-100 h-[62px] text-red-700 px-3 pb-1 pt-1 text-center text-sm font-medium hover:border-red-300 hover:border-1 mb-3 transition-hover duration-200 ease-in-out sticky left-0 top-0 shadow-md ">
+                                <b >Are you sure</b> you want to delete this link? 
+                                <div className=" flex items-center justify-center gap-4 ">
+                                    <ButtonEl onClickHandler={()=> setDeleteClicked((prev) => !prev)} placeholder="Cancel" buttonType={"cardButton"} particularStyle=" bg-green-400 text-white w-23 h-7 " />  
+                                    <ButtonEl onClickHandler={clicked} placeholder="Delete" buttonType={"cardButton"} particularStyle=" text-white bg-red-400  w-23 h-7 " />     
+                                </div>
+                            </div>
+                        </motion.div>
+                    </AnimatePresence> : null }
                 
                     {cardType === "youtube" &&  <iframe  className="w-[99%] mx-auto h-50  rounded-lg  "  title="YouTube video player" src={link.includes('youtu.be') ? link.replace('youtu.be', 'youtube.com/embed') : link}  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe> }
                     
-                    {cardType === 'twitter' && <div className="w-full mb-[-10px] mx-auto"> 
-                            <blockquote className= "twitter-tweet m-0 w-full max-w-full"  >
+                    {cardType === 'twitter' && <div className="w-full mb-[-10px] mt-[-1px] mx-auto"> 
+                            <blockquote className= "twitter-tweet w-full max-w-full"  >
                                 <a href={link.replace('x.com','twitter.com')} target="_blank" rel="noopener noreferrer" > </a>
                             </blockquote> 
                     </div>}

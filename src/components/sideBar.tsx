@@ -33,11 +33,11 @@ const SideBar = ({setModalNeededBy} : ChildProps) => {
         <div >
             <div>
                 <ButtonEl onClickHandler={clicked} startIcon={<Dasboard dim="35" style=" ml-2 " />} particularStyle=" h-8 gap-6" buttonType="sidebar" placeholder="Dashboard"/>
-                <ButtonEl onClickHandler={clicked} startIcon={<YoutubeIcon dim="40" style=" m-0 " />} particularStyle=" h-8 gap-3" buttonType="sidebar" placeholder="YouTube"/>
+                <ButtonEl onClickHandler={clicked} startIcon={<YoutubeIcon dim="40" style=" mx-2 " />} particularStyle=" h-8 gap-3" buttonType="sidebar" placeholder="YouTube"/>
                 <ButtonEl onClickHandler={clicked} startIcon={<TwitterIcon  dim="35" />} particularStyle=" gap-7 h-10 " buttonType="sidebar" placeholder="X"/>
                 <ButtonEl onClickHandler={clicked} startIcon={<RedditIcon dim="40" />} particularStyle=" text-2xl gap-5 h-10  " buttonType="sidebar" placeholder="Reddit"/>
                 <ButtonEl onClickHandler={clicked} startIcon={<InstagramIcon dim="40" />} particularStyle=" text-2xl h-10 py-3 " buttonType="sidebar" placeholder="Instagram"/>
-                <ButtonEl onClickHandler={clicked} startIcon={<WebIcon diml="55" dimb="40" />} particularStyle="  text-2xl h-10 " buttonType="sidebar" placeholder="Webpage"/>
+                <ButtonEl onClickHandler={clicked} startIcon={<WebIcon diml="40" dimb="40" />} particularStyle="  text-2xl h-10 " buttonType="sidebar" placeholder="Webpage"/>
             </div>  
             
                 <div >

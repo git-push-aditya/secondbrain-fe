@@ -2,7 +2,8 @@ import { CopyIcon, CrossIcon, LeftIcon } from "../icons/commonIcons";
 import { ButtonEl } from "./button"; 
 import {motion, AnimatePresence} from "framer-motion";
 import Dropdown from "./dropdown"; 
-import { useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import Tag from "./tags";
 
 interface props{
     cause : "addContent" | "shareBrain" | "logout" |"addCollection"| "addCommunity"|"joinCommunity" |"close";
@@ -37,8 +38,38 @@ const collectionList = ["Dashboard","Food Blogs", "Dev Blogs","politic Blogs","b
 const AddContent = ({closeCard} : cardComponent ) => {
     const [selectedLink,setSelectedLink] =  useState<string>("blank");
     const [selectedCollection,setSelectedCollection] =  useState<string>("blank");
+    const [currentTag ,setCurrentTag] = useState<string>("");
+    const [tagsList, setTagsList] = useState<string[]>([]);
 
-    return <motion.div initial={{y:8,scale:0.99 }} animate={{y:0,scale:1}} exit={{opacity:0}} transition={{ duration: 0.3  }}className={`h-[70%] md:h-[68%] xl:h-[58%] w-[70%] xl:w-[50%] md:w-[60%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB `} >
+
+    const tagsKeyDownHandler = (e:React.KeyboardEvent<HTMLInputElement>) => {
+        if(e.key === 'Enter'){
+            const trimmed = currentTag.trim();
+            if(trimmed !== ''){
+                setTagsList((prev) => [...prev,trimmed]);
+            } 
+            setCurrentTag("");
+        }
+    }
+
+    const deleteTag = useCallback((tag :string) => {
+        setTagsList((prev) => prev.filter((given) => given != tag));
+    },[])
+
+    const renderedTags = useMemo(() => {
+        return tagsList.map((tag) => (
+            <Tag
+                key={tag}
+                name={tag}
+                id={tag}
+                onClickHandler={() => deleteTag(tag)}
+                endIcon={<CrossIcon dim="15" />}
+            />
+        ));
+    }, [tagsList]);
+
+
+    return <motion.div initial={{y:8,scale:0.99 }} animate={{y:0,scale:1}} exit={{opacity:0}} transition={{ duration: 0.3  }} className={`max-h-[70%] md:max-h-[68%] xl:max-h-[100%] w-[70%] xl:w-[50%] md:w-[60%] rounded-3xl bg-modalCard  cursor-default overflow-y-auto scrollbarSB  pb-6`} >
             <div className="flex justify-between mx-8 nd:mx-10 xl:mx-12 mt-10"> 
                 <div className="font-[650]  text-4xl text-modalHead font-inter ">Save a New Link</div>
                 <ButtonEl buttonType=""   onClickHandler={closeCard} startIcon={<CrossIcon dim="40" style="text-gray" />} />
@@ -50,13 +81,22 @@ const AddContent = ({closeCard} : cardComponent ) => {
                 <input type="text" placeholder="Paste link here" className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none"  /> 
                 <input type="text" placeholder="Enter title" className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none"  /> 
                 
-                <textarea placeholder="Note..." className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none"  /> 
+                <textarea placeholder="Note..." className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none overflow-y-auto scrollbarSB"  /> 
 
-                <Dropdown list={linkType} selected={selectedLink} title="Link type" setState={setSelectedLink}/>
+                    <input type="text" placeholder="Enter tags for this post" className="w-[90%] mt-2 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none" value={currentTag} onChange={(e) => setCurrentTag(e.target.value)} onKeyDown={(e) => tagsKeyDownHandler(e)} /> 
 
-                <Dropdown list={collectionList} selected={selectedCollection} title="Collection" setState={setSelectedCollection}/>
+                <div className="mt-1 flex flex-wrap mx-12 gap-2 w-[90%] overflow-y-auto scrollbarSB max-h-[48px]">
+                    {renderedTags}
+                </div>
 
-                <ButtonEl buttonType="primary" onClickHandler={clicked} particularStyle="w-[80%] xl:w-[46%]  font-inter mt-6 h-16 mx-auto font-[550] font-inter " placeholder="Add Link" />
+                <div className="w-[90%] mt-2 mx-auto my-auto flex items-center justify-center">
+                    <Dropdown list={linkType} selected={selectedLink} title="Link type" setState={setSelectedLink}/>
+                </div>
+                <div className="w-[90%] mt-2 mx-auto flex items-center justify-center">
+                    <Dropdown list={collectionList}  selected={selectedCollection} title="Collection" setState={setSelectedCollection}/>
+                </div> 
+
+                <ButtonEl buttonType="primary" onClickHandler={clicked} particularStyle="w-[80%] xl:w-[90%]  font-inter mt-4 h-16 mx-auto font-[550] font-inter " placeholder="Add Link" />
 
 
             </div>
@@ -108,7 +148,7 @@ const AddCollection = ({closeCard} : cardComponent ) => {
  
 const StartCommunity = ({closeCard} : cardComponent ) => {
     const [allowMessage,setAllowMessage] = useState<Boolean>(false);
-    const [allowPost,setAllowPost] = useState<Boolean>(false);
+    const [allowPost,setAllowPost] = useState<boolean | undefined>(false);
     const [communityName,setcommunityName] = useState<string>("");
     const [communityDesc, setcommunityDesc] = useState<string>("");
     const [founderEmail,setfounderEmail] = useState<string>("");
@@ -217,21 +257,7 @@ const JoinCommunity = ({closeCard} : cardComponent ) => {
             <ButtonEl buttonType="primary" onClickHandler={clicked} particularStyle="w-[85%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter " placeholder="Join Community"  />
         </motion.div>  
 }
+ 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-export default Modal;
-
+export default Modal; 

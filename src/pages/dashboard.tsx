@@ -21,7 +21,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         if(popUpLive){
-            const counter = setTimeout(() => {setPopUpLive(false); console.log("tik")}, 10000);
+            const counter = setTimeout(() => {setPopUpLive(false); console.log("tik")}, 3000);
             return () => clearInterval(counter);
         }
     }, [popUpLive])
@@ -29,7 +29,7 @@ const Dashboard = () => {
     return<>
         <div className="flex h-screen w-screen">
             {modalNeeded !== "close" && <AnimatePresence><Modal cause={modalNeeded} closeModal={closeModal}  /></AnimatePresence>}
-            {popUpLive && <PopUp placeholder="Link coppied to clipboard!!" />} 
+            {popUpLive && <AnimatePresence><PopUp placeholder="Link coppied to clipboard!!" /></AnimatePresence>} 
             <SideBar setModalNeededBy={setModalNeededBy} />
             
             <MainBlock setModalNeededBy={setModalNeededBy} popUpLive={popUpLive} setPopUpLive={setPopUpLive} />
