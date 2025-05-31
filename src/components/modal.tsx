@@ -22,14 +22,19 @@ const clicked = () => {
 
 
 const Modal = ({ cause, closeModal }: props) => {
-    return <AnimatePresence><motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, ease: 'circIn' }} className="h-screen w-screen  backdrop-blur-xs bg-[rgba(0,0,0,0.5)] fixed z-20 top-0 left-0 flex justify-center items-center" >
+    return <motion.div 
+    initial={{ opacity: 0 }} 
+    animate={{ opacity: 1 }} 
+    exit={{opacity:0}}
+    transition={{ duration: 0.3, ease: 'circIn' }} 
+    className="h-screen w-screen  backdrop-blur-xs bg-[rgba(0,0,0,0.5)] fixed z-20 top-0 left-0 flex justify-center items-center" >
         {cause == "addContent" && <AddContent closeCard={closeModal} />}
         {cause == "shareBrain" && <ShareBrain cause={cause} closeCard={closeModal} />}
         {cause == "logout" && <Logout closeCard={closeModal} />}
         {cause == "addCommunity" && <StartCommunity closeCard={closeModal} />}
         {cause == "addCollection" && <AddCollection closeCard={closeModal} />}
         {cause == "joinCommunity" && <JoinCommunity closeCard={closeModal} />}
-    </motion.div></AnimatePresence>
+    </motion.div>
 }
 
 const linkType = ["Web", "Youtube", "X", "Reddit", "Instagram", "blank"];
@@ -69,10 +74,10 @@ const AddContent = ({ closeCard }: cardComponent) => {
     }, [tagsList]);
 
 
-    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className={`max-h-[70%] md:max-h-[68%] xl:max-h-[100%] w-[70%] xl:w-[50%] md:w-[60%] rounded-3xl bg-modalCard  cursor-default overflow-y-auto scrollbarSB  pb-6`} >
-        <div className="flex justify-between mx-8 nd:mx-10 xl:mx-12 mt-10">
+    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} exit={{ y:8,opacity: 0 }} transition={{ duration: 0.1 }} className={`max-h-[70%] md:max-h-[68%] xl:max-h-[100%] w-[70%] xl:w-[50%] md:w-[60%] rounded-3xl bg-modalCard  cursor-default overflow-y-auto scrollbarSB  pb-6`} >
+        <div className="flex justify-between items-center mx-8 nd:mx-10 xl:mx-12 mt-10">
             <div className="font-[650]  text-4xl text-modalHead font-inter ">Save a New Link</div>
-            <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="40" style="text-gray" />} />
+            <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2" />} />
         </div>
         <div className="mt-3 text-center text-xl mx-12  font-[450] text-gray-500">
             Paste a link you want to save or share with your Second Brain.
@@ -106,9 +111,9 @@ const AddContent = ({ closeCard }: cardComponent) => {
 const ShareBrain = ({ closeCard }: cardComponent) => {
 
     return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} transition={{ duration: 0.2 }} className={`h-[65%] md:h-[57%] xl:h-[42%] w-[70%] xl:w-[40%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB `} >
-        <div className="flex justify-between mx-8 md:mx-10 xl:mx-12 mt-10">
+        <div className="flex justify-between items-center mx-8 md:mx-10 xl:mx-12 mt-10">
             <div className="font-[650]  text-3xl text-modalHead font-inter ">Share your Second Brain</div>
-            <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="40" style="text-gray" />} />
+            <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2" />} />
         </div>
         <div className="  mt-6 xl:mt-7 md:mt-6  xl:text-2xl text-justify  text-xl mx-12  font-[450] text-gray-500">
             Share your entire collection of posts, blogs, tweets, and videos with others. They'll be able to import your content into their own Second Brain.
@@ -131,9 +136,9 @@ const Logout = ({ closeCard }: cardComponent) => {
 const AddCollection = ({ closeCard }: cardComponent) => {
 
     return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} transition={{ duration: 0.3 }} className={`h-[65%] md:h-[57%] xl:h-[48%] w-[70%] xl:w-[38%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB `} >
-        <div className="flex justify-between mx-8 nd:mx-10 xl:mx-12 mt-8">
+        <div className="flex justify-between items-center mx-8 nd:mx-10 xl:mx-12 mt-8">
             <div className="font-[650]  text-3xl text-modalHead font-inter ">Start a new collection</div>
-            <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="40" style="text-gray" />} />
+            <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2" />} />
         </div>
         <div className="  mt-6 text-lg mx-12  font-[450] text-gray-500">
             Organize related links under one collection. Perfect for keeping your research or ideas grouped together.

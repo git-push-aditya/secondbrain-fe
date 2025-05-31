@@ -28,8 +28,10 @@ const Dashboard = () => {
 
     return<>
         <div className="flex h-screen w-screen">
-            {modalNeeded !== "close" && <AnimatePresence><Modal cause={modalNeeded} closeModal={closeModal}  /></AnimatePresence>}
-            {popUpLive && <AnimatePresence><PopUp placeholder="Link coppied to clipboard!!" /></AnimatePresence>} 
+            <AnimatePresence>
+                {modalNeeded !== "close" && <Modal cause={modalNeeded} closeModal={closeModal}  />}
+                {popUpLive && <PopUp placeholder="Link coppied to clipboard!!" />} 
+            </AnimatePresence>
             <SideBar setModalNeededBy={setModalNeededBy} />
             
             <MainBlock setModalNeededBy={setModalNeededBy} popUpLive={popUpLive} setPopUpLive={setPopUpLive} />

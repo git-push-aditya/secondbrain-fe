@@ -15,7 +15,7 @@ export interface cardProp {
     createdAt?: string;
     link: string;
     setPopUpLive?: React.Dispatch<React.SetStateAction<Boolean>>;
-    layout : "grid" | "list";
+    layout: "grid" | "list";
 }
 
 
@@ -23,24 +23,26 @@ const clicked = () => {
     alert("clikced");
 }
 
+
 const typeIcon: { [key: string]: ReactElement } = {
     'twitter': <TwitterIcon dim="45" />,
     'youtube': <YoutubeIcon dim="60" />,
-    'web': <WebIcon diml="60" dimb="50" />,
     'reddit': <RedditIcon dim="50" />,
-    'instagram': <InstagramIcon dim="50" />
+    'instagram': <InstagramIcon dim="50" />,
+    'web': <WebIcon diml="60" dimb="50" />
 }
 
-interface layoutCard extends cardProp{
-    deletClicked : Boolean;
-    setDeleteClicked : React.Dispatch<React.SetStateAction<Boolean>>;
-    shareClicked : (link:string) => void;
+
+interface layoutCard extends cardProp {
+    deletClicked: Boolean;
+    setDeleteClicked: React.Dispatch<React.SetStateAction<Boolean>>;
+    shareClicked: (link: string) => void;
 }
 
 
 const defaultStyle: string = "w-88 font-source hover:border-slate-500  transition-hover duration-300 max-h-145  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md ";
 
-export const CardElement = ({ title, cardType, layout,note, setPopUpLive, tags, createdAt, link }: cardProp) => {
+export const CardElement = ({ title, cardType, layout, note, setPopUpLive, tags, createdAt, link }: cardProp) => {
 
     const [deletClicked, setDeleteClicked] = useState<Boolean>(false);
     const shareClicked = (link: string) => {
@@ -48,18 +50,24 @@ export const CardElement = ({ title, cardType, layout,note, setPopUpLive, tags, 
         setPopUpLive?.((prev) => !prev);
     }
 
-    return layout === "grid" ? 
-        <GridStyle title={title} cardType={cardType} note={note} setPopUpLive={setPopUpLive} tags={tags} createdAt={createdAt} link={link} layout={"grid"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} shareClicked={shareClicked} /> 
-            : 
-        <AnimatePresence> <ListStyle title={title} cardType={cardType} note={note} setPopUpLive={setPopUpLive} tags={tags} createdAt={createdAt} link={link} layout={"list"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} shareClicked={shareClicked} /></AnimatePresence> 
+    return layout === "grid" ?
+        <GridStyle title={title} cardType={cardType} note={note} setPopUpLive={setPopUpLive} tags={tags} createdAt={createdAt} link={link} layout={"grid"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} shareClicked={shareClicked} />
+        :
+        <AnimatePresence> <ListStyle title={title} cardType={cardType} note={note} setPopUpLive={setPopUpLive} tags={tags} createdAt={createdAt} link={link} layout={"list"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} shareClicked={shareClicked} /></AnimatePresence>
 
 }
 
 
 
-const GridStyle =({ title,deletClicked,setDeleteClicked,shareClicked ,cardType, note, setPopUpLive, tags, createdAt, link }: layoutCard) => { 
+const GridStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardType, note, setPopUpLive, tags, createdAt, link }: layoutCard) => {
 
-    return <div className={defaultStyle}>
+    return <motion.div
+        key={"listCard"}
+        initial={{ y: 8, opacity: 0 }}
+        animate={{ y: 0, x: 0, opacity: 1 }}
+        exit={{ x: -10, opacity: 0 }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
+        ><div className={defaultStyle}>
         <div className="flex justify-between gap-2 px-6 pt-1" >
             <div className="flex justify-around gap-2 items-center">
                 {typeIcon[cardType]}
@@ -124,7 +132,7 @@ const GridStyle =({ title,deletClicked,setDeleteClicked,shareClicked ,cardType, 
                     </div>
                 }
 
-                {note && <div className="px-2 cursor-default font-sans font-[440] text-slate-700 text-xl pt-4 px-3 text-justify">
+                {note && <div className="px-2 cursor-default font-sans font-[440] text-slate-500 text-xl pt-4 px-3 text-justify">
                     {note}
                 </div>}
 
@@ -137,37 +145,75 @@ const GridStyle =({ title,deletClicked,setDeleteClicked,shareClicked ,cardType, 
             <div className="px-6 mb-4 cursor-default text-lg font-[400] text-slate-500">Added on {createdAt}</div>
         </div>
     </div>
+    </motion.div>
 }
 
 
 
 
 
-const ListStyle =({ title,deletClicked,setDeleteClicked,shareClicked ,cardType, note, setPopUpLive, tags, createdAt, link }:layoutCard ) => {
-    return <motion.div 
-            key={"listCard"}    
-            initial={{y:8, opacity:0}}
-            animate={{y:0,x:0,opacity: 1}}
-            exit={{x:-10, opacity:0}}
-            transition={{duration:0.4, ease:"easeInOut"}}
-            className="w-[94%] h-[80px] flex gap-3 items-center mt-4 mx-auto hover:border-slate-500 transition-hover cursor-default duration-300 bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md pl-3"
+const ListStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardType, note, setPopUpLive, tags, createdAt, link }: layoutCard) => {
+    return <motion.div
+        key={"listCard"}
+        initial={{ y: 8, opacity: 0 }}
+        animate={{ y: 0, x: 0, opacity: 1 }}
+        exit={{ x: -10, opacity: 0 }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
+        className="w-[95%] h-[80px] flex items-center mt-4 mx-auto hover:border-slate-500 transition-hover cursor-default duration-300 bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md pl-3"
 
-        >
-            <div className="flex items-center w-[6%] justify-center">
-                {typeIcon[cardType]}
-            </div>
-            <div className=" w-[70%] h-full ">
-                <div className="w-[50%]  pt-2 font-cardTitleHeading truncate h-[60%] flex items-center text-2xl text-cardTitle font-[500] ">
-                    {title}
+    >
+        <div className="flex  items-center w-[5%] justify-center">
+            {typeIcon[cardType]}
+        </div>
+        <div className=" w-[70%] h-full pl-1">
+            <div className="w-[100%] flex h-[60%] gap-10 items-center">
+                <div className="max-w-[50%] pt-2 font-cardTitleHeading h-[100%] flex items-center text-2xl text-cardTitle font-[500] ">
+                    <span className="truncate w-full">{title}</span>
                 </div>
-                <div className="w-[90%]  truncate">
-                    {note}
+                <div className="max-w-[50%] overflow-x-auto scrollbar-hidden pt-2 flex gap-2 items-center">
+                    <Tag style=" h-7 " name="science" id="hehe" />
+                    <Tag style=" h-7 " name="science and technology" id="hehe" />
+                    <Tag style=" h-7 " name="Freelance" id="hehe" />
+                    <Tag style=" h-7 " name="..." id="hehe" />
                 </div>
             </div>
-            <div className=" flex w-[20%] justify-around items-center h-full gap-2">
-                {<ShareIcon style="size-8 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" onClickHandler={() => shareClicked(link)} />}
-                {<DeleteIcon onClickHandler={() => setDeleteClicked((prev) => !prev)} style={`size-8.5 transition-translate duration-300 ease-in-out hover:-translate-y-0.5 ${deletClicked ? " text-red-600 " : " "}`} />}
-                {<RedirectIcon style="size-8 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" link={link} />}
+
+            <div className="w-[100%] h-[40%] truncate font-sans font-[440] text-slate-600  text-md ">
+                {note}
             </div>
-        </motion.div> 
+        </div>
+        <div className=" cursor-default w-[10%] text-md text-center text-clamp-2 font-[500] text-slate-500">
+            Added on {createdAt}
+        </div>
+        <AnimatePresence mode="wait">
+            {deletClicked ? <motion.div key="deletePopUp"
+                initial={{ x: 20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 20, opacity: 0 }}
+                transition={{ duration: 0.2 }} className=" w-[15%] h-full"><div className=" cursor-pointer bg-red-100 rounded-2xl w-full border-1 border-red-100 h-full text-red-700 text-center text-sm hover:border-red-300 hover:border-1  transition-hover duration-200 ease-in-out  shadow-md font[300]">
+                    <b >Are you sure</b> you want to delete this link?
+                    <div className=" flex items-center justify-center gap-4 ">
+                        <ButtonEl onClickHandler={() => setDeleteClicked((prev) => !prev)} placeholder="Cancel" buttonType={"cardButton"} particularStyle=" bg-green-400 text-white w-20 h-6 text-sm " />
+                        <ButtonEl onClickHandler={clicked} placeholder="Delete" buttonType={"cardButton"} particularStyle=" text-white bg-red-400 text-sm w-20 h-6 " />
+                    </div>
+                </div>  </motion.div>
+                    : 
+                <motion.div
+                    key="icons"
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: -20, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex w-[15%] justify-around items-center h-full"
+                    >
+                    {<ShareIcon 
+                        layout={"list"} style="size-8 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" onClickHandler={() => shareClicked(link)} />}
+                    {<DeleteIcon 
+                        layout={"list"} onClickHandler={() => setDeleteClicked((prev) => !prev)} style={`size-8.5 transition-translate duration-300 ease-in-out hover:-translate-y-0.5 ${deletClicked ? " text-red-600 " : " "}`} />}
+                    {<RedirectIcon 
+                        layout={"list"} style="size-8 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" link={link} />}
+                </motion.div>
+            } 
+        </AnimatePresence>
+    </motion.div>
 }
