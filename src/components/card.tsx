@@ -15,7 +15,7 @@ export interface cardProp {
     createdAt?: string;
     link: string;
     setPopUpLive?: React.Dispatch<React.SetStateAction<Boolean>>;
-    layout: "grid" | "list";
+    layout?: "grid" | "list";
 }
 
 
@@ -68,10 +68,10 @@ const GridStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardTy
         exit={{ x: -10, opacity: 0 }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
         ><div className={defaultStyle}>
-        <div className="flex justify-between gap-2 px-6 pt-1" >
+        <div className="flex justify-between gap-2 px-6 mt-1 pt-1" >
             <div className="flex justify-around gap-2 items-center">
                 {typeIcon[cardType]}
-                <div className="font-[650] cursor-default text-cardTitle text-xl font-cardTitleHeading ">{title}</div>
+                <div className="font-[650] line-clamp-2 cursor-default text-cardTitle text-xl font-cardTitleHeading ">{title}</div>
             </div>
             <div className="flex justify-around gap-4 items-center">
                 <ShareIcon style="size-7 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" onClickHandler={() => shareClicked(link)} />
@@ -80,7 +80,7 @@ const GridStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardTy
         </div>
         <div >
             <div className="px-2 max-h-[321px] overflow-y-auto scrollbar-hidden scroll-smooth overscroll-auto relative">
-                {deletClicked ? <AnimatePresence>
+                <AnimatePresence mode="wait"> {deletClicked ? 
                     <motion.div key="deletePopUp"
                         initial={{ y: -40, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
@@ -94,7 +94,7 @@ const GridStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardTy
                             </div>
                         </div>
                     </motion.div>
-                </AnimatePresence> : null}
+                 : null}</AnimatePresence>
 
                 {cardType === "youtube" && <iframe className="w-[99%] mx-auto h-50  rounded-lg  " title="YouTube video player" src={link.includes('youtu.be') ? link.replace('youtu.be', 'youtube.com/embed') : link} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>}
 
@@ -105,7 +105,7 @@ const GridStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardTy
                 </div>}
 
                 {cardType === 'reddit' && <>
-                    <div className="" >
+                    <div className=" mt-2 " >
                         <blockquote className="reddit-embed-bq">
                             <a href={link}></a>
                         </blockquote>
@@ -113,7 +113,7 @@ const GridStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardTy
                 </>}
 
                 {cardType === 'instagram' &&
-                    <div className="flex justify-center mb-[-8px]">
+                    <div className="flex justify-center mt-2 overflow-hidden rounded-2xl  border-1 border-slate-200 mb-[-8px]">
                         <blockquote className="instagram-media w-full max-w-full " data-instgrm-permalink={link} data-instgrm-version="14">
                             <a href={!link.includes('embed&amp;utm_campaign=loading') ? link.replace('web_copy_link', 'embed&amp;utm_campaign=loading') : link}></a>
                         </blockquote>

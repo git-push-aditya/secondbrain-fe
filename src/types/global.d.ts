@@ -7,5 +7,10 @@ declare global {
         load: () => void; 
       };
     };
+    instgrm: {
+      Embeds: {
+        process: () => void;
+      };
+    };
   }
 }
