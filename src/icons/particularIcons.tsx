@@ -8,7 +8,7 @@ export interface genIconStyle{
 
 
 
-export const LogoIcon = ({dim} : {dim : string} ) => {
+export const LogoIcon = ({dim,style} : genIconStyle ) => {
   return (
     <div><svg
       viewBox="0 0 56 56"
@@ -16,7 +16,7 @@ export const LogoIcon = ({dim} : {dim : string} ) => {
       fill="currentColor"
       stroke="currentColor"
       width={dim} height={dim}
-      className={'m-2 w-24 h-24 text-black  cursor-pointer'}
+      className={`m-2 w-24 h-24 text-black  cursor-pointer ${style}`}
     >
       <g>
         <path

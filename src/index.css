@@ -1,10 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,100..900;1,100..900&family=Donegal+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap');
 @font-face {
   font-family: Source-Sans-3;
   src : url('/src/assets/fonts/SourceSans3-SemiBold.ttf')
 }
- 
+
+
+
 @import "tailwindcss";
 
 @theme {
@@ -20,7 +23,8 @@
     --font-inter : Inter , "sans-serif";
     --font-cardTitleHeading : "Source-Sans-3", "sans-serif";
     --font-head: Bitter, "sans-serif";
-    
+    --font-subHead :"LibreBaskerville", serif;
+
     --color-sidebarBg : #F5F5F6;
     --color-secondBrainHeading: #2A2E40; 
     --color-sidebarTabHeading : #666E77;

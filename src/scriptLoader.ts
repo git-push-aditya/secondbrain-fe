@@ -28,28 +28,18 @@ export function loadTwitterScript () : Promise<void> {
 }
 
 
-let redditScriptloaded = false;
-
 export const redditScriptLoader = () : Promise<void>=> {
-    return new Promise((resolve, reject) => {
-        if(redditScriptloaded || document.getElementById('reddit-wjs') ){
-            resolve();
-            return;
-        } 
-
-        const script = document.createElement('script') as HTMLScriptElement;
+    return new Promise((resolve, reject) => { 
+        const script = document.createElement('script');
+        script.src = 'https://embed.reddit.com/widgets.js';
         script.async = true;
         script.id = 'reddit-wjs';
-        script.src = "https://embed.reddit.com/widgets.js"
-        script.charset ='utf-8';
+        script.charset = 'utf-8';
 
-        script.onload = () => {
-            redditScriptloaded = true;
-            resolve();
-        };
-        script.onerror = reject;
+        const oldScript = document.getElementById('reddit-wjs');
+        if (oldScript) oldScript.remove();
+
         document.body.appendChild(script);
-        console.log('script appended : ',script);
     })
 }
 

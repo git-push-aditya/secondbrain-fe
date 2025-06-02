@@ -96,7 +96,7 @@ const GridStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardTy
                     </motion.div>
                  : null}</AnimatePresence>
 
-                {cardType === "youtube" && <iframe className="w-[99%] mx-auto h-50  rounded-lg  " title="YouTube video player" src={link.includes('youtu.be') ? link.replace('youtu.be', 'youtube.com/embed') : link} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>}
+                {cardType === "youtube" && <iframe className="w-[99%] mx-auto h-50 mt-2 rounded-lg  " title="YouTube video player" src={link.includes('youtu.be') ? link.replace('youtu.be', 'youtube.com/embed') : link} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>}
 
                 {cardType === 'twitter' && <div className="w-full mb-[-10px] mt-[-1px] mx-auto">
                     <blockquote className="twitter-tweet w-full max-w-full"  >
@@ -159,7 +159,7 @@ const ListStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardTy
         animate={{ y: 0, x: 0, opacity: 1 }}
         exit={{ x: -10, opacity: 0 }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
-        className="w-[95%] h-[80px] flex items-center mt-4 mx-auto hover:border-slate-500 transition-hover cursor-default duration-300 bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md pl-3"
+        className={`w-[100%] h-[80px] flex items-center mt-4 mx-auto hover:border-slate-500 transition-hover cursor-default duration-300 bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md pl-3`}
 
     >
         <div className="flex  items-center w-[5%] justify-center">
