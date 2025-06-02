@@ -25,6 +25,9 @@
     --font-head: Bitter, "sans-serif";
     --font-subHead :"LibreBaskerville", serif;
 
+    --breakpoint-sharedBp2xl: 107rem;
+    --breakpoint-sharedBplg: 76.875rem;
+
     --color-sidebarBg : #F5F5F6;
     --color-secondBrainHeading: #2A2E40; 
     --color-sidebarTabHeading : #666E77;
@@ -43,6 +46,19 @@
     --color-modalCard : #EDEDED;
     --color-modalHead: #2E394A;
 }
+
+@layer utilities {
+  .text-gradient {
+    color: #E6EBEB;
+    background-image: linear-gradient(45deg, #063e7b 2%, #000000 10%, #110C36 40%, #14205b 70%, #063e7b 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+
+
  
 .scrollbar-hidden {
     scrollbar-width: none;  

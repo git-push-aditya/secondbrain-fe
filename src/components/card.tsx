@@ -16,6 +16,7 @@ export interface cardProp {
     link: string;
     setPopUpLive?: React.Dispatch<React.SetStateAction<Boolean>>;
     layout?: "grid" | "list";
+    shared : boolean;       //shared refers to if user is accessign someones'shared brain page via generated public link
 }
 
 
@@ -40,9 +41,9 @@ interface layoutCard extends cardProp {
 }
 
 
-const defaultStyle: string = "w-88 font-source hover:border-slate-500  transition-hover duration-300 max-h-145  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md ";
 
-export const CardElement = ({ title, cardType, layout, note, setPopUpLive, tags, createdAt, link }: cardProp) => {
+
+export const CardElement = ({ title,shared, cardType, layout, note, setPopUpLive, tags, createdAt, link }: cardProp) => {
 
     const [deletClicked, setDeleteClicked] = useState<Boolean>(false);
     const shareClicked = (link: string) => {
@@ -51,15 +52,18 @@ export const CardElement = ({ title, cardType, layout, note, setPopUpLive, tags,
     }
 
     return layout === "grid" ?
-        <GridStyle title={title} cardType={cardType} note={note} setPopUpLive={setPopUpLive} tags={tags} createdAt={createdAt} link={link} layout={"grid"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} shareClicked={shareClicked} />
+        <GridStyle shared={shared} title={title} cardType={cardType} note={note} setPopUpLive={setPopUpLive} tags={tags} createdAt={createdAt} link={link} layout={"grid"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} shareClicked={shareClicked} />
         :
-        <AnimatePresence> <ListStyle title={title} cardType={cardType} note={note} setPopUpLive={setPopUpLive} tags={tags} createdAt={createdAt} link={link} layout={"list"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} shareClicked={shareClicked} /></AnimatePresence>
+         <ListStyle shared={shared} title={title} cardType={cardType} note={note} setPopUpLive={setPopUpLive} tags={tags} createdAt={createdAt} link={link} layout={"list"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} shareClicked={shareClicked} />
 
 }
 
 
 
-const GridStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardType, note, setPopUpLive, tags, createdAt, link }: layoutCard) => {
+const GridStyle = ({ title,shared, deletClicked, setDeleteClicked, shareClicked, cardType, note, setPopUpLive, tags, createdAt, link }: layoutCard) => {
+
+    const defaultStyle: string = `${ !shared ? "w-88" : " w-85 overflow-x-hidden "}   ${cardType == 'reddit' ? " hover:border-orange-600 " : cardType == "twitter" ? " hover:border-blue-800" : cardType == "youtube" ? " hover:border-red-700 "  : cardType == "instagram" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 max-h-145  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md`;
+
 
     return <motion.div
         key={"listCard"}
@@ -67,6 +71,7 @@ const GridStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardTy
         animate={{ y: 0, x: 0, opacity: 1 }}
         exit={{ x: -10, opacity: 0 }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
+        className={`${shared ? " hover:scale-101 transition-hover duration-150 ease-in-out hover:sahdow-lg" : " "}`}
         ><div className={defaultStyle}>
         <div className="flex justify-between gap-2 px-6 mt-1 pt-1" >
             <div className="flex justify-around gap-2 items-center">
@@ -75,7 +80,7 @@ const GridStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardTy
             </div>
             <div className="flex justify-around gap-4 items-center">
                 <ShareIcon style="size-7 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" onClickHandler={() => shareClicked(link)} />
-                <DeleteIcon onClickHandler={() => setDeleteClicked((prev) => !prev)} style={`size-7.5 transition-translate duration-300 ease-in-out hover:-translate-y-0.5 ${deletClicked ? " text-red-600 " : " "}`} />
+                {!shared && <DeleteIcon onClickHandler={() => setDeleteClicked((prev) => !prev)} style={`size-7.5 transition-translate duration-300 ease-in-out hover:-translate-y-0.5 ${deletClicked ? " text-red-600 " : " "}`} />}
             </div>
         </div>
         <div >
@@ -137,12 +142,12 @@ const GridStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardTy
                 </div>}
 
             </div>
-            <div className="flex items-center gap-2 justify-center my-3">
+            <div className="flex items-center gap-2 justify-center m-3">
                 <Tag name="science" id="hehe" />
                 <Tag name="science and technology" id="hehe" />
                 <Tag name="..." id="hehe" />
             </div>
-            <div className="px-6 mb-4 cursor-default text-lg font-[400] text-slate-500">Added on {createdAt}</div>
+            {!shared && <div className="px-6 mb-4 cursor-default text-lg font-[400] text-slate-500">Added on {createdAt}</div>}
         </div>
     </div>
     </motion.div>
@@ -152,14 +157,14 @@ const GridStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardTy
 
 
 
-const ListStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardType, note, setPopUpLive, tags, createdAt, link }: layoutCard) => {
+const ListStyle = ({ title,shared, deletClicked, setDeleteClicked, shareClicked, cardType, note, setPopUpLive, tags, createdAt, link }: layoutCard) => {
     return <motion.div
         key={"listCard"}
         initial={{ y: 8, opacity: 0 }}
         animate={{ y: 0, x: 0, opacity: 1 }}
         exit={{ x: -10, opacity: 0 }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
-        className={`w-[100%] h-[80px] flex items-center mt-4 mx-auto hover:border-slate-500 transition-hover cursor-default duration-300 bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md pl-3`}
+        className={`w-[100%] h-[80px] flex items-center mt-4 mx-auto transition-hover cursor-default duration-300  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md pl-3 ${shared ? " hover:scale-101 transition-hover duration-150 ease-in-out hover:sahdow-lg" : " "}  ${cardType == 'reddit' ? " hover:border-orange-600 " : cardType == "twitter" ? " hover:border-blue-800" : cardType == "youtube" ? " hover:border-red-700 "  : cardType == "instagram" ? " hover:border-[#bc1888] " : " hover:border-slate-500"}`}
 
     >
         <div className="flex  items-center w-[5%] justify-center">
@@ -204,14 +209,14 @@ const ListStyle = ({ title, deletClicked, setDeleteClicked, shareClicked, cardTy
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: -20, opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="flex w-[15%] justify-around items-center h-full"
+                    className={`flex w-[15%] ${!shared ? " justify-around" : " justify-center gap-12" } items-center h-full`}
                     >
-                    {<ShareIcon 
-                        layout={"list"} style="size-8 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" onClickHandler={() => shareClicked(link)} />}
-                    {<DeleteIcon 
+                    <ShareIcon 
+                        layout={"list"} style="size-8 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" onClickHandler={() => shareClicked(link)} />
+                    {!shared && <DeleteIcon 
                         layout={"list"} onClickHandler={() => setDeleteClicked((prev) => !prev)} style={`size-8.5 transition-translate duration-300 ease-in-out hover:-translate-y-0.5 ${deletClicked ? " text-red-600 " : " "}`} />}
-                    {<RedirectIcon 
-                        layout={"list"} style="size-8 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" link={link} />}
+                    <RedirectIcon 
+                        layout={"list"} style="size-8 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" link={link} />
                 </motion.div>
             } 
         </AnimatePresence>

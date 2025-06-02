@@ -26,7 +26,7 @@ const Dashboard = ({popUpLive, setPopUpLive,layout,setLayout}:{popUpLive:Boolean
 
     return<>
         <div className="flex h-screen w-screen">
-            <AnimatePresence>
+            <AnimatePresence mode="wait">
                 {modalNeeded !== "close" && <Modal cause={modalNeeded} closeModal={closeModal}  />}
                 {popUpLive && <PopUp placeholder="Link coppied to clipboard!!" />} 
             </AnimatePresence>
