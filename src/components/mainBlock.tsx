@@ -7,6 +7,14 @@ import { GridIcon, ListIcon, PlusIcon ,ShareIcon} from "../icons/commonIcons";
 import type { ChildProps } from "../pages/dashboard";
 
 
+/* 
+<div className="text-center font-head font-[500] p-4">
+                 //NOTE: fixed placing to adjust placement of component irrerspective of other component and along with this using z value to maintain who stays on top of whom when times call for it 
+                 //at initial fietch req with paginationlimitonl10 cards at a timee; you also get a complete list of all tags prev.used by user and at time of add content browser compares orignal list for old tags and new tags; db only stores tags for specific user(if its toomuch than make user id to tags as array and try n manage) 
+                 //optimize / cache the twitter reddit so that is stays on unmount or something</div>
+*/
+
+
 const MainBlock = ({setModalNeededBy, setPopUpLive, layout,setLayout} : ChildProps) => {
     const [tweetCount, setTweetCount] = useState<number>(0);//no. of tweets card among all cards
     const [tweetScriptNeeded,setTweetScriptNeeded] = useState<boolean>(false);   // if tweets needed
@@ -26,23 +34,20 @@ const MainBlock = ({setModalNeededBy, setPopUpLive, layout,setLayout} : ChildPro
 
 
     
-    const layoutStyle = "hover:bg-[#F5F5F6] rounded-lg p-2  cursor-pointer";
+    const layoutStyle = "hover:bg-[#F5F5F6] transition-hover duration-150 ease-in-out rounded-lg p-2  cursor-pointer";
     
     return<div className="bg-mainComponentBg z-10 flex-1 pb-20 relative h-full overflow-y-auto scrollbarMC">
                 
         <div className="flex justify-between gap-4 p-6 left-0 top-0 sticky z-10 items-center bg-gradient-to-b from-mainComponentBg via-mainComponentBg to-transparent">
-            <div className="text-5xl text-dashboardHeading font-extrabold cursor-default">Welcome, Aditya Dubey</div>
+            <div className="xl:text-5xl md:text-3xl text-xl  font-dashboardHeading font-extrabold cursor-default line-colaps-2 text-4xl font-bold text-gradient  ">Welcome, Aditya Dubey</div>
             <div className="flex justify-around gap-6">
                 <ButtonEl onClickHandler={() => setModalNeededBy("shareBrain")} placeholder="Share Brain" particularStyle=" h-14 " buttonType="secondary" startIcon={<ShareIcon style="size-8.5 " />}></ButtonEl>
                 <ButtonEl onClickHandler={() => setModalNeededBy("addContent")} placeholder="Add Content" buttonType="primary" startIcon={<PlusIcon style="size-8.5 " />}></ButtonEl>
                 
             </div>
         </div> 
-        <div  className="flex justify-end mr-7">
-            <div className="text-center font-head font-[500] p-4">
-                 //NOTE: fixed placing to adjust placement of component irrerspective of other component and along with this using z value to maintain who stays on top of whom when times call for it 
-                 //at initial fietch req with paginationlimitonl10 cards at a timee; you also get a complete list of all tags prev.used by user and at time of add content browser compares orignal list for old tags and new tags; db only stores tags for specific user(if its toomuch than make user id to tags as array and try n manage) 
-                 //optimize / cache the twitter reddit so that is stays on unmount or something</div>
+        <div  className="flex justify-tsart ml-7">
+            
             <div className="flex items-center justify-around ml-6 w-26 gap-2 rounded-lg "> 
                 <GridIcon dim="50" onClickHandler={() => setLayout?.("grid")} style={layoutStyle}/> 
                 <ListIcon dim="50" onClickHandler={() => setLayout?.("list")} style={layoutStyle} />

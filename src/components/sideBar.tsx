@@ -19,7 +19,7 @@ const SideBar = ({setModalNeededBy} : ChildProps) => {
     }
 
 
-    return <div className="w-[18%] border-r-2 border-slate-300 bg-sidebarBg h-[90.9%] overflow-y-scroll scrollbarSB relative z-10 scroll-smooth"> 
+    return <div className="w-[18%] border-r-2 border-slate-300 bg-sidebarBg h-[90.9%] overflow-y-scroll overflow-x-hidden scrollbarSB relative z-10 scroll-smooth"> 
         <div className="flex justify-start gap-2 cursor-pointer items-center  px-2 pt-6 left-0 top-0 sticky z-10 bg-sidebarBg  ">
             <LogoIcon dim="40" />
             <div>
@@ -32,12 +32,12 @@ const SideBar = ({setModalNeededBy} : ChildProps) => {
         
         <div >
             <div>
-                <ButtonEl onClickHandler={clicked} startIcon={<Dasboard dim="35" style=" ml-2 " />} particularStyle=" h-8 gap-6" buttonType="sidebar" placeholder="Dashboard"/>
-                <ButtonEl onClickHandler={clicked} startIcon={<YoutubeIcon dim="40" style=" mx-2 " />} particularStyle=" h-8 gap-3" buttonType="sidebar" placeholder="YouTube"/>
-                <ButtonEl onClickHandler={clicked} startIcon={<TwitterIcon  dim="35" />} particularStyle=" gap-7 ml-2 h-10 " buttonType="sidebar" placeholder="X"/>
-                <ButtonEl onClickHandler={clicked} startIcon={<RedditIcon dim="40" />} particularStyle=" text-2xl gap-5 ml-2 h-10  " buttonType="sidebar" placeholder="Reddit"/>
-                <ButtonEl onClickHandler={clicked} startIcon={<InstagramIcon dim="40" />} particularStyle=" ml-2 text-2xl h-10 py-3 " buttonType="sidebar" placeholder="Instagram"/>
-                <ButtonEl onClickHandler={clicked} startIcon={<WebIcon diml="40" dimb="40" />} particularStyle="  ml-3 text-2xl h-10 " buttonType="sidebar" placeholder="Webpage"/>
+                <ButtonEl onClickHandler={clicked} startIcon={<Dasboard dim="35" style=" ml-2 " />} particularStyle="  h-8 gap-6" buttonType="sidebar" placeholder="Dashboard"/>
+                <ButtonEl onClickHandler={clicked} startIcon={<YoutubeIcon dim="40" style=" mx-2 " />} particularStyle="  h-8 gap-3" buttonType="sidebar" placeholder="YouTube"/>
+                <ButtonEl onClickHandler={clicked} startIcon={<TwitterIcon  dim="35" />} particularStyle="  gap-7 pl-6 h-10 " buttonType="sidebar" placeholder="X"/>
+                <ButtonEl onClickHandler={clicked} startIcon={<RedditIcon dim="40" />} particularStyle=" text-2xl gap-5 pl-6 h-10  " buttonType="sidebar" placeholder="Reddit"/>
+                <ButtonEl onClickHandler={clicked} startIcon={<InstagramIcon dim="40" />} particularStyle=" pl-6 text-2xl h-10 py-3 " buttonType="sidebar" placeholder="Instagram"/>
+                <ButtonEl onClickHandler={clicked} startIcon={<WebIcon diml="40" dimb="40" />} particularStyle="  pl-7 text-2xl h-10 " buttonType="sidebar" placeholder="Webpage"/>
             </div>  
             
                 <div >

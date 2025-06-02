@@ -9,7 +9,7 @@ import { LogoIcon } from "../icons/particularIcons"
 
 export const SharedCollection = ({popUpLive, setPopUpLive,layout,setLayout}:{popUpLive:Boolean,setPopUpLive:React.Dispatch<React.SetStateAction<Boolean>>,layout: "grid" | "list",setLayout: React.Dispatch<React.SetStateAction<"grid" | "list">>}) => {
 
-    const layoutStyle = "hover:bg-[#F5F5F6] rounded-lg p-2  cursor-pointer size-11 lg:size-13";
+    const layoutStyle = "hover:bg-[#F5F5F6] rounded-lg p-2 transition:hover duration-200 ease-in-out  cursor-pointer size-11 lg:size-13";
 
     return <div className="h-full w-full bg-mainComponentBg flex flex-col items-center py-5 ">
         <div className="w-[90%] md:w-[75%] h-[15%] flex gap-4 lg:gap-8 items-center ">

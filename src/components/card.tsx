@@ -164,7 +164,7 @@ const ListStyle = ({ title,shared, deletClicked, setDeleteClicked, shareClicked,
         animate={{ y: 0, x: 0, opacity: 1 }}
         exit={{ x: -10, opacity: 0 }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
-        className={`w-[100%] h-[80px] flex items-center mt-4 mx-auto transition-hover cursor-default duration-300  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md pl-3 ${shared ? " hover:scale-101 transition-hover duration-150 ease-in-out hover:sahdow-lg" : " "}  ${cardType == 'reddit' ? " hover:border-orange-600 " : cardType == "twitter" ? " hover:border-blue-800" : cardType == "youtube" ? " hover:border-red-700 "  : cardType == "instagram" ? " hover:border-[#bc1888] " : " hover:border-slate-500"}`}
+        className={`${shared ? " w-[100%] " : " w-[96%] " } h-[80px] flex items-center mt-4 mx-auto transition-hover cursor-default duration-300  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md pl-3 ${shared ? " hover:scale-101 transition-hover duration-150 ease-in-out hover:sahdow-lg" : " "}  ${cardType == 'reddit' ? " hover:border-orange-600 " : cardType == "twitter" ? " hover:border-blue-800" : cardType == "youtube" ? " hover:border-red-700 "  : cardType == "instagram" ? " hover:border-[#bc1888] " : " hover:border-slate-500"}`}
 
     >
         <div className="flex  items-center w-[5%] justify-center">

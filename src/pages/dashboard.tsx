@@ -28,7 +28,6 @@ const Dashboard = ({popUpLive, setPopUpLive,layout,setLayout}:{popUpLive:Boolean
         <div className="flex h-screen w-screen">
             <AnimatePresence mode="wait">
                 {modalNeeded !== "close" && <Modal cause={modalNeeded} closeModal={closeModal}  />}
-                {popUpLive && <PopUp placeholder="Link coppied to clipboard!!" />} 
             </AnimatePresence>
             <SideBar setModalNeededBy={setModalNeededBy} />
             
