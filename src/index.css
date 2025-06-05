@@ -32,6 +32,7 @@
     --boxShadow-even: 0 0 6px rgba(0, 0, 0, 0.2);
 
     --breakpoint-sharedBp2xl: 107rem;
+    --breakpoint-authBreakPoint: 93.75rem;
     --breakpoint-sharedBplg: 76.875rem;
 
     --color-sidebarBg : #F5F5F6;

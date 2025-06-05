@@ -15,16 +15,16 @@ const Auth = ({ user, setUser }: AuthProps) => {
     const [password, setPassword] = useState<string>("");
     const [rememberMe, setRememberMe] = useState<boolean>(false);
 
-    const inputStyle = "mt-3 px-3 shadow-lg/20 transition duration-200 ease-in-out border-2 border-white/0 rounded-xl hover:border-black/80 hover:cursor-pointer w-full h-13 text-md text-slate-800 font-[600] font-inter";
+    const inputStyle = "mt-3 px-3 shadow-lg/20 transition duration-200 ease-in-out border-2 border-white/0 rounded-xl hover:border-black/80 hover:cursor-pointer w-full h-13 text-md text-slate-800 font-[600] font-inter bg-white";
 
 //on remember me sellect, save jwt as localstorage and not session storage
 //pass in dummy data for username and password and auto click thesignin button and irrespective fo rememebr me clicked or not,save the cookie as session storage
 
     return <div className="h-screen flex w-screen overflow-hidden">
-        <div className="w-[62%] h-full bg-[#E4E7E6] overflow-hidden border-r-3 border-slate-500" >
-            <img src="/authBg.png" className="scale-125 object-none w-full h-full " />
+        <div className="transition-all duration-300 ease-in-out hidden lg:block w-[62%] h-full bg-[#E4E7E6] overflow-hidden border-r-2 border-slate-500" >
+            <img src="/authBg.png" className="transition-all duration-300 ease-in-out scale:108 authBreakPoint:scale-125 object-none w-full h-full " />
         </div>
-        <div className="h-full w-[38%] overflow-hidden cursor-default flex items-center">
+        <div className="h-full transition-all duration-300 ease-in-out  w-full lg:w-[38%] bg-[#F5F5F6] lg:bg-white overflow-hidden cursor-default flex  justify-center items-center">
             <div className="w-[65%] mx-auto">
                 <div className="text-6xl font-[550] font-notoSans text-[#080B0A] ">{authMode == "logIn" ? "Log in" : "Sign up"}</div>
                 <div className="text-md font-[550] mt-2 text-gray-600 font-roboto ">{authMode == "logIn" ? "sign in to continue oraganizing" : "Sign up and start organizing your ideas"}</div>
