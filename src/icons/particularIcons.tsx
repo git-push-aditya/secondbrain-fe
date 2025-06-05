@@ -91,7 +91,7 @@ export const TwitterIcon =({dim,style}:genIconStyle) => {
     </svg></a>
   
 } 
- 
+
 
 export const RedditIcon = ({dim,style}:genIconStyle) => {
     return<a href="https://www.reddit.com" target="_blank" rel="noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" className={` cursor-pointer  ${style}`} strokeWidth="30" x="0px" y="0px"  width={dim} height={dim} viewBox="0 0 50 50">

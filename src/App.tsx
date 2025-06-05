@@ -5,45 +5,81 @@ import { loadTwitterScript, redditScriptLoader, instagramScriptLoader } from "./
 import { AnimatePresence } from "framer-motion";
 import { PopUp } from "./components/popUp";
 import Auth from "./pages/Auth";
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
 
-//<SharedCollection popUpLive={popUpLive} setPopUpLive={setPopUpLive} layout={layout} setLayout={setLayout}/>
-//<Dashboard popUpLive={popUpLive} setPopUpLive={setPopUpLive} layout={layout} setLayout={setLayout} />
-function App() {
-  const [popUpLive, setPopUpLive] = useState<Boolean>(false);
-  const [layout, setLayout] = useState<"grid" | "list">("grid");
-
-  useEffect(() => {
-    loadTwitterScript().then(() => {
-      window.twttr.widgets.load();
-    })
-
-    redditScriptLoader();
-    instagramScriptLoader();
-  }, [])
-
-  useEffect(() => {
-    window.twttr?.widgets?.load();
-    redditScriptLoader();
-    window.instgrm?.Embeds?.process();
-  }, [layout])
-
-
-  useEffect(() => {
-    if (popUpLive) {
-      const counter = setTimeout(() => { setPopUpLive(false); console.log("tik") }, 3000);
-      return () => clearInterval(counter);
-    }
-  }, [popUpLive])
-
-  return (
-    <>
-      <AnimatePresence>
-        {popUpLive && <PopUp placeholder="Link coppied to clipboard!!" />}
-      </AnimatePresence>
-
-      <Auth />
-    </>
-  )
+export interface AuthUser {
+	userName: string;
+	profilePic: string;
+	email: string;
 }
 
-export default App 
+
+interface protectedRouteProp {
+	user: AuthUser | null;
+	redirectTo: string;
+}
+
+
+function App() {
+	const [popUpLive, setPopUpLive] = useState<Boolean>(false);
+	const [layout, setLayout] = useState<"grid" | "list">("grid");
+	const [user, setuser] = useState<AuthUser | null>(null);
+
+	useEffect(() => {
+		loadTwitterScript().then(() => {
+			window.twttr.widgets.load();
+		})
+
+		redditScriptLoader();
+		instagramScriptLoader();
+	}, [])
+
+	useEffect(() => {
+		window.twttr?.widgets?.load();
+		redditScriptLoader();
+		window.instgrm?.Embeds?.process();
+	}, [layout])
+
+
+	useEffect(() => {
+		if (popUpLive) {
+			const counter = setTimeout(() => { setPopUpLive(false); console.log("tik") }, 3000);
+			return () => clearInterval(counter);
+		}
+	}, [popUpLive]);
+
+
+
+	return (
+		<AnimatePresence>
+			<BrowserRouter> 
+					{popUpLive && <PopUp placeholder="Link coppied to clipboard!!" />}
+					<Routes>
+
+					<Route path="/" element={<Auth user={user} setUser={setuser} />} />
+
+					<Route element={<ProtectedRoute user={user} redirectTo="/" />}>
+						<Route path="/user" element={<Dashboard popUpLive={popUpLive} setPopUpLive={setPopUpLive} layout={layout} setLayout={setLayout} />} />
+					</Route>
+
+
+					<Route path="/sharedbrain" element={<SharedCollection popUpLive={popUpLive} setPopUpLive={setPopUpLive} layout={layout} setLayout={setLayout} />} />
+
+					<Route path="*" element={<p>There's nothing here: 404!</p>} />
+					</Routes> 
+			</BrowserRouter>
+		</AnimatePresence>
+		
+	)
+}
+
+
+const ProtectedRoute = ({ user, redirectTo }: protectedRouteProp) => {
+	if (!user) {
+		return <Navigate to={redirectTo} replace />
+	}
+	return <Outlet />;
+}
+
+
+export default App;

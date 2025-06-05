@@ -28,8 +28,8 @@ export const SharedCollection = ({popUpLive, setPopUpLive,layout,setLayout}:{pop
         </div>
         
         <div className="w-[95%] md:w-[80%] h-[85%] 2xl:h-[80%]">
-            <div className="flex justify-between items-center mx-15 md:mx-12 mt-3 norder-1">
-                <div className="text-gray-700 animate-pulse ml-2 line-clamp-3 text-sm md:text-xl font-[480] cursor-default">
+            <div className="flex justify-between items-center mx-15 md:mx-12 ">
+                <div className="text-gray-700 animate-pulse duration-[5000ms] duration-[2000ms] ml-2 line-clamp-3 text-sm md:text-xl font-[480] cursor-default">
                     secondbrain helps you capture and share insights from the web — your second brain, curated for the world.
                 </div>
                 <div className="flex items-center justify-around  w-26 gap-2 mr-2 rounded-lg"> 

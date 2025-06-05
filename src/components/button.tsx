@@ -19,7 +19,6 @@ const specificStyle : {[key: string]: string} = {
     "back" : " rounded-3xl bg-gray-300 hover:bg-gray-200 font-[500] justify-center text-cardTitleHeading text-2xl h-12 w-30 transition-hover duration-200 ease-in-out  ",
     "cardButton" : " rounded-2xl text-head  font-[550] border-1 border-white justify-center text-lg transition-hover duration-200 ease-in-out hover:scale-104 mt-1  ",
     "authin" : " bg-black w-full h-14 justify-center font-roboto text-white text-xl ",
-    "authicon" : " w-full bg-[#94a3b8] h-14 ",
     "" : ""
 };
 
