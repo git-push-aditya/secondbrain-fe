@@ -6,6 +6,10 @@ import { AnimatePresence } from "framer-motion";
 import { PopUp } from "./components/popUp";
 import Auth from "./pages/Auth";
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
+const queryClient = new QueryClient();
 
 export interface AuthUser {
 	userName: string;
@@ -51,25 +55,27 @@ function App() {
 
 
 	return (
-		<AnimatePresence>
-			<BrowserRouter> 
-					{popUpLive && <PopUp placeholder="Link coppied to clipboard!!" />}
-					<Routes>
+			<QueryClientProvider client={queryClient}>
+				<AnimatePresence>
+					<BrowserRouter>
+						{popUpLive && <PopUp placeholder="Link coppied to clipboard!!" />}
+						<Routes>
 
-					<Route path="/" element={<Auth user={user} setUser={setuser} />} />
+							<Route path="/" element={<Auth user={user} setUser={setuser} />} />
 
-					<Route element={<ProtectedRoute user={user} redirectTo="/" />}>
-						<Route path="/user" element={<Dashboard popUpLive={popUpLive} setPopUpLive={setPopUpLive} layout={layout} setLayout={setLayout} />} />
-					</Route>
+							<Route element={<ProtectedRoute user={user} redirectTo="/" />}>
+								<Route path="/user" element={<Dashboard user={user} popUpLive={popUpLive} setPopUpLive={setPopUpLive} layout={layout} setLayout={setLayout} />} />
+							</Route>
 
 
-					<Route path="/sharedbrain" element={<SharedCollection popUpLive={popUpLive} setPopUpLive={setPopUpLive} layout={layout} setLayout={setLayout} />} />
+							<Route path="/sharedbrain" element={<SharedCollection popUpLive={popUpLive} setPopUpLive={setPopUpLive} layout={layout} setLayout={setLayout} />} />
 
-					<Route path="*" element={<p>There's nothing here: 404!</p>} />
-					</Routes> 
-			</BrowserRouter>
-		</AnimatePresence>
-		
+							<Route path="*" element={<p>There's nothing here: 404!</p>} />
+						</Routes>
+					</BrowserRouter>
+				</AnimatePresence>
+				<ReactQueryDevtools initialIsOpen={false} position="bottom" /> 
+			</QueryClientProvider> 
 	)
 }
 

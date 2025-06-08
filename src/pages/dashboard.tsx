@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MainBlock  from "../components/mainBlock";
 import SideBar from "../components/sideBar"; 
 import Modal from "../components/modal";
 import { AnimatePresence } from "framer-motion";
 import { PopUp } from "../components/popUp";
+import type { AuthUser } from "../App";
 
 type ModalType = "addContent" | "shareBrain" | "logout" | "addCollection"| "addCommunity"|"joinCommunity" |"close";
 
@@ -13,13 +14,14 @@ export interface ChildProps {
   popUpLive ?: Boolean;
   layout?: "grid" | "list";
   setLayout?:React.Dispatch<React.SetStateAction<"grid" | "list">>;
+  user: AuthUser | null;
 }
 
 
-const Dashboard = ({popUpLive, setPopUpLive,layout,setLayout}:{popUpLive:Boolean,setPopUpLive:React.Dispatch<React.SetStateAction<Boolean>>,layout: "grid" | "list",setLayout: React.Dispatch<React.SetStateAction<"grid" | "list">>}) => {
+const Dashboard = ({popUpLive,user, setPopUpLive,layout,setLayout}:{user : AuthUser | null, popUpLive:Boolean,setPopUpLive:React.Dispatch<React.SetStateAction<Boolean>>,layout: "grid" | "list",setLayout: React.Dispatch<React.SetStateAction<"grid" | "list">>}) => {
     const [modalNeeded, setModalNeededBy] = useState<ModalType >("close");
 
-    
+    useEffect(()=>{setLayout('grid')},[])
     const closeModal = () => setModalNeededBy("close");
 
 
@@ -29,9 +31,9 @@ const Dashboard = ({popUpLive, setPopUpLive,layout,setLayout}:{popUpLive:Boolean
             <AnimatePresence mode="wait">
                 {modalNeeded !== "close" && <Modal cause={modalNeeded} closeModal={closeModal}  />}
             </AnimatePresence>
-            <SideBar setModalNeededBy={setModalNeededBy} />
+            <SideBar setModalNeededBy={setModalNeededBy} user={null} />
             
-            <MainBlock setModalNeededBy={setModalNeededBy} layout= {layout} setLayout={setLayout} popUpLive={popUpLive} setPopUpLive={setPopUpLive} />
+            <MainBlock setModalNeededBy={setModalNeededBy} user={user} layout= {layout} setLayout={setLayout} popUpLive={popUpLive} setPopUpLive={setPopUpLive} />
         </div> 
     </>
 }

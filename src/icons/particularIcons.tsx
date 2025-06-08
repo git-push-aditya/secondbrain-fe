@@ -16,7 +16,7 @@ export const LogoIcon = ({dim,style} : genIconStyle ) => {
       fill="currentColor"
       stroke="currentColor"
       width={dim} height={dim}
-      className={`m-2 w-24 h-24 text-black  cursor-pointer ${style}`}
+      className={`m-2 text-black  cursor-pointer ${style}`}
     >
       <g>
         <path

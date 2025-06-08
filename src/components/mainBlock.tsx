@@ -15,22 +15,7 @@ import type { ChildProps } from "../pages/dashboard";
 */
 
 
-const MainBlock = ({setModalNeededBy, setPopUpLive, layout,setLayout} : ChildProps) => {
-    const [tweetCount, setTweetCount] = useState<number>(0);//no. of tweets card among all cards
-    const [tweetScriptNeeded,setTweetScriptNeeded] = useState<boolean>(false);   // if tweets needed
-    
-    const [cardsList,setCardList]=useState<cardProp[]>([]);  //contains the list of all the card needed
-    
-    const [redditCount, setRedditcount] = useState<number>(0);
-    const [redditScriptneeded, setRedditScriptneeded] = useState<boolean>(false);
-
-    const [instaCount, setInstaCount] = useState<number>(0);
-    const [instaScriptNeeded, setInstaScriptNeeded] = useState<boolean>(false);
-
-    
-
-
-
+const MainBlock = ({setModalNeededBy, setPopUpLive, layout,setLayout, user} : ChildProps) => {
 
 
     
@@ -38,22 +23,23 @@ const MainBlock = ({setModalNeededBy, setPopUpLive, layout,setLayout} : ChildPro
     
     return<div className="bg-mainComponentBg z-10 flex-1 pb-20 relative h-full overflow-y-auto scrollbarMC">
                 
-        <div className="flex justify-between gap-4 p-6 left-0 top-0 sticky z-10 items-center bg-gradient-to-b from-mainComponentBg via-mainComponentBg to-transparent">
-            <div className="xl:text-5xl md:text-3xl text-xl  font-dashboardHeading font-extrabold cursor-default line-colaps-2 text-4xl font-bold text-gradient  ">Welcome, Aditya Dubey</div>
+        <div className="flex justify-between bg-mainComponentBg border-b-2 border-slate-300 gap-4 p-6 left-0 top-0 sticky z-10 items-center">
+            <div className="xl:text-5xl md:text-3xl text-xl  font-dashboardHeading font-extrabold cursor-default line-colaps-2 text-4xl font-bold text-gradient  ">Welcome, {user?.userName}</div>
             <div className="flex justify-around gap-6">
                 <ButtonEl onClickHandler={() => setModalNeededBy("shareBrain")} placeholder="Share Brain" particularStyle=" h-14 " buttonType="secondary" startIcon={<ShareIcon style="size-8.5 " />}></ButtonEl>
                 <ButtonEl onClickHandler={() => setModalNeededBy("addContent")} placeholder="Add Content" buttonType="primary" startIcon={<PlusIcon style="size-8.5 " />}></ButtonEl>
                 
             </div>
         </div> 
-        <div  className="flex justify-tsart ml-7">
+        <div  className="flex justify-end mt-4 mr-8">
             
             <div className="flex items-center justify-around ml-6 w-26 gap-2 rounded-lg "> 
                 <GridIcon dim="50" onClickHandler={() => setLayout?.("grid")} style={layoutStyle}/> 
-                <ListIcon dim="50" onClickHandler={() => setLayout?.("list")} style={layoutStyle} />
+                <ListIcon dim="50" onClickHandler={() => setLayout?.("list")} style={layoutStyle} /> 
             </div>
         </div>
         <div className=" mt-6  w-full flex justify-center ">
+
             <div className={` ${layout === "grid" ? " grid 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 xl:gap-6  lg:gap-4 gap-2 gap-y-6 " : " w-full " }`}> 
                 <CardElement setPopUpLive={() => setPopUpLive?.(true)}  layout={layout} title="wassup people this is crazy" note="wassup people this is crazy fgfu huu hioup pope and iyou iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and iyou iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and iyou iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and iyou iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and iyou iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and iyou iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i  djdh fhv thr etsr fgfu huu hioup pope and i" shared={false} createdAt="11/12/2004" cardType="twitter" link="https://twitter.com/narendramodi/status/1919736905115054505"></CardElement>
                 <CardElement setPopUpLive={() => setPopUpLive?.(true)} layout={layout} title="wassup people this is crazy" note="you iaefi awoda awiwi jjjdddhhhf  djdh fhv thr etsr fgfu huu hioup pope and i" shared={false} createdAt="11/12/2004" cardType="reddit" link="https://www.reddit.com/r/TheWhiteLotusHBO/comments/1is3or1/who_do_you_think_is_the_murderer_or_murderers_of/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button"></CardElement>

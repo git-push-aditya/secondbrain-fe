@@ -4,7 +4,7 @@ import { CollectionIcon, ChatbotIcon, CommunityIcon, InstagramIcon, LogoIcon, Re
 import { ButtonEl } from "./button";
 import type { ChildProps } from "../pages/dashboard";
 
-const headingStyle :string = "text-4xl font-[560]  font-head text-secondBrainHeading";
+const headingStyle :string = "text-4xl font-[600]  font-head text-secondBrainHeading";
 
 const CollectionList = ["Food Blogs", "Dev blogs","politics blogs"];
 const communityList = ["Titans project","Titans project","Titans project","Titans project"]
@@ -20,8 +20,8 @@ const SideBar = ({setModalNeededBy} : ChildProps) => {
 
 
     return <div className="w-[18%] border-r-2 border-slate-300 bg-sidebarBg h-[90.9%] overflow-y-scroll overflow-x-hidden scrollbarSB relative z-10 scroll-smooth"> 
-        <div className="flex justify-start gap-2 cursor-pointer items-center  px-2 pt-6 left-0 top-0 sticky z-10 bg-sidebarBg  ">
-            <LogoIcon dim="40" />
+        <div className="flex justify-start gap-2 cursor-pointer items-center  px-2 left-0 top-0 sticky z-10 bg-sidebarBg">
+            <LogoIcon dim="90" />
             <div>
                 <div className={headingStyle}>Second</div> 
                 <div className={headingStyle}>Brain App</div>
