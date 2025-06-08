@@ -1,7 +1,7 @@
 import { useEffect, useState, type SetStateAction } from "react";
 import { ButtonEl } from "../components/button";
 import type { AuthUser } from "../App";
-import { useAuthInQuery,useAuthUpQuery } from '../api/auth/mutate';
+import { useAuthInQuery,useAuthUpQuery, useCheckMe } from '../api/auth/mutate';
 import { useNavigate } from "react-router-dom";
  
 interface AuthProps { 
@@ -10,10 +10,16 @@ interface AuthProps {
 }
 
 const Auth = ({ user, setUser }: AuthProps) => {
+    const { data: meReqData , refetch, isSuccess: meIsSuccess, isError:meIsError } = useCheckMe();
+    useEffect(()=>{
+        refetch();
+    },[]);
 
     useEffect(()=>{
-        
-    },[]);
+        if(meIsSuccess && meReqData?.data.status){
+            setUser({ userName:meReqData.data.payload.userName, profilePic:"fewfe", email:meReqData.data.payload.email });
+        }else{}
+    },[meReqData,meIsSuccess,meIsError])
 
     const [emailUser, setEmailUser] = useState<string>("");
     const [userName,setUserName] = useState<string>("");
@@ -54,10 +60,27 @@ const Auth = ({ user, setUser }: AuthProps) => {
 
 
 
-    const handleGuestLogIn = () => {
-        setUser({userName:'randomuser',profilePic:'ubuono',email:'dummy@doom.com'});
-        logIN({userName:'randomuser',password:'Qwer1234+-*/',rememberMe:false});
+const handleGuestLogIn = () => {
+  logIN(
+    {
+      userName: 'randomuser',
+      password: 'Qwer1234+-*/',
+      rememberMe: false,
+    },
+    {
+      onSuccess: () => {
+        setUser({
+          userName: 'randomuser',
+          profilePic: 'ubuono',
+          email: 'dummy@doom.com',
+        }); 
+      },
+      onError: (err) => {
+        console.error('Guest login failed', err);
+      },
     }
+  );
+};
 
 
 //on remember me sellect, save jwt as localstorage and not session storage

@@ -63,7 +63,7 @@ export const CardElement = ({ title,shared, cardType, layout, note, setPopUpLive
 const GridStyle = ({ title,shared, deletClicked, setDeleteClicked, shareClicked, cardType, note, setPopUpLive, tags, createdAt, link }: layoutCard) => {
     const [readMore, setReadMore] = useState<Boolean>(false);
 
-    const defaultStyle: string = `${ !shared ? "w-88" : " w-85 overflow-x-hidden "}   ${cardType == 'reddit' ? " hover:border-orange-600 " : cardType == "twitter" ? " hover:border-blue-800" : cardType == "youtube" ? " hover:border-red-700 "  : cardType == "instagram" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 max-h-145  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md`;
+    const defaultStyle: string = `${ !shared ? "w-85" : " w-85 overflow-x-hidden "}   ${cardType == 'reddit' ? " hover:border-orange-600 " : cardType == "twitter" ? " hover:border-blue-800" : cardType == "youtube" ? " hover:border-red-700 "  : cardType == "instagram" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 h-115  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md`;
 
 
     return <motion.div
@@ -145,11 +145,11 @@ const GridStyle = ({ title,shared, deletClicked, setDeleteClicked, shareClicked,
                 
                 {!shared && <div className="px-3 my-2 cursor-default text-lg font-[500] text-slate-500">Added on {createdAt}</div>}
             </div>
-            <div className="flex items-center gap-2 justify-center m-3">
-                    <Tag name="science" id="hehe" />
-                    <Tag name="science and technology" id="hehe" />
-                    <Tag name="..." id="hehe" />
-                </div>
+            <div className="flex items-center gap-2 justify-center m-3 ">
+                <Tag name="science" id="hehe" />
+                <Tag name="science and technology" id="hehe" />
+                <Tag name="..." id="hehe" />
+            </div>
             
         </div>
     </div>

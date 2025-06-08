@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from 'axios';
 
 interface authInTypes{
@@ -40,4 +40,18 @@ export const useAuthUpQuery = () => {
     mutationFn: ({email, userName, password, rememberMe}: authUpTypes) =>
       signUp({email, userName, password, rememberMe}) 
   })
+}
+
+const meRequest = () => {
+  return axios.get('http://localhost:2233/me',{
+    withCredentials:true
+  })
+}
+
+export const useCheckMe = () => {
+  return useQuery({
+    queryKey: ['fetchMe'],
+    queryFn: meRequest,
+    enabled: false,
+  }); 
 }

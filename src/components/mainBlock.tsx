@@ -19,9 +19,10 @@ const MainBlock = ({setModalNeededBy, setPopUpLive, layout,setLayout, user} : Ch
 
 
     
-    const layoutStyle = "hover:bg-[#F5F5F6] transition-hover duration-150 ease-in-out rounded-lg p-2  cursor-pointer";
+    const layoutStyle = "hover:text-white hover:bg-[#6056AA]/60 text-black transition-hover duration-150 ease-in-out rounded-lg p-2  cursor-pointer bg-slate-300";
     
     return<div className="bg-mainComponentBg z-10 flex-1 pb-20 relative h-full overflow-y-auto scrollbarMC">
+        
                 
         <div className="flex justify-between bg-mainComponentBg border-b-2 border-slate-300 gap-4 p-6 left-0 top-0 sticky z-10 items-center">
             <div className="xl:text-5xl md:text-3xl text-xl  font-dashboardHeading font-extrabold cursor-default line-colaps-2 text-4xl font-bold text-gradient  ">Welcome, {user?.userName}</div>
@@ -31,7 +32,7 @@ const MainBlock = ({setModalNeededBy, setPopUpLive, layout,setLayout, user} : Ch
                 
             </div>
         </div> 
-        <div  className="flex justify-end mt-4 mr-8">
+        <div  className="flex justify-start mt-4 ml-5">
             
             <div className="flex items-center justify-around ml-6 w-26 gap-2 rounded-lg "> 
                 <GridIcon dim="50" onClickHandler={() => setLayout?.("grid")} style={layoutStyle}/> 
