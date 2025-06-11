@@ -35,8 +35,9 @@ const MainBlock = ({setModalNeededBy, setPopUpLive, layout,setLayout, user} : Ch
         <div  className="flex justify-start mt-4 ml-5">
             
             <div className="flex items-center justify-around ml-6 w-26 gap-2 rounded-lg "> 
-                <GridIcon dim="50" onClickHandler={() => setLayout?.("grid")} style={layoutStyle}/> 
-                <ListIcon dim="50" onClickHandler={() => setLayout?.("list")} style={layoutStyle} /> 
+                <GridIcon dim="50" onClickHandler={() => setLayout?.("grid")} style={layoutStyle + (layout === "grid" ? " border-2  hover:border-0" : "")}/>
+                <ListIcon dim="50" onClickHandler={() => setLayout?.("list")} style={layoutStyle + (layout === "list" ? " border-2 hover:border-0" : "")}/>
+
             </div>
         </div>
         <div className=" mt-6  w-full flex justify-center ">

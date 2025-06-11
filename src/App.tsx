@@ -66,7 +66,7 @@ function App() {
 							<Route element={<ProtectedRoute user={user} redirectTo="/" />}>
 								<Route path="/user" element={<Dashboard user={user} popUpLive={popUpLive} setPopUpLive={setPopUpLive} layout={layout} setLayout={setLayout} />} />
 							</Route>
-
+							
 
 							<Route path="/sharedbrain" element={<SharedCollection popUpLive={popUpLive} setPopUpLive={setPopUpLive} layout={layout} setLayout={setLayout} />} />
 

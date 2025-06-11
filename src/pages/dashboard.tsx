@@ -5,6 +5,7 @@ import Modal from "../components/modal";
 import { AnimatePresence } from "framer-motion";
 import { PopUp } from "../components/popUp";
 import type { AuthUser } from "../App";
+import { ChatBot } from "../components/Chatbot";
 
 type ModalType = "addContent" | "shareBrain" | "logout" | "addCollection"| "addCommunity"|"joinCommunity" |"close";
 
@@ -32,10 +33,14 @@ const Dashboard = ({popUpLive,user, setPopUpLive,layout,setLayout}:{user : AuthU
                 {modalNeeded !== "close" && <Modal cause={modalNeeded} closeModal={closeModal}  />}
             </AnimatePresence>
             <SideBar setModalNeededBy={setModalNeededBy} user={null} />
-            
             <MainBlock setModalNeededBy={setModalNeededBy} user={user} layout= {layout} setLayout={setLayout} popUpLive={popUpLive} setPopUpLive={setPopUpLive} />
+            
         </div> 
     </>
 }
 
 export default Dashboard;
+
+/**
+ *             <ChatBot />
+ */
