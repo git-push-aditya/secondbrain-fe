@@ -26,7 +26,22 @@ const signUp = ({email, userName, password, rememberMe}: authUpTypes) => {
   )
 }
 
+const meRequest = () => {
+  return axios.get('http://localhost:2233/me',{
+    withCredentials:true
+  })
+}
 
+const logout = () => { 
+  return axios.post('http://localhost:2233/auth/logout',{},{
+    withCredentials: true
+  });
+}
+
+
+
+
+/////////////////////////////
 export const useAuthInQuery = ()=> {
   return useMutation<any, Error, authInTypes>({
     mutationFn: ({ userName, password, rememberMe }: authInTypes) =>
@@ -42,16 +57,19 @@ export const useAuthUpQuery = () => {
   })
 }
 
-const meRequest = () => {
-  return axios.get('http://localhost:2233/me',{
-    withCredentials:true
-  })
-}
 
 export const useCheckMe = () => {
   return useQuery({
     queryKey: ['fetchMe'],
     queryFn: meRequest,
-    enabled: false,
+    enabled: true,
   }); 
+}
+
+
+export const useLogOutQuery = () => {
+  return useMutation({
+    mutationFn : logout,
+    mutationKey : ["signup"]
+  })
 }

@@ -1,9 +1,27 @@
-import { CopyIcon, CrossIcon, LeftIcon } from "../icons/commonIcons";
+import { CopyIcon, CrossIcon, Dasboard, LeftIcon } from "../icons/commonIcons";
 import { ButtonEl } from "./button";
 import { motion, AnimatePresence } from "framer-motion";
 import Dropdown from "./dropdown";
 import { useCallback, useMemo, useState } from "react";
 import Tag from "./tags";
+import { useAddContentQuery, useCreateCollection, useShareBrain } from "../api/user/mutate";
+import { useQueryClient } from "@tanstack/react-query";
+import { all, type AxiosResponse } from 'axios';
+import { data } from "react-router-dom";
+import { useTabAtom } from "../recoil/tab";
+
+export type type = 'WEB' | 'YOUTUBE' | 'REDDIT' | 'TWITTER' | 'INSTAGRAM' ;
+
+type CollectionType = { id: number; name: string };
+
+export type GetListResponse = {
+  status: string;
+  payload: {
+    collectionList: CollectionType[];
+    tagsList: { title: string }[];
+    message: string;
+  };
+};
 
 interface props {
     cause: "addContent" | "shareBrain" | "logout" | "addCollection" | "addCommunity" | "joinCommunity" | "close";
@@ -35,16 +53,36 @@ const Modal = ({ cause, closeModal }: props) => {
         {cause == "addCollection" && <AddCollection closeCard={closeModal} />}
         {cause == "joinCommunity" && <JoinCommunity closeCard={closeModal} />}
     </motion.div>
-}
+} 
 
-const linkType = ["Web", "Youtube", "X", "Reddit", "Instagram", "blank"];
-const collectionList = ["Dashboard", "Food Blogs", "Dev Blogs", "politic Blogs", "blank"];
+
+
 
 const AddContent = ({ closeCard }: cardComponent) => {
-    const [selectedLink, setSelectedLink] = useState<string>("blank");
-    const [selectedCollection, setSelectedCollection] = useState<string>("blank");
+    const linkType = ["Web", "Youtube", "X", "Reddit", "Instagram", "blank"]; 
+    const queryClient = useQueryClient();
+
+    const listData = queryClient.getQueryData<AxiosResponse<GetListResponse>>(['getList']);
+    const collectionList = listData?.data?.payload?.collectionList || [];
+    console.log("Collection List:", collectionList); // should print array of objects with `name`
+
+
+    const [selectedLink, setSelectedLink] = useState<string>('blank');
+    const [selectedCollection, setSelectedCollection] = useState<string>("blank"); 
     const [currentTag, setCurrentTag] = useState<string>("");
+
+ 
+//TWO THINGS TO DO: 
+/**
+ * 1)filtertags   
+ *          //have passed in list of names will accaess the id from actual list at the time of mutation call using somefilter or something
+ * 2)passin the valid list of collections for the user and extract correct collection id for each
+ */
     const [tagsList, setTagsList] = useState<string[]>([]);
+
+    const [hyperLink,setHyperLink] = useState<string>('');
+    const [title,setTitle] = useState<string>('');
+    const [note,setNote] = useState<string>('');
 
 
     const tagsKeyDownHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -73,9 +111,55 @@ const AddContent = ({ closeCard }: cardComponent) => {
         ));
     }, [tagsList]);
 
+    const {mutate, data, isSuccess, isError,} = useAddContentQuery(); 
+    const addContentHandler = async () => {  
 
-    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} exit={{ y:8,opacity: 0 }} transition={{ duration: 0.1 }} className={`max-h-[70%] md:max-h-[68%] xl:max-h-[100%] w-[70%] xl:w-[50%] md:w-[60%] rounded-3xl bg-modalCard  cursor-default overflow-y-auto scrollbarSB  pb-6`} >
-        <div className="flex justify-between items-center mx-8 nd:mx-10 xl:mx-12 mt-10">
+        if(hyperLink.trim() === "" || title.trim() === "") return;
+ 
+        //collection id handled
+        let collectionId = -1;
+        if(selectedCollection === "blank"){
+            collectionId = collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1;
+        }else{
+            collectionId = collectionList.find((coll) => coll.name === selectedCollection)?.id ?? -1;
+        }
+  
+        //tags list handled
+        const allTags = listData?.data?.payload.tagsList || [];
+        const modAllTags = allTags.map((tag) => {return tag.title.toLowerCase()});
+
+        let existingTags : string[] = [];
+        let newTags:string[] = [];
+
+
+        tagsList.forEach((tag) => {
+            let lowerTag = tag.toLowerCase();
+            if( modAllTags.includes(lowerTag)){
+                existingTags.push(lowerTag);
+            }else{
+                newTags.push(lowerTag);
+            }
+        })
+ 
+        //linktype handled
+        let linkType  : type = selectedLink === 'blank' ? 'WEB' : selectedLink.toUpperCase() as type;
+
+ 
+        mutate({title : title.trim(), hyperlink : hyperLink.trim() , note : note.trim(), type : linkType, collectionId: collectionId, existingTags: existingTags, newTags: newTags});
+
+        if(isSuccess){
+            alert('content added');
+            console.log('clicked add content');
+        } 
+        if(isError){
+            alert('error occured');
+            console.error('error adding conntetn');
+        } 
+        closeCard(); 
+    } 
+
+    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} exit={{ y:8,opacity: 0 }} transition={{ duration: 0.1 }} className={` max-h-[800px]  w-[80%] xl:w-[50%] md:w-[60%] rounded-3xl bg-modalCard  cursor-default scrollbarSB  pb-8`} >
+        <div className="flex justify-between items-center mx-8 md:mx-10 xl:mx-12 mt-10">
             <div className="font-[650]  text-4xl text-modalHead font-inter ">Save a New Link</div>
             <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2" />} />
         </div>
@@ -83,25 +167,27 @@ const AddContent = ({ closeCard }: cardComponent) => {
             Paste a link you want to save or share with your Second Brain.
         </div>
         <div className="text-center mt-2">
-            <input type="text" placeholder="Paste link here" className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none" />
-            <input type="text" placeholder="Enter title" className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none" />
 
-            <textarea placeholder="Note..." className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none overflow-y-auto scrollbarSB" />
+            <input type="text" placeholder="Paste link here" className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none" value={hyperLink} onChange={(e) => setHyperLink(e.target.value)} />
+
+            <input type="text" placeholder="Enter title" className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none" value={title} onChange={(e) => setTitle(e.target.value)} />
+
+            <textarea placeholder="Note..." className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none overflow-y-auto scrollbarSB" value={note} onChange={(e) => setNote(e.target.value)} />
 
             <input type="text" placeholder="Enter tags for this post" className="w-[90%] mt-2 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none" value={currentTag} onChange={(e) => setCurrentTag(e.target.value)} onKeyDown={(e) => tagsKeyDownHandler(e)} />
 
-            <div className="mt-1 flex flex-wrap mx-12 gap-2 w-[90%] overflow-y-auto scrollbarSB max-h-[48px]">
+            <div className="mt-2 flex flex-wrap mx-12 gap-2 w-[90%] overflow-y-auto scrollbarSB max-h-[48px]">
                 {renderedTags}
             </div>
 
-            <div className="w-[90%] mt-2 mx-auto my-auto flex items-center justify-center">
+            <div className="w-[90%] mt-2 mx-auto mt-2 flex items-center justify-center" >
                 <Dropdown list={linkType} selected={selectedLink} title="Link type" setState={setSelectedLink} />
             </div>
-            <div className="w-[90%] mt-2 mx-auto flex items-center justify-center">
-                <Dropdown list={collectionList} selected={selectedCollection} title="Collection" setState={setSelectedCollection} />
+            <div className="w-[90%] mt-2 mx-auto mt-3 flex items-center justify-center" >
+                <Dropdown list={collectionList.map((item) => item.name)} selected={selectedCollection} title="Collection" setState={setSelectedCollection} />
             </div>
 
-            <ButtonEl buttonType="primary" onClickHandler={clicked} particularStyle="w-[80%] xl:w-[90%]  font-inter mt-4 h-16 mx-auto font-[550] font-inter " placeholder="Add Link" />
+            <ButtonEl buttonType="primary" onClickHandler={() => addContentHandler()} particularStyle="w-[80%] xl:w-[90%]  font-inter mt-4 h-16 mx-auto font-[550] font-inter " placeholder="Add Link" />
 
 
         </div>
@@ -109,8 +195,29 @@ const AddContent = ({ closeCard }: cardComponent) => {
 }
 
 const ShareBrain = ({ closeCard }: cardComponent) => {
+    const {mutate, isPending, data,isSuccess, error} = useShareBrain();
+    const queryClient = useQueryClient();
+    const listData = queryClient.getQueryData<AxiosResponse<GetListResponse>>(['getList']);
+    const collectionList = listData?.data?.payload?.collectionList || [];
+    const [tab] = useTabAtom();
 
-    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} transition={{ duration: 0.2 }} className={`h-[65%] md:h-[57%] xl:h-[42%] w-[70%] xl:w-[40%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB `} >
+    const handleShareBrain = () => {
+        let toShareCollection: number =  -1;
+        if(tab.startsWith('dashboard')){
+            toShareCollection = collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1; // if tab 
+        }else{
+            toShareCollection = parseInt(tab.split('-')[1]); // if tab ==> collection-4, than toShareCollection =4 ? // since tab is  astring 
+        }
+
+        try{
+            mutate({collectionId: toShareCollection});
+            console.log("generated link");
+        }catch(e){
+            console.error("Issue with creating a sharacble link", error);
+        }
+    }
+
+    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} transition={{ duration: 0.2 }} className={` max-h-[500px] w-[70%] xl:w-[40%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB pb-10`} >
         <div className="flex justify-between items-center mx-8 md:mx-10 xl:mx-12 mt-10">
             <div className="font-[650]  text-3xl text-modalHead font-inter ">Share your Second Brain</div>
             <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2" />} />
@@ -120,10 +227,16 @@ const ShareBrain = ({ closeCard }: cardComponent) => {
         </div>
         <div className="mt-3 xl:text-xl md:text-md mx-12 text-center font-[400] text-gray-600">
             You can stop sharing your Second Brain at any time.
-        </div>
-        <ButtonEl buttonType="primary" onClickHandler={clicked} particularStyle="w-[80%] xl:w-[88%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter " placeholder="Share Brain" startIcon={<CopyIcon dim="40" style="color-white" />} />
+        </div> 
+        {!isSuccess ? 
+            <ButtonEl buttonType="primary" onClickHandler={() => handleShareBrain()} particularStyle={`w-[80%] xl:w-[88%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter ${isPending && " animate-pulse"} `} placeholder="Share Brain" startIcon={<CopyIcon dim="40" style="color-white" />} /> 
+            :
+            <div className="w-[80%] xl:w-[88%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter bg-primaryButtonBlue rounded-xl h-14 justify-center text-primaryButtonText hover:bg-hover1 font-inter text-3xl  font-[500]">{data?.payload?.generatedLink}</div>
+        }
     </motion.div>
 }
+
+
 const Logout = ({ closeCard }: cardComponent) => {
 
     return <div className="h-[50%] w-[60%] bg-modalCard py-4">
@@ -133,7 +246,21 @@ const Logout = ({ closeCard }: cardComponent) => {
 }
 
 
-const AddCollection = ({ closeCard }: cardComponent) => {
+const AddCollection =  ({ closeCard }: cardComponent) => {
+    const [collectionName, setCollectionName] = useState<string>("");
+    const [collectionDesc, setCollectionDesc] = useState<string>("");
+    const {mutateAsync,isPending,error} = useCreateCollection();
+
+    const handleAddCollection = async () => {
+        if(collectionName.trim() === "" || collectionDesc.trim() === "") return;
+        try{
+           mutateAsync({collectionName, collectionDesc});  
+        }catch(e){
+            console.log('errro occured',error)
+        }finally{
+            closeCard();
+        }
+    }
 
     return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} transition={{ duration: 0.3 }} className={`h-[65%] md:h-[57%] xl:h-[48%] w-[70%] xl:w-[38%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB `} >
         <div className="flex justify-between items-center mx-8 nd:mx-10 xl:mx-12 mt-8">
@@ -144,10 +271,11 @@ const AddCollection = ({ closeCard }: cardComponent) => {
             Organize related links under one collection. Perfect for keeping your research or ideas grouped together.
         </div>
         <div className="text-center mt-3">
-            <input type="text" placeholder="Name your collection" className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-700 focus:outline-none" />
-            <textarea placeholder="A brief description shown when this collection is shared." className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading scrollbarSB border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-700 focus:outline-none" />
+            <input type="text" placeholder="Name your collection" className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-700 focus:outline-none" value={collectionName} onChange={(e) => setCollectionName(e.target.value)}/>
+            <textarea placeholder="A brief description shown when this collection is shared." className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading scrollbarSB border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-700 focus:outline-none" value={collectionDesc} onChange={(e) => setCollectionDesc(e.target.value)} />
         </div>
-        <ButtonEl buttonType="primary" onClickHandler={clicked} particularStyle="w-[90%]  font-inter mt-2 h-12 mx-auto text-2xl font-[550] font-inter " placeholder="Create new collection" />
+        <ButtonEl buttonType="primary" onClickHandler={() => handleAddCollection()} particularStyle="w-[90%]  font-inter mt-2 h-12 mx-auto text-2xl font-[550] font-inter " placeholder="Create new collection" />
+            {isPending && <div className="animate-pulse text-lg text-center mt-1 font[600]">Creating collection {collectionName}</div>}
     </motion.div>
 }
 

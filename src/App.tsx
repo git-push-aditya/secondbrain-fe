@@ -7,7 +7,8 @@ import { PopUp } from "./components/popUp";
 import Auth from "./pages/Auth";
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import {RecoilRoot } from 'recoil';
 
 const queryClient = new QueryClient();
 
@@ -27,7 +28,7 @@ interface protectedRouteProp {
 function App() {
 	const [popUpLive, setPopUpLive] = useState<Boolean>(false);
 	const [layout, setLayout] = useState<"grid" | "list">("grid");
-	const [user, setuser] = useState<AuthUser | null>(null);
+	const [user, setUser] = useState<AuthUser | null>(null); 
 
 	useEffect(() => {
 		loadTwitterScript().then(() => {
@@ -55,16 +56,17 @@ function App() {
 
 
 	return (
+		<RecoilRoot>
 			<QueryClientProvider client={queryClient}>
 				<AnimatePresence>
 					<BrowserRouter>
 						{popUpLive && <PopUp placeholder="Link coppied to clipboard!!" />}
 						<Routes>
 
-							<Route path="/" element={<Auth user={user} setUser={setuser} />} />
+							<Route path="/" element={<Auth user={user} setUser={setUser} />} />
 
 							<Route element={<ProtectedRoute user={user} redirectTo="/" />}>
-								<Route path="/user" element={<Dashboard user={user} popUpLive={popUpLive} setPopUpLive={setPopUpLive} layout={layout} setLayout={setLayout} />} />
+								<Route path="/user" element={<Dashboard setUser={setUser} user={user} popUpLive={popUpLive} setPopUpLive={setPopUpLive} layout={layout} setLayout={setLayout} />} />
 							</Route>
 							
 
@@ -76,6 +78,7 @@ function App() {
 				</AnimatePresence>
 				<ReactQueryDevtools initialIsOpen={false} position="bottom" /> 
 			</QueryClientProvider> 
+		</RecoilRoot>
 	)
 }
 
