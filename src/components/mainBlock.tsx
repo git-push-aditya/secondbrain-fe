@@ -1,13 +1,15 @@
-import { useState, useEffect} from "react"; 
-import type { cardProp } from "./card";
+import { useState, useEffect, useMemo} from "react"; 
+import type { cardProp, cardType } from "./card";
 import { ButtonEl } from "./button"
 import { CardElement } from "./card";
 import { GridIcon, ListIcon, PlusIcon ,ShareIcon} from "../icons/commonIcons";   
 import type { ChildProps } from "../pages/dashboard";
 import { useTabAtom } from "../recoil/tab";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";
 import type { GetListResponse } from "./modal";
+import { useFetchQuery } from "../api/user/query";
+import { useLimitAtom, usePageAtom } from "../recoil/pageLimit";
 
 
 /* 
@@ -20,21 +22,47 @@ import type { GetListResponse } from "./modal";
 
 const MainBlock = ({setModalNeededBy, setPopUpLive, layout,setLayout, user} : ChildProps) => {
 
-    const [tab] = useTabAtom();
-    const queryClient = useQueryClient();
-    const listData = queryClient.getQueryData<AxiosResponse<GetListResponse>>(['getList']);
-    const collectionList = listData?.data?.payload?.collectionList || [];
-    
-    const  [currentCollection, setCurrentCollection] = useState<string | undefined>('Dashboard');
+    const [tab] = useTabAtom(); 
+    const { data: listData, isSuccess: isListSuccess } = useQuery<AxiosResponse<GetListResponse>>({
+        queryKey: ['getList']
+    });
+
+    const collectionList = useMemo(
+        () => listData?.data?.payload?.collectionList || [],
+        [listData]
+    );
 
     useEffect(() => {
-        if(tab.startsWith('dashboard')){
+        if (!isListSuccess) return;
+        
+        if (tab.startsWith('dashboard')) {
             setCurrentCollection("Dashboard");
-        }else{
-            //@ts-ignore
-            setCurrentCollection(collectionList?.find((coll) => coll.id === parseInt(tab.split('-')[1])).name ?? "Dashboard");
-        }///fo this for community as well 
-    },[tab,setCurrentCollection])
+            setCurrentCollectionId(collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1);
+        } else {
+            const tabId = parseInt(tab.split('-')[1]);
+            const matched = collectionList.find((coll) => coll.id === tabId);
+            setCurrentCollection(matched?.name ?? "Dashboard");
+            setCurrentCollectionId(tabId);
+        }
+    }, [tab, listData,isListSuccess]);
+
+    const  [currentCollection, setCurrentCollection] = useState<string>('Dashboard');
+    const  [currentCollectionId, setCurrentCollectionId] = useState<number>(-1);
+
+    const [page,setPage] = usePageAtom();
+    const [limit] = useLimitAtom();
+
+    useEffect(()=>{
+        setPage(1);
+    },[currentCollectionId])
+
+    const {refetch, data: cardData, isSuccess} = useFetchQuery({collectionId:currentCollectionId, page,limit});
+
+    useEffect(()=>{
+        refetch().then(({ data }) => {
+            console.log(data); 
+        });
+    },[page,currentCollectionId])
     
     const layoutStyle = "hover:text-white hover:bg-[#6056AA]/60 text-black transition-hover duration-150 ease-in-out rounded-lg p-2  cursor-pointer bg-slate-300";
     
@@ -61,10 +89,14 @@ const MainBlock = ({setModalNeededBy, setPopUpLive, layout,setLayout, user} : Ch
 
             <div className={` ${layout === "grid" ? " grid 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 xl:gap-6  lg:gap-4 gap-2 gap-y-6 " : " w-full " }`}> 
                 {
-                    tab.startsWith('dashboard')  
+                    tab.startsWith('dashboard')  ? <>{ isSuccess && cardData?.payload?.content.map((element: { content: { title: string; type: string; hyperlink: string; note: string | undefined; tags: { title: string; id: number; }[] | undefined; createdAt: string | undefined; }; }) => {
+
+                        return <CardElement title={element.content.title} cardType={element.content.type.toLowerCase() as cardType} link={element.content.hyperlink} note={element.content.note} tags={element.content.tags} createdAt={element.content.createdAt} layout={layout} shared={false} /> }) } </> : <div></div>
+                
                 }
             </div> 
         </div>
+        <div><ButtonEl onClickHandler={() => setPage((page) => page +1) } placeholder="Load more..." buttonType={"loadMore"} /></div>
     </div>
 }  
 

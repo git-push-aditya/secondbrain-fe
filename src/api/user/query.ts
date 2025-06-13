@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from 'axios';
 
 
-interface fetchContent {
+interface fetchContentType {
     collectionId : number,
     page : number,
     limit : number
@@ -17,10 +17,11 @@ const getLists = () => {
 }
 
 
-const fetchContent = ({collectionId, page,limit}: fetchContent) => {
-    return axios.get('http://localhost:2233/user/fetchcontents',{
+const fetchContent = async ({collectionId,page,limit}: fetchContentType) => {
+    const res = await axios.get(`http://localhost:2233/user/fetchcontents?collectionId=${collectionId}&page=${page}&limit=${limit}`, {
         withCredentials: true
-    })
+    });
+    return res.data;
 }
 
 
@@ -47,10 +48,10 @@ export const useGetListQuery = () => {
     })
 }
 
-export const useFetchQuery = ({collectionId, page,limit}:fetchContent) => {
-    return useQuery ({
-        queryKey : ['fetchQuery',collectionId, pageXOffset,limit],
-        queryFn : () => fetchContent({collectionId, page,limit}),
-        enabled : false
+export const useFetchQuery = ({collectionId,page,limit} : fetchContentType) => { 
+    return useQuery  ({ 
+        queryKey : ['fetchData',collectionId, page,limit],
+        queryFn : () => fetchContent({collectionId,page,limit}),
+        enabled : true 
     })
 }

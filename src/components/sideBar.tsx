@@ -76,7 +76,7 @@ const SideBar = ({setModalNeededBy,setUser} : ChildProps) => {
                                 <>
                                     <ButtonEl onClickHandler={() => setModalNeededBy("addCollection")} placeholder="Add Collection" particularStyle=" pl-7" buttonType="sidebar" startIcon={<PlusIcon dim={"40"} />} />
                                     {   
-                                        listSuccess && Array.isArray(lists?.data?.payload?.collectionList) &&     lists.data.payload.collectionList.filter((collection: {id :number, name : string} ) => collection.name !== 'dashboard').map((collection: {id :number, name : string} ) => (<ButtonEl onClickHandler={() => setTab("collection-" + collection.id.toString())} placeholder={collection.name} particularStyle=" pl-7 line-clamp-1 " buttonType="sidebar" startIcon={<CollectionIcon dim={"40"} />} />))
+                                        listSuccess && Array.isArray(lists?.data?.payload?.collectionList) &&     lists.data.payload.collectionList.filter((collection: {id :number, name : string} ) => collection.name !== 'dashboard').map((collection: {id :number, name : string} ) => (<ButtonEl onClickHandler={() => setTab("collection-" + collection.id.toString())} placeholder={collection.name} particularStyle=" pl-7 truncate " buttonType="sidebar" startIcon={<CollectionIcon dim={"40"} />} />))
                                     }
                                 </>
                             )

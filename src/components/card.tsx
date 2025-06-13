@@ -6,10 +6,11 @@ import { ButtonEl } from "./button";
 import { AnimatePresence, motion } from "framer-motion";
 import { minEndingIndex } from "../utils"
 
+export type cardType = "youtube" | "web" | "twitter" | "reddit" | "instagram";
 
 export interface cardProp {
     title: string;
-    cardType: "youtube" | "web" | "twitter" | "reddit" | "instagram";
+    cardType: cardType;
     note?: string;
     tags?: { title: string, id: number }[];
     createdAt?: string;

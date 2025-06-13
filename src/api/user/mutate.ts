@@ -1,5 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from 'axios';
+import { useLimitAtom, usePageAtom } from "../../recoil/pageLimit";
+import { title } from "framer-motion/client";
 
 //////////query paramerets types
 interface addContentType {
@@ -29,7 +31,7 @@ interface shareBraintype {
 const addContent = (data: addContentType) => {
     return axios.post('http://localhost:2233/user/addcontent', data, {
         withCredentials: true
-    })
+    }).then(res=>res.data)
 }
 
 
@@ -39,10 +41,11 @@ const addCollection = (data: addCollectionType) => {
     })
 }
 
-const sharebrain = (data : shareBraintype) => {
-    return axios.patch('http://localhost:2233/user/generatelink',data,{
-        withCredentials : true
-    }).then(res => res.data);
+const sharebrain = async (data : shareBraintype) => {
+    const res = await axios.patch('http://localhost:2233/user/generatelink', data, {
+        withCredentials: true
+    });
+    return res.data;
 }
 
 
@@ -50,10 +53,15 @@ const sharebrain = (data : shareBraintype) => {
 
 //////////////////////////////////exported cutom hooks
 export const useAddContentQuery = () => {
+    const client = useQueryClient();
+    const [page] = usePageAtom();
+    const [limit] = useLimitAtom();
     return useMutation<any, Error, addContentType>({
-        mutationFn: addContent,
-        //        onSuccess : --revalidate the content on the current content of current collection
-    })
+        mutationFn: ({collectionId, title,hyperlink,note,type,existingTags,newTags}) => addContent({collectionId, title,hyperlink,note,type,existingTags,newTags}),
+        onSuccess : (_, variables) => {
+            client.invalidateQueries({ queryKey: ['fetchData',variables.collectionId,page,limit] });
+        }
+    })    
 }
 
 
@@ -63,7 +71,7 @@ export const useCreateCollection = () => {
     return useMutation<any, Error, addCollectionType>({
         mutationFn: addCollection,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['getList'] });
+            queryClient.invalidateQueries({ queryKey: ['getList'] })
         }
     })
 }
