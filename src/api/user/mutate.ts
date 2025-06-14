@@ -100,6 +100,7 @@ export const useDeletecardQuery = ({contentId,collectionId } : {contentId: numbe
         mutationKey :['deleteCard',contentId],
         mutationFn : () => deleteCard({contentId}),
         onSuccess : () => {
+            queryClient.invalidateQueries({ queryKey: ['fetchData', variables.collectionId] });
             queryClient.setQueryData(['fetchData',collectionId],((prev :any) => {
                 if (!prev) return [];
                 return {...prev,
