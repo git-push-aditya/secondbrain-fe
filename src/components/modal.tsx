@@ -1,14 +1,16 @@
-import { CopyIcon, CrossIcon, Dasboard, LeftIcon } from "../icons/commonIcons";
+import { CopyIcon, CrossIcon, Dasboard, LeftIcon, Loader } from "../icons/commonIcons";
 import { ButtonEl } from "./button";
 import { motion, AnimatePresence } from "framer-motion";
 import Dropdown from "./dropdown";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Tag from "./tags";
 import { useAddContentQuery, useCreateCollection, useShareBrain } from "../api/user/mutate";
 import { useQueryClient } from "@tanstack/react-query";
 import { all, type AxiosResponse } from 'axios';
 import { data } from "react-router-dom";
-import { useTabAtom } from "../recoil/tab";
+import { usePopUpAtom, useTabAtom } from "../recoil/clientStates";
+import { useGetListQuery } from "../api/user/query";
+import type { SetterOrUpdater } from "recoil";
 
 export type type = 'WEB' | 'YOUTUBE' | 'REDDIT' | 'TWITTER' | 'INSTAGRAM' ;
 
@@ -30,6 +32,7 @@ interface props {
 }
 
 interface cardComponent {
+    setPopUpLive ?: SetterOrUpdater<boolean>;
     closeCard: () => void;
     cause?: "addContent" | "shareBrain" | "logout" | "addCollection" | "addCommunity" | "joinCommunity" | "close";
 }
@@ -40,6 +43,9 @@ const clicked = () => {
 
 
 const Modal = ({ cause, closeModal }: props) => {
+
+    const [popUpLive, setPopUpLive] = usePopUpAtom();
+
     return <motion.div 
     initial={{ opacity: 0 }} 
     animate={{ opacity: 1 }} 
@@ -47,7 +53,7 @@ const Modal = ({ cause, closeModal }: props) => {
     transition={{ duration: 0.3, ease: 'circIn' }} 
     className="h-screen w-screen  backdrop-blur-xs bg-[rgba(0,0,0,0.5)] fixed z-20 top-0 left-0 flex justify-center items-center" >
         {cause == "addContent" && <AddContent closeCard={closeModal} />}
-        {cause == "shareBrain" && <ShareBrain cause={cause} closeCard={closeModal} />}
+        {cause == "shareBrain" && <ShareBrain setPopUpLive={setPopUpLive} cause={cause} closeCard={closeModal} />}
         {cause == "logout" && <Logout closeCard={closeModal} />}
         {cause == "addCommunity" && <StartCommunity closeCard={closeModal} />}
         {cause == "addCollection" && <AddCollection closeCard={closeModal} />}
@@ -194,23 +200,39 @@ const AddContent = ({ closeCard }: cardComponent) => {
     </motion.div>
 }
 
-const ShareBrain = ({ closeCard }: cardComponent) => {
-    const {mutate, isPending, data,isSuccess, error} = useShareBrain();
-    const queryClient = useQueryClient();
-    const listData = queryClient.getQueryData<AxiosResponse<GetListResponse>>(['getList']);
-    const collectionList = listData?.data?.payload?.collectionList || [];
-    const [tab] = useTabAtom();
+const ShareBrain = ({ closeCard ,setPopUpLive}: cardComponent) => {
 
-    const handleShareBrain = () => {
-        let toShareCollection: number =  -1;
-        if(tab.startsWith('dashboard')){
-            toShareCollection = collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1; // if tab 
-        }else{
-            toShareCollection = parseInt(tab.split('-')[1]); // if tab ==> collection-4, than toShareCollection =4 ? // since tab is  astring 
+    const [tab] = useTabAtom(); 
+    const { data: listData, isFetched,isSuccess : isListSuccess } = useGetListQuery()
+
+    let collectionList : {name:string, id:number}[];
+    if(isFetched){
+        collectionList = listData?.data?.payload.collectionList;
+    }
+ 
+    const  [currentCollectionId, setCurrentCollectionId] = useState<number>(-1);
+
+    useEffect(() => {
+        if (!isListSuccess) return;
+        
+        if (tab.startsWith('dashboard')) { 
+            setCurrentCollectionId(collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1);
+        } else {
+            const tabId = parseInt(tab.split('-')[1]); 
+            setCurrentCollectionId(tabId);
         }
+    }, [tab, listData,isListSuccess]);
 
+    const {mutateAsync, isPending,data,isSuccess, error} = useShareBrain({collectionId: currentCollectionId})
+
+    const copyLink = () => {
+        navigator.clipboard.writeText(data?.payload?.generatedLink ?? "SoS");
+        setPopUpLive?.((prev) => !prev);
+    }
+
+    const handleShareBrain = async () => {
         try{
-            mutate({collectionId: toShareCollection});
+            await mutateAsync({collectionId: currentCollectionId});
             console.log("generated link");
         }catch(e){
             console.error("Issue with creating a sharacble link", error);
@@ -218,20 +240,24 @@ const ShareBrain = ({ closeCard }: cardComponent) => {
     }
 
     return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} transition={{ duration: 0.2 }} className={` max-h-[500px] w-[70%] xl:w-[40%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB pb-10`} >
-        <div className="flex justify-between items-center mx-8 md:mx-10 xl:mx-12 mt-10">
+        <div className="flex justify-between items-center mx-8 md:mx-10 xl:mx-12 mt-8">
             <div className="font-[650]  text-3xl text-modalHead font-inter ">Share your Second Brain</div>
             <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2" />} />
         </div>
-        <div className="  mt-6 xl:mt-7 md:mt-6  xl:text-2xl text-justify  text-xl mx-12  font-[450] text-gray-500">
+        <div className="  mt-6 xl:mt-5 md:mt-6  xl:text-xl text-justify  text-xl mx-12  font-[450] text-gray-500">
             Share your entire collection of posts, blogs, tweets, and videos with others. They'll be able to import your content into their own Second Brain.
         </div>
-        <div className="mt-3 xl:text-xl md:text-md mx-12 text-center font-[400] text-gray-600">
-            You can stop sharing your Second Brain at any time.
+        <div className="mt-2 xl:text-xl md:text-md mx-12 text-center font-[400] text-gray-600">
+            You can stop sharing your secondbrain at any time.
         </div> 
-        {!isSuccess ? 
-            <ButtonEl buttonType="primary" onClickHandler={() => handleShareBrain()} particularStyle={`w-[80%] xl:w-[88%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter ${isPending && " animate-pulse"} `} placeholder="Share Brain" startIcon={<CopyIcon dim="40" style="color-white" />} /> 
+        {
+            isPending ? <div className="w-[80%] xl:w-[88%] mt-6 h-16 mx-auto  bg-primaryButtonBlue rounded-xl h-14 justify-center hover:bg-hover1"><Loader dimh="30" dimw="60" style="" /></div> : !isSuccess ? 
+            <ButtonEl buttonType="primary" onClickHandler={() => handleShareBrain()} particularStyle={`w-[80%] xl:w-[88%] gap-5 mt-6 h-16 mx-auto font-[550] font-inter `} placeholder="Share Brain" startIcon={<CopyIcon dim="40" style="color-white" />} /> 
             :
-            <div className="w-[80%] xl:w-[88%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter bg-primaryButtonBlue rounded-xl h-14 justify-center text-primaryButtonText hover:bg-hover1 font-inter text-3xl  font-[500]">{data?.payload?.generatedLink}</div>
+            <div className=" flex xl:max-w-[88%] max-w-[95%] bg-gray-200 justify-between items-center mx-auto h-18 mt-3 rounded-[3.5rem] border-2 border-gray-800 p-1">
+                <div className="max-w-[80%] line-clamp-1 pl-3 text-[1.48rem] font-cardTitleHeading">{data?.payload?.generatedLink ?? "server issue, no link generated"}</div>
+                <div className="cursor-pointer justify-center flex items-center h-full rounded-[3.5rem] bg-[#8F96C0] hover:bg-[#AAB1DA] w-[20%] shadow-2xl text-[1.43rem] font-[480] transition-hover duration-150" onClick={() => copyLink()}>Copy link</div>
+            </div>
         }
     </motion.div>
 }

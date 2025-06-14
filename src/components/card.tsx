@@ -5,8 +5,10 @@ import Tag from "./tags";
 import { ButtonEl } from "./button";
 import { AnimatePresence, motion } from "framer-motion";
 import { minEndingIndex } from "../utils"
+import { usePopUpAtom } from "../recoil/clientStates";
+import type { SetterOrUpdater } from "recoil";
 
-export type cardType = "youtube" | "web" | "twitter" | "reddit" | "instagram";
+export type cardType = "YOUTUBE" | "WEB" | "TWITTER" | "REDDIT" | "INSTAGRAM";
 
 export interface cardProp {
     title: string;
@@ -15,7 +17,7 @@ export interface cardProp {
     tags?: { title: string, id: number }[];
     createdAt?: string;
     link: string;
-    setPopUpLive?: React.Dispatch<React.SetStateAction<Boolean>>;
+    setPopUpLive?: SetterOrUpdater<boolean>;
     layout?: "grid" | "list";
     shared : boolean;       //shared refers to if user is accessign someones'shared brain page via generated public link
 }
@@ -27,11 +29,11 @@ const clicked = () => {
 
 
 const typeIcon: { [key: string]: ReactElement } = {
-    'twitter': <TwitterIcon dim="45" />,
-    'youtube': <YoutubeIcon dim="60" />,
-    'reddit': <RedditIcon dim="50" />,
-    'instagram': <InstagramIcon dim="50" />,
-    'web': <WebIcon diml="60" dimb="50" />
+    'TWITTER': <TwitterIcon dim="45" />,
+    'YOUTUBE': <YoutubeIcon dim="60" />,
+    'REDDIT': <RedditIcon dim="50" />,
+    'INSTAGRAM': <InstagramIcon dim="50" />,
+    'WEB': <WebIcon diml="60" dimb="50" />
 }
 
 
@@ -44,8 +46,9 @@ interface layoutCard extends cardProp {
 
 
 
-export const CardElement = ({ title,shared, cardType, layout, note, setPopUpLive, tags, createdAt, link }: cardProp) => {
+export const CardElement = ({ title,shared, cardType, layout, note, tags, createdAt, link }: cardProp) => {
 
+    const [popUpLive, setPopUpLive] = usePopUpAtom();
     const [deletClicked, setDeleteClicked] = useState<Boolean>(false);
     const shareClicked = (link: string) => {
         navigator.clipboard.writeText(link);
@@ -64,7 +67,7 @@ export const CardElement = ({ title,shared, cardType, layout, note, setPopUpLive
 const GridStyle = ({ title,shared, deletClicked, setDeleteClicked, shareClicked, cardType, note, setPopUpLive, tags, createdAt, link }: layoutCard) => {
     const [readMore, setReadMore] = useState<Boolean>(false);
 
-    const defaultStyle: string = `${ !shared ? "w-85" : " w-85 overflow-x-hidden "}   ${cardType == 'reddit' ? " hover:border-orange-600 " : cardType == "twitter" ? " hover:border-blue-800" : cardType == "youtube" ? " hover:border-red-700 "  : cardType == "instagram" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 h-115  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md`;
+    const defaultStyle: string = `${ !shared ? "w-85" : " w-85 overflow-x-hidden "}   ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 "  : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 h-115  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md`;
 
 
     return <motion.div
@@ -103,15 +106,15 @@ const GridStyle = ({ title,shared, deletClicked, setDeleteClicked, shareClicked,
                     </motion.div>
                  : null}</AnimatePresence>
 
-                {cardType === "youtube" && <iframe className="w-[99%] mx-auto h-50 mt-2 rounded-lg  " title="YouTube video player" src={link.includes('youtu.be') ? link.replace('youtu.be', 'youtube.com/embed') : link} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>}
+                {cardType === "YOUTUBE" && <iframe className="w-[99%] mx-auto h-50 mt-2 rounded-lg  " title="YouTube video player" src={link.includes('youtu.be') ? link.replace('youtu.be', 'youtube.com/embed') : link} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>}
 
-                {cardType === 'twitter' && <div className="w-full mb-[-10px] mt-[-1px] mx-auto">
+                {cardType === 'TWITTER' && <div className="w-full mb-[-10px] mt-[-1px] mx-auto">
                     <blockquote className="twitter-tweet w-full max-w-full"  >
                         <a href={link.replace('x.com', 'twitter.com')} target="_blank" rel="noopener noreferrer" > </a>
                     </blockquote>
                 </div>}
 
-                {cardType === 'reddit' && <>
+                {cardType === 'REDDIT' && <>
                     <div className=" mt-2 " >
                         <blockquote className="reddit-embed-bq">
                             <a href={link}></a>
@@ -119,7 +122,7 @@ const GridStyle = ({ title,shared, deletClicked, setDeleteClicked, shareClicked,
                     </div>
                 </>}
 
-                {cardType === 'instagram' &&
+                {cardType === 'INSTAGRAM' &&
                     <div className="flex justify-center mt-2 overflow-hidden rounded-2xl  border-1 border-slate-200 mb-[-8px]">
                         <blockquote className="instagram-media w-full max-w-full " data-instgrm-permalink={link} data-instgrm-version="14">
                             <a href={!link.includes('embed&amp;utm_campaign=loading') ? link.replace('web_copy_link', 'embed&amp;utm_campaign=loading') : link}></a>
@@ -128,7 +131,7 @@ const GridStyle = ({ title,shared, deletClicked, setDeleteClicked, shareClicked,
                 }
 
                 {
-                    cardType === 'web' &&
+                    cardType === 'WEB' &&
                     <div className="flex justify-center">
                         <a href={link} target="_blank">
                             {<WebPageDisplay />}
@@ -178,18 +181,18 @@ const ListStyle = ({ title,shared, deletClicked, setDeleteClicked, shareClicked,
         animate={{ y: 0, x: 0, opacity: 1 }}
         exit={{ x: -10, opacity: 0 }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
-        className={`${shared ? " w-[100%] " : " w-[96%] " } h-[80px] flex items-center mb-4 mx-auto transition-hover cursor-default duration-300  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md pl-3 ${shared ? " hover:scale-101 transition-hover duration-150 ease-in-out hover:sahdow-lg" : " "}  ${cardType == 'reddit' ? " hover:border-orange-600 " : cardType == "twitter" ? " hover:border-blue-800" : cardType == "youtube" ? " hover:border-red-700 "  : cardType == "instagram" ? " hover:border-[#bc1888] " : " hover:border-slate-500"}`}
+        className={`${shared ? " w-[100%] " : " w-[96%] " } h-[80px] flex items-center mb-4 mx-auto transition-hover cursor-default duration-300  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md pl-3 ${shared ? " hover:scale-101 transition-hover duration-150 ease-in-out hover:sahdow-lg" : " "}  ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 "  : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"}`}
 
     >
         <div className="flex  items-center w-[5%] justify-center">
             {typeIcon[cardType]}
         </div>
-        <div className=" w-[70%] h-full pl-1">
-            <div className="w-[100%] flex h-[60%] gap-10 items-center">
-                <div className="max-w-[50%] pt-2 font-cardTitleHeading h-[100%] flex items-center text-2xl text-cardTitle font-[500] ">
+        <div className=" w-[70%] h-full pl-1 py-2">
+            <div className={`w-[100%] flex gap-10 items-center ${note !== "" ? "h-[60%] " : "h-full"}`}>
+                <div className="max-w-[50%] font-cardTitleHeading h-[100%] flex items-center text-2xl text-cardTitle font-[500] ">
                     <span className="truncate w-full">{title}</span>
                 </div>
-                <div className="max-w-[50%] overflow-x-auto scrollbar-hidden pt-2 flex gap-2 items-center">
+                <div className="max-w-[50%] overflow-x-auto scrollbar-hidden flex gap-2 items-center">
                     <Tag style=" h-7 " name="science" id="hehe" />
                     <Tag style=" h-7 " name="science and technology" id="hehe" />
                     <Tag style=" h-7 " name="Freelance" id="hehe" />
@@ -197,7 +200,7 @@ const ListStyle = ({ title,shared, deletClicked, setDeleteClicked, shareClicked,
                 </div>
             </div>
 
-            <div className="w-[100%] h-[40%] truncate font-sans font-[440] text-slate-600  text-md ">
+            <div className={`w-[100%] h-[40%] truncate font-sans font-[440]  text-slate-600  text-md  ${note !== "" ? "block" : "hidden"}`}>
                 {note}
             </div>
         </div>

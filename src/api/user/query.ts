@@ -1,12 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from 'axios';
-
-
-interface fetchContentType {
-    collectionId : number,
-    page : number,
-    limit : number
-}
+ 
 
 //query functions
 
@@ -17,8 +11,8 @@ const getLists = () => {
 }
 
 
-const fetchContent = async ({collectionId,page,limit}: fetchContentType) => {
-    const res = await axios.get(`http://localhost:2233/user/fetchcontents?collectionId=${collectionId}&page=${page}&limit=${limit}`, {
+const fetchContent = async (pageParam : number, collectionId: number) => {
+    const res = await axios.get(`http://localhost:2233/user/fetchcontents?collectionId=${collectionId}&page=${pageParam}&limit=${12}`, {
         withCredentials: true
     });
     return res.data;
@@ -48,10 +42,14 @@ export const useGetListQuery = () => {
     })
 }
 
-export const useFetchQuery = ({collectionId,page,limit} : fetchContentType) => { 
-    return useQuery  ({ 
-        queryKey : ['fetchData',collectionId, page,limit],
-        queryFn : () => fetchContent({collectionId,page,limit}),
-        enabled : true 
-    })
-}
+export const useFetchQuery = ({ collectionId }: { collectionId: number }) => {
+  return useInfiniteQuery({
+    queryKey: ['fetchData', collectionId],
+    queryFn: ({ pageParam = 1 }) => fetchContent(pageParam, collectionId),
+    initialPageParam: 1,
+    enabled: collectionId !== -1,
+    getNextPageParam: (lastPage,allPages) =>
+      lastPage.payload.more ? allPages.length + 1 : undefined,
+  });
+};
+//hasnextpage and fetchnextpage

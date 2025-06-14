@@ -6,7 +6,7 @@ import { AnimatePresence } from "framer-motion";
 import type { AuthUser } from "../App";
 import { ChatBot } from "../components/Chatbot";
 import { useQueryClient } from '@tanstack/react-query';
-import { useTabAtom } from "../recoil/tab";
+import { usePopUpAtom, useTabAtom } from "../recoil/clientStates";
 
 type ModalType = "addContent" | "shareBrain" | "logout" | "addCollection"| "addCommunity"|"joinCommunity" |"close";
 
@@ -25,8 +25,9 @@ export interface ChildProps {
 }
 
 
-const Dashboard = ({popUpLive,user, setUser,setPopUpLive,layout,setLayout}:{user : AuthUser | null, popUpLive:Boolean,setPopUpLive:React.Dispatch<React.SetStateAction<Boolean>>,layout: "grid" | "list",setLayout: React.Dispatch<React.SetStateAction<"grid" | "list">>, setUser: React.Dispatch<React.SetStateAction<AuthUser | null>>}) => {
+const Dashboard = ({ user, setUser, layout,setLayout}:{user : AuthUser | null,   layout: "grid" | "list",setLayout: React.Dispatch<React.SetStateAction<"grid" | "list">>, setUser: React.Dispatch<React.SetStateAction<AuthUser | null>>}) => {
 
+    const [popUpLive, setPopUpLive] = usePopUpAtom();
     const [modalNeeded, setModalNeededBy] = useState<ModalType >("close");
     const [collectionList, setCollectionList] = useState<{id : number, title: string}[]>([]);
 ///have to look into this as to how to use tanstack query chache w/o data duplicacy
@@ -44,7 +45,7 @@ const Dashboard = ({popUpLive,user, setUser,setPopUpLive,layout,setLayout}:{user
                 {modalNeeded !== "close" && <Modal cause={modalNeeded} closeModal={closeModal}  />}
             </AnimatePresence>
             <SideBar setModalNeededBy={setModalNeededBy} collectionList={collectionList} setCollectionList={setCollectionList} user={user} setUser={setUser} />
-            {tab === 'chatbot' ? <ChatBot /> : <MainBlock setModalNeededBy={setModalNeededBy} user={user} layout= {layout} setLayout={setLayout} popUpLive={popUpLive} collectionList={collectionList} setCollectionList={setCollectionList} setPopUpLive={setPopUpLive} />}
+            {tab === 'chatbot' ? <ChatBot /> : <MainBlock setModalNeededBy={setModalNeededBy} user={user} layout= {layout} setLayout={setLayout} collectionList={collectionList} setCollectionList={setCollectionList}   />}
             
             
         </div> 

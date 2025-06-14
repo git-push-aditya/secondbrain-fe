@@ -5,7 +5,7 @@ import { ButtonEl } from "./button";
 import type { ChildProps } from "../pages/dashboard";
 import { useLogOutQuery } from "../api/auth/mutate";
 import { useNavigate } from "react-router-dom";
-import { useTabAtom } from "../recoil/tab";
+import { useTabAtom } from "../recoil/clientStates";
 import { useGetListQuery } from "../api/user/query";
 
 const headingStyle :string = "text-4xl font-[600]  font-head text-secondBrainHeading";
@@ -61,11 +61,11 @@ const SideBar = ({setModalNeededBy,setUser} : ChildProps) => {
         <div >
             <div>
                 <ButtonEl onClickHandler={() => setTab('dashboard')} startIcon={<Dasboard dim="35" style=" ml-2 " />} particularStyle="  h-8 gap-6" buttonType="sidebar" placeholder="Dashboard"/>
-                <ButtonEl onClickHandler={() => setTab('dashboard-youtube')} startIcon={<YoutubeIcon dim="40" style=" mx-2 " />} particularStyle="  h-8 gap-3" buttonType="sidebar" placeholder="YouTube"/>
-                <ButtonEl onClickHandler={() => setTab('dashboard-twitter')} startIcon={<TwitterIcon  dim="35" />} particularStyle="  gap-7 pl-6 h-10 " buttonType="sidebar" placeholder="X"/>
-                <ButtonEl onClickHandler={() => setTab('dashboard-reddit')} startIcon={<RedditIcon dim="40" />} particularStyle=" text-2xl gap-5 pl-6 h-10  " buttonType="sidebar" placeholder="Reddit"/>
-                <ButtonEl onClickHandler={() => setTab('dashboard-instagram')} startIcon={<InstagramIcon dim="40" />} particularStyle=" pl-6 text-2xl h-10 py-3 " buttonType="sidebar" placeholder="Instagram"/>
-                <ButtonEl onClickHandler={() => setTab('dashboard-web')} startIcon={<WebIcon diml="40" dimb="40" />} particularStyle="  pl-7 text-2xl h-10 " buttonType="sidebar" placeholder="Webpage"/>
+                <ButtonEl onClickHandler={() => setTab('dashboard-YOUTUBE')} startIcon={<YoutubeIcon dim="40" style=" mx-2 " />} particularStyle="  h-8 gap-3" buttonType="sidebar" placeholder="YouTube"/>
+                <ButtonEl onClickHandler={() => setTab('dashboard-TWITTER')} startIcon={<TwitterIcon  dim="35" />} particularStyle="  gap-7 pl-6 h-10 " buttonType="sidebar" placeholder="X"/>
+                <ButtonEl onClickHandler={() => setTab('dashboard-REDDIT')} startIcon={<RedditIcon dim="40" />} particularStyle=" text-2xl gap-5 pl-6 h-10  " buttonType="sidebar" placeholder="Reddit"/>
+                <ButtonEl onClickHandler={() => setTab('dashboard-INSTAGRAM')} startIcon={<InstagramIcon dim="40" />} particularStyle=" pl-6 text-2xl h-10 py-3 " buttonType="sidebar" placeholder="Instagram"/>
+                <ButtonEl onClickHandler={() => setTab('dashboard-WEB')} startIcon={<WebIcon diml="40" dimb="40" />} particularStyle="  pl-7 text-2xl h-10 " buttonType="sidebar" placeholder="Webpage"/>
             </div>  
             
                 <div >

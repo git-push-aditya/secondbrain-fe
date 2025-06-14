@@ -9,6 +9,7 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {RecoilRoot } from 'recoil';
+import { usePopUpAtom } from "./recoil/clientStates";
 
 const queryClient = new QueryClient();
 
@@ -26,7 +27,7 @@ interface protectedRouteProp {
 
 
 function App() {
-	const [popUpLive, setPopUpLive] = useState<Boolean>(false);
+	const [popUpLive, setPopUpLive] = usePopUpAtom();
 	const [layout, setLayout] = useState<"grid" | "list">("grid");
 	const [user, setUser] = useState<AuthUser | null>(null); 
 
@@ -56,7 +57,6 @@ function App() {
 
 
 	return (
-		<RecoilRoot>
 			<QueryClientProvider client={queryClient}>
 				<AnimatePresence>
 					<BrowserRouter>
@@ -66,19 +66,18 @@ function App() {
 							<Route path="/" element={<Auth user={user} setUser={setUser} />} />
 
 							<Route element={<ProtectedRoute user={user} redirectTo="/" />}>
-								<Route path="/user" element={<Dashboard setUser={setUser} user={user} popUpLive={popUpLive} setPopUpLive={setPopUpLive} layout={layout} setLayout={setLayout} />} />
+								<Route path="/user" element={<Dashboard setUser={setUser} user={user} layout={layout} setLayout={setLayout} />} />
 							</Route>
-							
+							///dashboard sharedcollectiom
 
-							<Route path="/sharedbrain" element={<SharedCollection popUpLive={popUpLive} setPopUpLive={setPopUpLive} layout={layout} setLayout={setLayout} />} />
+							<Route path="/sharedbrain" element={<SharedCollection layout={layout} setLayout={setLayout} />} />
 
 							<Route path="*" element={<p>There's nothing here: 404!</p>} />
 						</Routes>
 					</BrowserRouter>
 				</AnimatePresence>
 				<ReactQueryDevtools initialIsOpen={false} position="bottom" /> 
-			</QueryClientProvider> 
-		</RecoilRoot>
+			</QueryClientProvider>  
 	)
 }
 

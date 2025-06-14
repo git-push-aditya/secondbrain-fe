@@ -7,6 +7,7 @@ interface buttonProps{
     buttonType : 'primary' | 'secondary' | "sidebar" | "dropDown" |"" | "dropdown"|"back" | "cardButton" | "authin" | "authicon" | "loadMore";
     startIcon? : ReactElement; 
     endIcon?: ReactElement;
+    disabled ?: boolean;
 }
 
 const specificStyle : {[key: string]: string} = {
@@ -19,14 +20,14 @@ const specificStyle : {[key: string]: string} = {
     "back" : " rounded-3xl bg-gray-300 hover:bg-gray-200 font-[500] justify-center text-cardTitleHeading text-2xl h-12 w-30 transition-hover duration-200 ease-in-out  ",
     "cardButton" : " rounded-2xl text-head  font-[550] border-1 border-white justify-center text-lg transition-hover duration-200 ease-in-out hover:scale-104 mt-1  ",
     "authin" : " bg-black w-full h-14 justify-center font-roboto text-white text-xl ",
-    "loadMore" : "",
+    "loadMore" : "mx-auto border-2 px-8 py-1 rounded-3xl border-primaryButtonBlue text-xl bg-gray-300 font-[500]  ",
     "" : ""
 };
 
 const defaultStyle = "   flex items-center  gap-3 cursor-pointer group  ease-out transition-hover duration-300 ";
 
-export const ButtonEl = ({placeholder, onClickHandler, particularStyle, buttonType, startIcon,endIcon} : buttonProps) => {
-    return<div ><button onClick={onClickHandler} className={`${defaultStyle}  ${specificStyle[buttonType]}  ${particularStyle}`}> 
+export const ButtonEl = ({placeholder, onClickHandler,disabled = false, particularStyle, buttonType, startIcon,endIcon} : buttonProps) => {
+    return<div ><button onClick={onClickHandler} disabled={disabled} className={`${defaultStyle}  ${specificStyle[buttonType]}  ${particularStyle}`}> 
         {startIcon}
         <span className="truncate">
         {placeholder}</span>

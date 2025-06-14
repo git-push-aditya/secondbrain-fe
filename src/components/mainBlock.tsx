@@ -1,68 +1,46 @@
-import { useState, useEffect, useMemo} from "react"; 
+import { useState, useEffect, useMemo, Fragment} from "react"; 
 import type { cardProp, cardType } from "./card";
 import { ButtonEl } from "./button"
 import { CardElement } from "./card";
 import { GridIcon, ListIcon, PlusIcon ,ShareIcon} from "../icons/commonIcons";   
 import type { ChildProps } from "../pages/dashboard";
-import { useTabAtom } from "../recoil/tab";
+import { usePopUpAtom, useTabAtom } from "../recoil/clientStates";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";
 import type { GetListResponse } from "./modal";
-import { useFetchQuery } from "../api/user/query";
-import { useLimitAtom, usePageAtom } from "../recoil/pageLimit";
+import { useFetchQuery, useGetListQuery } from "../api/user/query"; 
 
 
-/* 
-<div className="text-center font-head font-[500] p-4">
-                 //NOTE: fixed placing to adjust placement of component irrerspective of other component and along with this using z value to maintain who stays on top of whom when times call for it 
-                 //at initial fietch req with paginationlimitonl10 cards at a timee; you also get a complete list of all tags prev.used by user and at time of add content browser compares orignal list for old tags and new tags; db only stores tags for specific user(if its toomuch than make user id to tags as array and try n manage) 
-                 //optimize / cache the twitter reddit so that is stays on unmount or something</div>
-*/
-
-
-const MainBlock = ({setModalNeededBy, setPopUpLive, layout,setLayout, user} : ChildProps) => {
-
+const MainBlock = ({setModalNeededBy, layout,setLayout, user} : ChildProps) => {
+ 
     const [tab] = useTabAtom(); 
-    const { data: listData, isSuccess: isListSuccess } = useQuery<AxiosResponse<GetListResponse>>({
-        queryKey: ['getList']
-    });
+    const { data: listData, isFetched,isSuccess : isListSuccess } = useGetListQuery()
 
-    const collectionList = useMemo(
-        () => listData?.data?.payload?.collectionList || [],
-        [listData]
-    );
+    let collectionList : {name:string, id:number}[];
+    if(isFetched){
+        collectionList = listData?.data?.payload.collectionList;
+    }
+
+    const  [currentCollection, setCurrentCollection] = useState<string>('dashboard');
+    const  [currentCollectionId, setCurrentCollectionId] = useState<number>(-1);
 
     useEffect(() => {
         if (!isListSuccess) return;
         
         if (tab.startsWith('dashboard')) {
-            setCurrentCollection("Dashboard");
+            setCurrentCollection("dashboard");
             setCurrentCollectionId(collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1);
         } else {
             const tabId = parseInt(tab.split('-')[1]);
             const matched = collectionList.find((coll) => coll.id === tabId);
-            setCurrentCollection(matched?.name ?? "Dashboard");
+            setCurrentCollection(matched?.name ?? "dashboard");
             setCurrentCollectionId(tabId);
         }
     }, [tab, listData,isListSuccess]);
 
-    const  [currentCollection, setCurrentCollection] = useState<string>('Dashboard');
-    const  [currentCollectionId, setCurrentCollectionId] = useState<number>(-1);
 
-    const [page,setPage] = usePageAtom();
-    const [limit] = useLimitAtom();
+    const {data: pagesData, hasNextPage, fetchNextPage} = useFetchQuery({collectionId:currentCollectionId});
 
-    useEffect(()=>{
-        setPage(1);
-    },[currentCollectionId])
-
-    const {refetch, data: cardData, isSuccess} = useFetchQuery({collectionId:currentCollectionId, page,limit});
-
-    useEffect(()=>{
-        refetch().then(({ data }) => {
-            console.log(data); 
-        });
-    },[page,currentCollectionId])
     
     const layoutStyle = "hover:text-white hover:bg-[#6056AA]/60 text-black transition-hover duration-150 ease-in-out rounded-lg p-2  cursor-pointer bg-slate-300";
     
@@ -89,14 +67,44 @@ const MainBlock = ({setModalNeededBy, setPopUpLive, layout,setLayout, user} : Ch
 
             <div className={` ${layout === "grid" ? " grid 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 xl:gap-6  lg:gap-4 gap-2 gap-y-6 " : " w-full " }`}> 
                 {
-                    tab.startsWith('dashboard')  ? <>{ isSuccess && cardData?.payload?.content.map((element: { content: { title: string; type: string; hyperlink: string; note: string | undefined; tags: { title: string; id: number; }[] | undefined; createdAt: string | undefined; }; }) => {
+                    pagesData?.pages.map((group, i) => (
+                        <Fragment key={i}>
+                            {
+                            group.payload.content.map((cardData: any, idx: number) =>
+                                tab.split('-')[0] === 'collection' || !tab.split('-')[1] ? (
+                                <CardElement
+                                    key={idx}
+                                    title={cardData.content.title}
+                                    cardType={cardData.content.type}
+                                    link={cardData.content.hyperlink}
+                                    note={cardData.content.note}
+                                    tags={cardData.content.tags}
+                                    createdAt={cardData.content.createdAt}
+                                    layout={layout}
+                                    shared={false}
+                                />
+                                ) : (
+                                    tab.split('-')[1] === cardData.content.type && <CardElement
+                                    key={idx}
+                                    title={cardData.content.title}
+                                    cardType={cardData.content.type}
+                                    link={cardData.content.hyperlink}
+                                    note={cardData.content.note}
+                                    tags={cardData.content.tags}
+                                    createdAt={cardData.content.createdAt}
+                                    layout={layout}
+                                    shared={false}
+                                />
+                                )
+                            )
+                            }
+                        </Fragment>
+                        ))
 
-                        return <CardElement title={element.content.title} cardType={element.content.type.toLowerCase() as cardType} link={element.content.hyperlink} note={element.content.note} tags={element.content.tags} createdAt={element.content.createdAt} layout={layout} shared={false} /> }) } </> : <div></div>
-                
                 }
             </div> 
         </div>
-        <div><ButtonEl onClickHandler={() => setPage((page) => page +1) } placeholder="Load more..." buttonType={"loadMore"} /></div>
+        <div className="mt-14"><ButtonEl onClickHandler={() => fetchNextPage()} disabled={!hasNextPage} placeholder="Load more..." particularStyle={`${hasNextPage ? " hover:scale-105 " : " border-slate-300 bg-slate-100 text-slate-400 "} `} buttonType={"loadMore"} /></div>
     </div>
 }  
 

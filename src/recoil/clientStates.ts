@@ -5,4 +5,13 @@ const tabAtom = atom<string>({
     default : 'dashboard'
 })
 
+const popUpAtom = atom<boolean>({
+    key : 'popUp',
+    default : false
+})
+
+
+
 export const  useTabAtom = () => useRecoilState(tabAtom);
+
+export const  usePopUpAtom = () => useRecoilState(popUpAtom);

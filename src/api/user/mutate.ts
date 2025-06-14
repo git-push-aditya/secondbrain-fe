@@ -1,6 +1,5 @@
 import { QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from 'axios';
-import { useLimitAtom, usePageAtom } from "../../recoil/pageLimit";
+import axios from 'axios'; 
 import { title } from "framer-motion/client";
 
 //////////query paramerets types
@@ -53,13 +52,11 @@ const sharebrain = async (data : shareBraintype) => {
 
 //////////////////////////////////exported cutom hooks
 export const useAddContentQuery = () => {
-    const client = useQueryClient();
-    const [page] = usePageAtom();
-    const [limit] = useLimitAtom();
+    const client = useQueryClient(); 
     return useMutation<any, Error, addContentType>({
         mutationFn: ({collectionId, title,hyperlink,note,type,existingTags,newTags}) => addContent({collectionId, title,hyperlink,note,type,existingTags,newTags}),
         onSuccess : (_, variables) => {
-            client.invalidateQueries({ queryKey: ['fetchData',variables.collectionId,page,limit] });
+            client.invalidateQueries({ queryKey: ['fetchData',variables.collectionId] });
         }
     })    
 }
@@ -77,8 +74,9 @@ export const useCreateCollection = () => {
 }
 
 
-export const useShareBrain = () => {
+export const useShareBrain = ({collectionId} : shareBraintype) => {
     return useMutation<any, Error, shareBraintype>({
+        mutationKey: ['sharebrain', collectionId],
         mutationFn : sharebrain
     })
 }
