@@ -15,8 +15,6 @@ const SideBar = ({setModalNeededBy,setUser} : ChildProps) => {
 
     const navigate= useNavigate();
 
-
-
     const [collectionClicked,setCollectionClicked] = useState<boolean>(false);
     const [communityClicked,setcommunityClicked] = useState<boolean>(false);
 

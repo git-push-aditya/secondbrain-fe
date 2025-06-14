@@ -73,7 +73,9 @@ const MainBlock = ({setModalNeededBy, layout,setLayout, user} : ChildProps) => {
                             group.payload.content.map((cardData: any, idx: number) =>
                                 tab.split('-')[0] === 'collection' || !tab.split('-')[1] ? (
                                 <CardElement
-                                    key={idx}
+                                    key={cardData.content.id}
+                                    id={cardData.content.id}
+                                    collectionId={group.payload.content.collectionId}
                                     title={cardData.content.title}
                                     cardType={cardData.content.type}
                                     link={cardData.content.hyperlink}
@@ -85,7 +87,9 @@ const MainBlock = ({setModalNeededBy, layout,setLayout, user} : ChildProps) => {
                                 />
                                 ) : (
                                     tab.split('-')[1] === cardData.content.type && <CardElement
-                                    key={idx}
+                                    key={cardData.content.id}
+                                    id={cardData.content.id}
+                                    collectionId={group.data.payload.collectionId}
                                     title={cardData.content.title}
                                     cardType={cardData.content.type}
                                     link={cardData.content.hyperlink}

@@ -52,4 +52,3 @@ export const useFetchQuery = ({ collectionId }: { collectionId: number }) => {
       lastPage.payload.more ? allPages.length + 1 : undefined,
   });
 };
-//hasnextpage and fetchnextpage

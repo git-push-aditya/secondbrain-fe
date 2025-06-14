@@ -47,6 +47,18 @@ const sharebrain = async (data : shareBraintype) => {
     return res.data;
 }
 
+const deleteCard = ({contentId}:{contentId:number}) =>  {
+    return axios.post('http://localhost:2233/user/deletecontent',{
+        contentId : contentId
+    },{
+       withCredentials: true
+    })
+}
+
+
+
+
+
 
 
 
@@ -78,5 +90,26 @@ export const useShareBrain = ({collectionId} : shareBraintype) => {
     return useMutation<any, Error, shareBraintype>({
         mutationKey: ['sharebrain', collectionId],
         mutationFn : sharebrain
+    })
+}
+
+export const useDeletecardQuery = ({contentId,collectionId } : {contentId: number,collectionId: number}) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationKey :['deleteCard',contentId],
+        mutationFn : () => deleteCard({contentId}),
+        onSuccess : () => {
+            queryClient.setQueryData(['fetchData',collectionId],((prev :any) => {
+                if (!prev) return [];
+                return {...prev,
+                    pages : prev.pages.map((page:any)=>{
+                        return {
+                        ...page,
+                        payload : page.payload.content.filter((item :any)=> item.content.id !== contentId)
+                    }})
+                };
+            }))
+        }
     })
 }

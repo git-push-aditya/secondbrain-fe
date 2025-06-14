@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 
 interface tagProps{
     name:string;
-    id: string;
+    id: string ;
     endIcon?: ReactElement;
     onClickHandler ?: () => void;
     style ?: string;
