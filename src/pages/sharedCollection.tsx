@@ -20,19 +20,19 @@ export const SharedCollection = ({layout,setLayout}:{layout: "grid" | "list",set
 
     const {data: sharedData, isLoading: sharedDataLoading, hasNextPage, isFetchingNextPage, fetchNextPage} = useFEctchData({hash});
 
-    return <div className="h-full w-full bg-mainComponentBg overflow-y-auto scrollbarMC flex flex-col items-center pt-5 pb-15 ">
+    return <div className="h-screen w-full bg-mainComponentBg overflow-y-auto scrollbarMC flex flex-col items-center pt-5 pb-15 ">
         <div className="w-[90%] md:w-[75%] h-[15%] flex gap-4 lg:gap-8 items-center ">
             <div>
                 <LogoIcon dim="30" style="size-20 md:size-25 xl:size-30" />
             </div>
             <div className="overflow-x-hidden">
-                <div className="xl:text-5xl md:text-3xl text-xl  font-dashboardHeading font-extrabold cursor-default line-colaps-2 text-4xl font-bold text-gradient  ">
+                <div className="xl:text-5xl md:text-3xl text-xl  font-dashboardHeading font-extrabold cursor-default line-colaps-2 text-4xl py-3 font-bold text-gradient  ">
                     {
                         isSuccess && <span> {metadata.payload.userName}'s shared brain</span>
                     }
                     
                 </div>
-                <div className="md:text-2xl cursor-default text-slate-800 text-lg font-[550] text-subHead mt-0 md:mt-2 lg:mt-3">
+                <div className="md:text-2xl cursor-default text-slate-800 text-lg font-[550] text-subHead mt-0 md:mt-2 lg:mt-1">
                     {
                         isSuccess && <span> Collection: {metadata?.payload.collectionName}</span>
                     }       
@@ -59,7 +59,7 @@ export const SharedCollection = ({layout,setLayout}:{layout: "grid" | "list",set
                                 {   
                                     group?.data?.payload?.content?.map((cardData :any, idx : number) => (       <CardElement 
                                         title={cardData.content.title}
-                                        key={idx}
+                                        key={cardData.content.id}
                                         collectionId={group.data.payload.collectionId}
                                         id={cardData.content.id}
                                         note={cardData.content.note}

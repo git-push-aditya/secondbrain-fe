@@ -9,7 +9,7 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {RecoilRoot } from 'recoil';
-import { usePopUpAtom } from "./recoil/clientStates";
+import { useCardCountAtom, usePopUpAtom } from "./recoil/clientStates";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +30,7 @@ function App() {
 	const [popUpLive, setPopUpLive] = usePopUpAtom();
 	const [layout, setLayout] = useState<"grid" | "list">("grid");
 	const [user, setUser] = useState<AuthUser | null>(null); 
+	const [cardsCount]  = useCardCountAtom();
 
 	useEffect(() => {
 		loadTwitterScript().then(() => {
@@ -44,7 +45,7 @@ function App() {
 		window.twttr?.widgets?.load();
 		redditScriptLoader();
 		window.instgrm?.Embeds?.process();
-	}, [layout])
+	}, [layout,cardsCount])
 
 
 	useEffect(() => {

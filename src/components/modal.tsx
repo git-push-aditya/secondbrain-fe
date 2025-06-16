@@ -65,7 +65,7 @@ const Modal = ({ cause, closeModal }: props) => {
 
 
 const AddContent = ({ closeCard }: cardComponent) => {
-    const linkType = ["Web", "Youtube", "X", "Reddit", "Instagram", "blank"]; 
+    const linkType = ["Web", "Youtube", "TWITTER", "Reddit", "Instagram", "blank"]; 
     const queryClient = useQueryClient();
 
     const listData = queryClient.getQueryData<AxiosResponse<GetListResponse>>(['getList']);
@@ -78,12 +78,6 @@ const AddContent = ({ closeCard }: cardComponent) => {
     const [currentTag, setCurrentTag] = useState<string>("");
 
  
-//TWO THINGS TO DO: 
-/**
- * 1)filtertags   
- *          //have passed in list of names will accaess the id from actual list at the time of mutation call using somefilter or something
- * 2)passin the valid list of collections for the user and extract correct collection id for each
- */
     const [tagsList, setTagsList] = useState<string[]>([]);
 
     const [hyperLink,setHyperLink] = useState<string>('');

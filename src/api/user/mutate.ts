@@ -93,24 +93,13 @@ export const useShareBrain = ({collectionId} : shareBraintype) => {
     })
 }
 
-export const useDeletecardQuery = ({contentId,collectionId } : {contentId: number,collectionId: number}) => {
+export const useDeletecardQuery = () => {
     const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationKey :['deleteCard',contentId],
-        mutationFn : () => deleteCard({contentId}),
-        onSuccess : () => {
+    return useMutation<any,Error,{contentId: number, collectionId: number}>({ 
+        mutationFn: ({ contentId, collectionId }: { contentId: number, collectionId: number }) => deleteCard({ contentId }),
+        onSuccess: (_,variables) => {
             queryClient.invalidateQueries({ queryKey: ['fetchData', variables.collectionId] });
-            queryClient.setQueryData(['fetchData',collectionId],((prev :any) => {
-                if (!prev) return [];
-                return {...prev,
-                    pages : prev.pages.map((page:any)=>{
-                        return {
-                        ...page,
-                        payload : page.payload.content.filter((item :any)=> item.content.id !== contentId)
-                    }})
-                };
-            }))
         }
-    })
-}
+    });
+};

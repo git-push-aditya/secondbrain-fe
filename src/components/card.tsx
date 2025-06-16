@@ -1,4 +1,4 @@
-import { useState, type ReactElement } from "react";
+import {  useState, type ReactElement } from "react";
 import { InstagramIcon, RedditIcon, TwitterIcon, WebIcon, WebPageDisplay, YoutubeIcon } from "../icons/particularIcons";
 import { DeleteIcon, RedirectIcon, ShareIcon } from "../icons/commonIcons";
 import Tag from "./tags";
@@ -6,8 +6,9 @@ import { ButtonEl } from "./button";
 import { AnimatePresence, motion } from "framer-motion";
 import { minEndingIndex } from "../utils"
 import { usePopUpAtom } from "../recoil/clientStates";
-import type { SetterOrUpdater } from "recoil";
-import { useDeletecardQuery } from "../api/user/mutate";
+import type { SetterOrUpdater } from "recoil"; 
+import React from "react"; 
+import { useDeleteID } from "../recoil/deleteId";
 
 export type cardType = "YOUTUBE" | "WEB" | "TWITTER" | "REDDIT" | "INSTAGRAM";
 
@@ -47,18 +48,14 @@ interface layoutCard extends cardProp {
     shareClicked: (link: string) => void;
 }
 
-
-
-
-export const CardElement = ({ title,collectionId, shared, cardType, layout,id, note, tags, createdAt, link }: cardProp) => {
+export const CardElement = React.memo(({ title,collectionId, shared, cardType, layout,id, note, tags, createdAt, link }: cardProp) => {
  
-    const {mutate} = useDeletecardQuery({contentId: id,collectionId});
-    
+    const [deleteId, setDeleteId] = useDeleteID()
+     
 
     const deleteCard = async () => {
-        mutate();
-    }
-
+        setDeleteId(id);
+    } 
 
     const formattedDate = new Date(createdAt).toLocaleDateString('en-US', {
         year: 'numeric',
@@ -78,7 +75,7 @@ export const CardElement = ({ title,collectionId, shared, cardType, layout,id, n
         :
         <ListStyle shared={shared} title={title} deleteCard={deleteCard} collectionId={collectionId} cardType={cardType} note={note} setPopUpLive={setPopUpLive} tags={tags} createdAt={formattedDate} id={id} link={link} layout={"list"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} shareClicked={shareClicked} />
 
-}
+})
 
 
 
@@ -152,7 +149,7 @@ const GridStyle = ({ title, shared, deletClicked,deleteCard, setDeleteClicked, s
                         cardType === 'WEB' &&
                         <div className="flex justify-center">
                             <a href={link} target="_blank">
-                                {<WebPageDisplay />}
+                                {<iframe className="w-[99%] mx-auto h-50 mt-2 rounded-lg  " title="YouTube video player" src={link} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe> }
                                 <div className="text-center text-mon0 text-xl text-primaryButtonBlue mt-[-30px]">
                                     {link.substring(link.indexOf('www'), minEndingIndex(link)).split('https://')[1]}
                                 </div>
@@ -169,9 +166,9 @@ const GridStyle = ({ title, shared, deletClicked,deleteCard, setDeleteClicked, s
                 </div>
  
                 <div className="flex items-center gap-2 justify-start m-3 overflow-x-auto scrollbar-hidden">
-                    { tags?.map((tag, idx) => (
+                    { tags?.length != 0 ? tags?.map((tag, idx) => (
                         <Tag key={idx} name={tag.tag.title} id={tag.tag.id.toString()} />
-                    )) }
+                    )) : <Tag key={666} name={cardType.toLowerCase()} id={cardType.toLowerCase() } />}
                 </div> 
             </div>
 
@@ -181,7 +178,7 @@ const GridStyle = ({ title, shared, deletClicked,deleteCard, setDeleteClicked, s
 
 
 
-
+//                       {<WebPageDisplay />}
 
 
 

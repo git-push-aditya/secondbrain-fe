@@ -10,8 +10,15 @@ const popUpAtom = atom<boolean>({
     default : false
 })
 
+const cardsCount = atom<number>({
+    key : "card-count",
+    default : 0
+})
+
 
 
 export const  useTabAtom = () => useRecoilState(tabAtom);
 
 export const  usePopUpAtom = () => useRecoilState(popUpAtom);
+
+export const useCardCountAtom = () => useRecoilState(cardsCount);

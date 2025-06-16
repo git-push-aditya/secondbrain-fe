@@ -48,7 +48,8 @@ export const useFetchQuery = ({ collectionId }: { collectionId: number }) => {
     queryFn: ({ pageParam = 1 }) => fetchContent(pageParam, collectionId),
     initialPageParam: 1,
     enabled: collectionId !== -1,
+    staleTime: 0, 
     getNextPageParam: (lastPage,allPages) =>
-      lastPage.payload.more ? allPages.length + 1 : undefined,
+      lastPage.payload.more ? allPages.length + 1 : undefined
   });
 };
