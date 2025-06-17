@@ -1,4 +1,4 @@
-import { CopyIcon, CrossIcon, Dasboard, LeftIcon, Loader } from "../icons/commonIcons";
+import { CopyIcon, CrossIcon, LeftIcon, Loader } from "../icons/commonIcons";
 import { ButtonEl } from "./button";
 import { motion, AnimatePresence } from "framer-motion";
 import Dropdown from "./dropdown";
@@ -6,23 +6,22 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Tag from "./tags";
 import { useAddContentQuery, useCreateCollection, useShareBrain } from "../api/user/mutate";
 import { useQueryClient } from "@tanstack/react-query";
-import { all, type AxiosResponse } from 'axios';
-import { data } from "react-router-dom";
+import { type AxiosResponse } from 'axios';
 import { usePopUpAtom, useTabAtom } from "../recoil/clientStates";
 import { useGetListQuery } from "../api/user/query";
 import type { SetterOrUpdater } from "recoil";
 
-export type type = 'WEB' | 'YOUTUBE' | 'REDDIT' | 'TWITTER' | 'INSTAGRAM' ;
+export type type = 'WEB' | 'YOUTUBE' | 'REDDIT' | 'TWITTER' | 'INSTAGRAM';
 
 type CollectionType = { id: number; name: string };
 
 export type GetListResponse = {
-  status: string;
-  payload: {
-    collectionList: CollectionType[];
-    tagsList: { title: string }[];
-    message: string;
-  };
+    status: string;
+    payload: {
+        collectionList: CollectionType[];
+        tagsList: { title: string }[];
+        message: string;
+    };
 };
 
 interface props {
@@ -32,7 +31,7 @@ interface props {
 }
 
 interface cardComponent {
-    setPopUpLive ?: SetterOrUpdater<boolean>;
+    setPopUpLive?: SetterOrUpdater<boolean>;
     closeCard: () => void;
     cause?: "addContent" | "shareBrain" | "logout" | "addCollection" | "addCommunity" | "joinCommunity" | "close";
 }
@@ -46,12 +45,12 @@ const Modal = ({ cause, closeModal }: props) => {
 
     const [popUpLive, setPopUpLive] = usePopUpAtom();
 
-    return <motion.div 
-    initial={{ opacity: 0 }} 
-    animate={{ opacity: 1 }} 
-    exit={{opacity:0}}
-    transition={{ duration: 0.3, ease: 'circIn' }} 
-    className="h-screen w-screen  backdrop-blur-xs bg-[rgba(0,0,0,0.5)] fixed z-20 top-0 left-0 flex justify-center items-center" >
+    return <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3, ease: 'circIn' }}
+        className="h-screen w-screen  backdrop-blur-xs bg-[rgba(0,0,0,0.5)] fixed z-20 top-0 left-0 flex justify-center items-center" >
         {cause == "addContent" && <AddContent closeCard={closeModal} />}
         {cause == "shareBrain" && <ShareBrain setPopUpLive={setPopUpLive} cause={cause} closeCard={closeModal} />}
         {cause == "logout" && <Logout closeCard={closeModal} />}
@@ -59,13 +58,13 @@ const Modal = ({ cause, closeModal }: props) => {
         {cause == "addCollection" && <AddCollection closeCard={closeModal} />}
         {cause == "joinCommunity" && <JoinCommunity closeCard={closeModal} />}
     </motion.div>
-} 
+}
 
 
 
 
 const AddContent = ({ closeCard }: cardComponent) => {
-    const linkType = ["Web", "Youtube", "TWITTER", "Reddit", "Instagram", "blank"]; 
+    const linkType = ["Web", "Youtube", "TWITTER", "Reddit", "Instagram", "blank"];
     const queryClient = useQueryClient();
 
     const listData = queryClient.getQueryData<AxiosResponse<GetListResponse>>(['getList']);
@@ -74,15 +73,15 @@ const AddContent = ({ closeCard }: cardComponent) => {
 
 
     const [selectedLink, setSelectedLink] = useState<string>('blank');
-    const [selectedCollection, setSelectedCollection] = useState<string>("blank"); 
+    const [selectedCollection, setSelectedCollection] = useState<string>("blank");
     const [currentTag, setCurrentTag] = useState<string>("");
 
- 
+
     const [tagsList, setTagsList] = useState<string[]>([]);
 
-    const [hyperLink,setHyperLink] = useState<string>('');
-    const [title,setTitle] = useState<string>('');
-    const [note,setNote] = useState<string>('');
+    const [hyperLink, setHyperLink] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
+    const [note, setNote] = useState<string>('');
 
 
     const tagsKeyDownHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -111,54 +110,54 @@ const AddContent = ({ closeCard }: cardComponent) => {
         ));
     }, [tagsList]);
 
-    const {mutate, data, isSuccess, isError,} = useAddContentQuery(); 
-    const addContentHandler = async () => {  
+    const { mutate, data, isSuccess, isError, } = useAddContentQuery();
+    const addContentHandler = async () => {
 
-        if(hyperLink.trim() === "" || title.trim() === "") return;
- 
+        if (hyperLink.trim() === "" || title.trim() === "") return;
+
         //collection id handled
         let collectionId = -1;
-        if(selectedCollection === "blank"){
+        if (selectedCollection === "blank") {
             collectionId = collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1;
-        }else{
+        } else {
             collectionId = collectionList.find((coll) => coll.name === selectedCollection)?.id ?? -1;
         }
-  
+
         //tags list handled
         const allTags = listData?.data?.payload.tagsList || [];
-        const modAllTags = allTags.map((tag) => {return tag.title.toLowerCase()});
+        const modAllTags = allTags.map((tag) => { return tag.title.toLowerCase() });
 
-        let existingTags : string[] = [];
-        let newTags:string[] = [];
+        let existingTags: string[] = [];
+        let newTags: string[] = [];
 
 
         tagsList.forEach((tag) => {
             let lowerTag = tag.toLowerCase();
-            if( modAllTags.includes(lowerTag)){
+            if (modAllTags.includes(lowerTag)) {
                 existingTags.push(lowerTag);
-            }else{
+            } else {
                 newTags.push(lowerTag);
             }
         })
- 
+
         //linktype handled
-        let linkType  : type = selectedLink === 'blank' ? 'WEB' : selectedLink.toUpperCase() as type;
+        let linkType: type = selectedLink === 'blank' ? 'WEB' : selectedLink.toUpperCase() as type;
 
- 
-        mutate({title : title.trim(), hyperlink : hyperLink.trim() , note : note.trim(), type : linkType, collectionId: collectionId, existingTags: existingTags, newTags: newTags});
 
-        if(isSuccess){
+        mutate({ title: title.trim(), hyperlink: hyperLink.trim(), note: note.trim(), type: linkType, collectionId: collectionId, existingTags: existingTags, newTags: newTags });
+
+        if (isSuccess) {
             alert('content added');
             console.log('clicked add content');
-        } 
-        if(isError){
+        }
+        if (isError) {
             alert('error occured');
             console.error('error adding conntetn');
-        } 
-        closeCard(); 
-    } 
+        }
+        closeCard();
+    }
 
-    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} exit={{ y:8,opacity: 0 }} transition={{ duration: 0.1 }} className={` max-h-[800px]  w-[80%] xl:w-[50%] md:w-[60%] rounded-3xl bg-modalCard  cursor-default scrollbarSB  pb-8`} >
+    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} exit={{ y: 8, opacity: 0 }} transition={{ duration: 0.1 }} className={` max-h-[800px]  w-[80%] xl:w-[50%] md:w-[60%] rounded-3xl bg-modalCard  cursor-default scrollbarSB  pb-8`} >
         <div className="flex justify-between items-center mx-8 md:mx-10 xl:mx-12 mt-10">
             <div className="font-[650]  text-4xl text-modalHead font-inter ">Save a New Link</div>
             <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2" />} />
@@ -194,30 +193,30 @@ const AddContent = ({ closeCard }: cardComponent) => {
     </motion.div>
 }
 
-const ShareBrain = ({ closeCard ,setPopUpLive}: cardComponent) => {
+const ShareBrain = ({ closeCard, setPopUpLive }: cardComponent) => {
 
-    const [tab] = useTabAtom(); 
-    const { data: listData, isFetched,isSuccess : isListSuccess } = useGetListQuery()
+    const [tab] = useTabAtom();
+    const { data: listData, isFetched, isSuccess: isListSuccess } = useGetListQuery()
 
-    let collectionList : {name:string, id:number}[];
-    if(isFetched){
+    let collectionList: { name: string, id: number }[];
+    if (isFetched) {
         collectionList = listData?.data?.payload.collectionList;
     }
- 
-    const  [currentCollectionId, setCurrentCollectionId] = useState<number>(-1);
+
+    const [currentCollectionId, setCurrentCollectionId] = useState<number>(-1);
 
     useEffect(() => {
         if (!isListSuccess) return;
-        
-        if (tab.startsWith('dashboard')) { 
+
+        if (tab.startsWith('dashboard')) {
             setCurrentCollectionId(collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1);
         } else {
-            const tabId = parseInt(tab.split('-')[1]); 
+            const tabId = parseInt(tab.split('-')[1]);
             setCurrentCollectionId(tabId);
         }
-    }, [tab, listData,isListSuccess]);
+    }, [tab, listData, isListSuccess]);
 
-    const {mutateAsync, isPending,data,isSuccess, error} = useShareBrain({collectionId: currentCollectionId})
+    const { mutateAsync, isPending, data, isSuccess, error } = useShareBrain({ collectionId: currentCollectionId })
 
     const copyLink = () => {
         navigator.clipboard.writeText(data?.payload?.generatedLink ?? "SoS");
@@ -225,10 +224,10 @@ const ShareBrain = ({ closeCard ,setPopUpLive}: cardComponent) => {
     }
 
     const handleShareBrain = async () => {
-        try{
-            await mutateAsync({collectionId: currentCollectionId});
+        try {
+            await mutateAsync({ collectionId: currentCollectionId });
             console.log("generated link");
-        }catch(e){
+        } catch (e) {
             console.error("Issue with creating a sharacble link", error);
         }
     }
@@ -243,15 +242,15 @@ const ShareBrain = ({ closeCard ,setPopUpLive}: cardComponent) => {
         </div>
         <div className="mt-2 xl:text-xl md:text-md mx-12 text-center font-[400] text-gray-600">
             You can stop sharing your secondbrain at any time.
-        </div> 
+        </div>
         {
-            isPending ? <div className="w-[80%] xl:w-[88%] mt-6 h-16 mx-auto  bg-primaryButtonBlue rounded-xl h-14 justify-center hover:bg-hover1"><Loader dimh="30" dimw="60" style="" /></div> : !isSuccess ? 
-            <ButtonEl buttonType="primary" onClickHandler={() => handleShareBrain()} particularStyle={`w-[80%] xl:w-[88%] gap-5 mt-6 h-16 mx-auto font-[550] font-inter `} placeholder="Share Brain" startIcon={<CopyIcon dim="40" style="color-white" />} /> 
-            :
-            <div className=" flex xl:max-w-[88%] max-w-[95%] bg-gray-200 justify-between items-center mx-auto h-18 mt-3 rounded-[3.5rem] border-2 border-gray-800 p-1">
-                <div className="max-w-[80%] line-clamp-1 pl-3 text-[1.48rem] font-cardTitleHeading">{data?.payload?.generatedLink ?? "server issue, no link generated"}</div>
-                <div className="cursor-pointer justify-center flex items-center h-full rounded-[3.5rem] bg-[#8F96C0] hover:bg-[#AAB1DA] w-[20%] shadow-2xl text-[1.43rem] font-[480] transition-hover duration-150" onClick={() => copyLink()}>Copy link</div>
-            </div>
+            isPending ? <div className="w-[80%] xl:w-[88%] mt-6 h-16 mx-auto  bg-primaryButtonBlue rounded-xl h-14 justify-center hover:bg-hover1"><Loader dimh="30" dimw="60" style="" /></div> : !isSuccess ?
+                <ButtonEl buttonType="primary" onClickHandler={() => handleShareBrain()} particularStyle={`w-[80%] xl:w-[88%] gap-5 mt-6 h-16 mx-auto font-[550] font-inter `} placeholder="Generate sharable link" startIcon={<CopyIcon dim="40" style="color-white" />} />
+                :
+                <div className=" flex xl:max-w-[88%] max-w-[95%] bg-gray-200 justify-between items-center mx-auto h-18 mt-3 rounded-[3.5rem] border-2 border-gray-800 p-1">
+                    <div className="max-w-[80%] line-clamp-1 pl-3 text-[1.48rem] font-cardTitleHeading">{data?.payload?.generatedLink ?? "server issue, no link generated"}</div>
+                    <div className="cursor-pointer justify-center flex items-center h-full rounded-[3.5rem] bg-[#8F96C0] hover:bg-[#AAB1DA] w-[20%] shadow-2xl text-[1.43rem] font-[480] transition-hover duration-150" onClick={() => copyLink()}>Copy link</div>
+                </div>
         }
     </motion.div>
 }
@@ -266,18 +265,18 @@ const Logout = ({ closeCard }: cardComponent) => {
 }
 
 
-const AddCollection =  ({ closeCard }: cardComponent) => {
+const AddCollection = ({ closeCard }: cardComponent) => {
     const [collectionName, setCollectionName] = useState<string>("");
     const [collectionDesc, setCollectionDesc] = useState<string>("");
-    const {mutateAsync,isPending,error} = useCreateCollection();
+    const { mutateAsync, isPending, error } = useCreateCollection();
 
     const handleAddCollection = async () => {
-        if(collectionName.trim() === "" || collectionDesc.trim() === "") return;
-        try{
-           mutateAsync({collectionName, collectionDesc});  
-        }catch(e){
-            console.log('errro occured',error)
-        }finally{
+        if (collectionName.trim() === "" || collectionDesc.trim() === "") return;
+        try {
+            mutateAsync({ collectionName, collectionDesc });
+        } catch (e) {
+            console.log('errro occured', error)
+        } finally {
             closeCard();
         }
     }
@@ -291,11 +290,11 @@ const AddCollection =  ({ closeCard }: cardComponent) => {
             Organize related links under one collection. Perfect for keeping your research or ideas grouped together.
         </div>
         <div className="text-center mt-3">
-            <input type="text" placeholder="Name your collection" className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-700 focus:outline-none" value={collectionName} onChange={(e) => setCollectionName(e.target.value)}/>
+            <input type="text" placeholder="Name your collection" className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-700 focus:outline-none" value={collectionName} onChange={(e) => setCollectionName(e.target.value)} />
             <textarea placeholder="A brief description shown when this collection is shared." className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading scrollbarSB border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-700 focus:outline-none" value={collectionDesc} onChange={(e) => setCollectionDesc(e.target.value)} />
         </div>
         <ButtonEl buttonType="primary" onClickHandler={() => handleAddCollection()} particularStyle="w-[90%]  font-inter mt-2 h-12 mx-auto text-2xl font-[550] font-inter " placeholder="Create new collection" />
-            {isPending && <div className="animate-pulse text-lg text-center mt-1 font[600]">Creating collection {collectionName}</div>}
+        {isPending && <div className="animate-pulse text-lg text-center mt-1 font[600]">Creating collection {collectionName}</div>}
     </motion.div>
 }
 

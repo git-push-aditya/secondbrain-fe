@@ -1,4 +1,4 @@
-import {  useState, type ReactElement } from "react";
+import { useState, type ReactElement } from "react";
 import { InstagramIcon, RedditIcon, TwitterIcon, WebIcon, WebPageDisplay, YoutubeIcon } from "../icons/particularIcons";
 import { DeleteIcon, RedirectIcon, ShareIcon } from "../icons/commonIcons";
 import Tag from "./tags";
@@ -6,8 +6,8 @@ import { ButtonEl } from "./button";
 import { AnimatePresence, motion } from "framer-motion";
 import { minEndingIndex } from "../utils"
 import { usePopUpAtom } from "../recoil/clientStates";
-import type { SetterOrUpdater } from "recoil"; 
-import React from "react"; 
+import type { SetterOrUpdater } from "recoil";
+import React from "react";
 import { useDeleteID } from "../recoil/deleteId";
 
 export type cardType = "YOUTUBE" | "WEB" | "TWITTER" | "REDDIT" | "INSTAGRAM";
@@ -17,13 +17,13 @@ export interface cardProp {
     cardType: cardType;
     note?: string;
     tags?: { tag: { title: string, id: number } }[];
-    createdAt : string;
+    createdAt: string;
     link: string;
     setPopUpLive?: SetterOrUpdater<boolean>;
     id: number;
     layout?: "grid" | "list";
     shared: boolean;
-    collectionId : number;    
+    collectionId: number;
 }
 
 
@@ -42,20 +42,20 @@ const typeIcon: { [key: string]: ReactElement } = {
 
 
 interface layoutCard extends cardProp {
-    deleteCard : () => void;
+    deleteCard: () => void;
     deletClicked: Boolean;
     setDeleteClicked: React.Dispatch<React.SetStateAction<Boolean>>;
     shareClicked: (link: string) => void;
 }
 
-export const CardElement = React.memo(({ title,collectionId, shared, cardType, layout,id, note, tags, createdAt, link }: cardProp) => {
- 
+export const CardElement = React.memo(({ title, collectionId, shared, cardType, layout, id, note, tags, createdAt, link }: cardProp) => {
+
     const [deleteId, setDeleteId] = useDeleteID()
-     
+
 
     const deleteCard = async () => {
         setDeleteId(id);
-    } 
+    }
 
     const formattedDate = new Date(createdAt).toLocaleDateString('en-US', {
         year: 'numeric',
@@ -79,10 +79,10 @@ export const CardElement = React.memo(({ title,collectionId, shared, cardType, l
 
 
 
-const GridStyle = ({ title, shared, deletClicked,deleteCard, setDeleteClicked, shareClicked, cardType, note, setPopUpLive, tags, createdAt, link }: layoutCard) => {
+const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, shareClicked, cardType, note, setPopUpLive, tags, createdAt, link }: layoutCard) => {
     const [readMore, setReadMore] = useState<Boolean>(false);
 
-    const defaultStyle: string = `${!shared ? "max-w-85" : " max-w-85 overflow-x-hidden "}   ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 " : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 h-115  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md scrollbar-hidden`;
+    const defaultStyle: string = `${!shared ? " w-85 " : " w-85 overflow-x-hidden "}   ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 " : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 h-115  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md scrollbar-hidden`;
 
 
     return <motion.div
@@ -93,7 +93,7 @@ const GridStyle = ({ title, shared, deletClicked,deleteCard, setDeleteClicked, s
         transition={{ duration: 0.4, ease: "easeInOut" }}
         className={`${shared ? " hover:scale-101 transition-hover duration-150 ease-in-out hover:sahdow-lg" : " "} scrollbar-hidden`}
     ><div className={defaultStyle}>
-            <div className="flex justify-between gap-2 px-6 mt-1 pt-1" >
+            <div className="flex justify-between gap-2 px-6 mt-1 pt-1 h-[15%] " >
                 <div className="flex justify-around gap-2 items-center">
                     {typeIcon[cardType]}
                     <div className="font-[650] line-clamp-2 cursor-default text-cardTitle text-xl font-cardTitleHeading ">{title}</div>
@@ -103,7 +103,7 @@ const GridStyle = ({ title, shared, deletClicked,deleteCard, setDeleteClicked, s
                     {!shared && <DeleteIcon onClickHandler={() => setDeleteClicked((prev) => !prev)} style={`size-7.5 transition-translate duration-300 ease-in-out hover:-translate-y-0.5 ${deletClicked ? " text-red-600 " : " "}`} />}
                 </div>
             </div>
-            <div className="">
+            <div className=" flex flex-col justify-between h-[85%]">
                 <div className="px-2 max-h-[321px] overflow-y-auto scrollbar-hidden scroll-smooth overscroll-auto relative ">
                     <AnimatePresence mode="wait"> {deletClicked ?
                         <motion.div key="deletePopUp"
@@ -149,7 +149,7 @@ const GridStyle = ({ title, shared, deletClicked,deleteCard, setDeleteClicked, s
                         cardType === 'WEB' &&
                         <div className="flex justify-center">
                             <a href={link} target="_blank">
-                                {<iframe className="w-[99%] mx-auto h-50 mt-2 rounded-lg  " title="YouTube video player" src={link} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe> }
+                                {<iframe className="w-[99%] mx-auto h-50 mt-2 rounded-lg  " title="YouTube video player" src={link} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>}
                                 <div className="text-center text-mon0 text-xl text-primaryButtonBlue mt-[-30px]">
                                     {link.substring(link.indexOf('www'), minEndingIndex(link)).split('https://')[1]}
                                 </div>
@@ -164,12 +164,12 @@ const GridStyle = ({ title, shared, deletClicked,deleteCard, setDeleteClicked, s
 
                     {!shared && <div className="px-3 my-2 cursor-default text-lg font-[500] text-slate-500">Added on {createdAt}</div>}
                 </div>
- 
-                <div className="flex items-center gap-2 justify-start m-3 overflow-x-auto scrollbar-hidden">
-                    { tags?.length != 0 ? tags?.map((tag, idx) => (
+
+                <div className="flex items-center gap-2 justify-start mt-0 mb-4 mx-3 overflow-x-auto scrollbar-hidden">
+                    {tags?.length != 0 ? tags?.map((tag, idx) => (
                         <Tag key={idx} name={tag.tag.title} id={tag.tag.id.toString()} />
-                    )) : <Tag key={666} name={cardType.toLowerCase()} id={cardType.toLowerCase() } />}
-                </div> 
+                    )) : <Tag key={666} name={cardType.toLowerCase()} id={cardType.toLowerCase()} />}
+                </div>
             </div>
 
         </div>
@@ -190,7 +190,7 @@ const GridStyle = ({ title, shared, deletClicked,deleteCard, setDeleteClicked, s
 
 
 
-const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked, cardType, note, setPopUpLive, tags, createdAt, link,deleteCard }: layoutCard) => {
+const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked, cardType, note, setPopUpLive, tags, createdAt, link, deleteCard }: layoutCard) => {
     return <motion.div
         key={"listCard"}
         initial={{ y: 8, opacity: 0 }}
@@ -209,10 +209,10 @@ const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked
                     <span className="truncate w-full">{title}</span>
                 </div>
                 <div className="max-w-[50%] overflow-x-auto scrollbar-hidden flex gap-2 items-center">
-                    { tags?.map((tag, idx) => (
+                    {tags?.map((tag, idx) => (
                         <Tag key={idx} style=" h-7 " name={tag.tag.title} id={tag.tag.id.toString()} />
-                    )) }
-                </div>  
+                    ))}
+                </div>
             </div>
 
             <div className={`w-[100%] h-[40%] truncate font-sans font-[440]  text-slate-600  text-md  ${note !== "" ? "block" : "hidden"}`}>

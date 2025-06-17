@@ -1,29 +1,31 @@
-import { useState, useEffect, Fragment } from "react"; 
+import { useState, useEffect, Fragment } from "react";
 import { ButtonEl } from "./button"
 import { CardElement } from "./card";
-import { GridIcon, ListIcon, PlusIcon, ShareIcon } from "../icons/commonIcons";
+import { DeleteIcon, GridIcon, ListIcon, Loader, PlusIcon, ShareIcon } from "../icons/commonIcons";
 import type { ChildProps } from "../pages/dashboard";
-import { useCardCountAtom, useTabAtom } from "../recoil/clientStates"; 
+import { useCardCountAtom, useTabAtom } from "../recoil/clientStates";
 import { useFetchQuery, useGetListQuery } from "../api/user/query";
+import { useDeletecardQuery, useDeleteCollectionQuery, useRemoveShareQuery } from "../api/user/mutate";
 import { useDeleteID } from "../recoil/deleteId";
-import { useDeletecardQuery } from "../api/user/mutate";
 
 
 const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) => {
 
 
-
-    const [tab] = useTabAtom();
+    const [tab, setTab] = useTabAtom();
     const { data: listData, isFetched, isSuccess: isListSuccess } = useGetListQuery()
 
-    let collectionList: { name: string, id: number }[];
-    if (isFetched) {
-        collectionList = listData?.data?.payload.collectionList;
-    }
+    let collectionList: { name: string, id: number, shared: boolean }[]; 
+
 
     const [currentCollection, setCurrentCollection] = useState<string>('dashboard');
     const [currentCollectionId, setCurrentCollectionId] = useState<number>(-1);
     const [cardsCount, setCardCount] = useCardCountAtom();
+
+
+    if (isFetched) {
+        collectionList = listData?.data?.payload.collectionList;
+    }
 
     useEffect(() => {
         if (!isListSuccess) return;
@@ -45,7 +47,9 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
     const [deleteId] = useDeleteID();
     const { mutate, isSuccess: deletedCard } = useDeletecardQuery();
     useEffect(() => {
-        mutate({ contentId: deleteId, collectionId: currentCollectionId });
+        if (deleteId !== -1) {
+            mutate({ contentId: deleteId, collectionId: currentCollectionId });
+        }
     }, [deleteId])
 
 
@@ -59,8 +63,42 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
         }
     }, [pagesData, contentLoading])
 
+    const clicked = () => {
+        alert('clicked');
+    }
 
 
+    //habdling deletion of a collection 
+    const [deleting, setDeleting] = useState<boolean>(false);
+    const { mutateAsync: deleteCollectionFn } = useDeleteCollectionQuery();
+    const deleteCollection = async () => {
+        try {
+            setDeleting(true);
+            await new Promise(resolve => setTimeout(resolve, 4000));
+            await deleteCollectionFn({ collectionId: currentCollectionId });
+            setTab('dashboard');
+        } catch (err) {
+            // handle error here if needed
+        } finally {
+            setDeleting(false);
+        }
+    }
+
+
+    //handling unshare
+    const [removingShare,setRemovingShare] = useState<boolean>(false);
+    const {mutateAsync : removerShare} = useRemoveShareQuery();
+    const handleRemoveShare = async () => {
+        try{
+            setRemovingShare(true);
+            await new Promise(resolve => setTimeout(resolve, 4000));
+            await removerShare({collectionId: currentCollectionId});
+        }catch(err){
+            console.log("errororooorooo");
+        }finally{
+            setRemovingShare(false);
+        }
+    }
 
     const layoutStyle = "hover:text-white hover:bg-[#6056AA]/60 text-black transition-hover duration-150 ease-in-out rounded-lg p-2  cursor-pointer bg-slate-300";
 
@@ -68,25 +106,52 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
 
 
         <div className="flex justify-between bg-mainComponentBg border-b-2 border-slate-300 gap-4 p-6 left-0 top-0 sticky z-10 items-center">
-            <div className="xl:text-5xl md:text-3xl text-xl  font-dashboardHeading font-extrabold cursor-default line-colaps-2 text-4xl font-bold text-gradient  py-2 ">Welcome, {user?.userName}</div>
+            <div className="xl:text-5xl md:text-3xl text-xl  font-dashboardHeading font-extrabold cursor-default line-colaps-2 text-4xl font-bold text-gradient  py-2 ">Welcome, {user?.userName}</div> 
             <div className="flex justify-around gap-6">
                 <ButtonEl onClickHandler={() => setModalNeededBy("shareBrain")} placeholder="Share Brain" particularStyle=" h-14 " buttonType="secondary" startIcon={<ShareIcon style="size-8.5 " />}></ButtonEl>
                 <ButtonEl onClickHandler={() => setModalNeededBy("addContent")} placeholder="Add Content" buttonType="primary" startIcon={<PlusIcon style="size-8.5 " />}></ButtonEl>
 
             </div>
         </div>
-        <div className="flex justify-start items-center mt-4 ml-5">
-
-            <div className="flex items-center justify-around ml-6 w-26 gap-2 rounded-lg ">
-                <GridIcon dim="50" onClickHandler={() => setLayout?.("grid")} style={layoutStyle + (layout === "grid" ? " border-2  hover:border-0" : "")} />
-                <ListIcon dim="50" onClickHandler={() => setLayout?.("list")} style={layoutStyle + (layout === "list" ? " border-2 hover:border-0" : "")} />
+        <div className="flex justify-between items-center mt-4 ml-7">
+            <div className="flex items-center justify-around">
+                <div className="flex items-center justify-around ml-6 w-26 gap-2 rounded-lg ">
+                    <GridIcon dim="50" onClickHandler={() => setLayout?.("grid")} style={layoutStyle + (layout === "grid" ? " border-2  hover:border-0" : "")} />
+                    <ListIcon dim="50" onClickHandler={() => setLayout?.("list")} style={layoutStyle + (layout === "list" ? " border-2 hover:border-0" : "")} />
+                </div>
+                <div className="w-[600px] text-clamp text-3xl font-[450] font-cardTitleHeading text-[#51488C] ml-4">Collection : {currentCollection}</div>
             </div>
-            <div className="w-[600px] text-clamp text-3xl font-[450] font-cardTitleHeading text-[#51488C] ml-4">Collection : {currentCollection}</div>
+            <div className="flex items-center justify-around">
+                <div className="flex items-center justify-around mr-6 gap-2 rounded-lg ">
+                    {
+                        !tab.startsWith('dashboard') &&
+                        <ButtonEl
+                            onClickHandler={deleteCollection}
+                            buttonType="rightTopbar"
+                            particularStyle={`bg-red-300 hover:bg-red-400 w-52 ${deleting ? ' bg-red-400 ' : ""}`}
+                            startIcon={!deleting ? <DeleteIcon style="size-6 m-0 p-0" /> : null}
+                            placeholder={!deleting ? "Delete collection" : ""}
+                            endIcon={deleting ? <Loader style="block size-14  text-white" dimh="10" dimw="20" /> : null}
+                        />
+
+                    }{
+                    <ButtonEl
+                        onClickHandler={handleRemoveShare}
+                        buttonType="rightTopbar"
+                        particularStyle={`bg-red-300 hover:bg-red-400${removingShare ? " bg-red-400" : ""}`}
+                        startIcon={!removingShare ? <DeleteIcon style="size-6 m-0 p-0" /> : null}
+                        placeholder={!removingShare ? "unShare brain" : ""}
+                        endIcon={removingShare ? <Loader style="block size-14 text-white" dimh="10" dimw="20" /> : null}
+                    />
+
+                    }
+                </div>
+            </div>
         </div>
         <div className=" mt-6  w-full flex justify-center ">
 
             <div className={` ${layout === "grid" ? " grid 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 xl:gap-6  lg:gap-4 gap-2 gap-y-6 " : " w-full "}`}>
-                {    
+                {
                     pagesData?.pages.map((group, i) => (
                         <Fragment key={i}>
                             {

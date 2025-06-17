@@ -1,6 +1,5 @@
-import { QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from 'axios'; 
-import { title } from "framer-motion/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from 'axios';
 
 //////////query paramerets types
 interface addContentType {
@@ -19,7 +18,7 @@ interface addCollectionType {
 }
 
 interface shareBraintype {
-    collectionId : number;
+    collectionId: number;
 }
 
 
@@ -30,7 +29,7 @@ interface shareBraintype {
 const addContent = (data: addContentType) => {
     return axios.post('http://localhost:2233/user/addcontent', data, {
         withCredentials: true
-    }).then(res=>res.data)
+    }).then(res => res.data)
 }
 
 
@@ -40,18 +39,34 @@ const addCollection = (data: addCollectionType) => {
     })
 }
 
-const sharebrain = async (data : shareBraintype) => {
+const sharebrain = async (data: shareBraintype) => {
     const res = await axios.patch('http://localhost:2233/user/generatelink', data, {
         withCredentials: true
     });
     return res.data;
 }
 
-const deleteCard = ({contentId}:{contentId:number}) =>  {
-    return axios.post('http://localhost:2233/user/deletecontent',{
-        contentId : contentId
-    },{
-       withCredentials: true
+const deleteCard = ({ contentId }: { contentId: number }) => {
+    return axios.post('http://localhost:2233/user/deletecontent', {
+        contentId: contentId
+    }, {
+        withCredentials: true
+    })
+}
+
+const deleteCollection = ({ collectionId }: { collectionId: number }) => {
+    return axios.post('http://localhost:2233/user/deletecollection', {
+        collectionId: collectionId
+    }, {
+        withCredentials: true
+    }).then(res => res.data)
+}
+
+const removerShare = ({ collectionId }: { collectionId: number }) => {
+    return axios.post('http://localhost:2233/user/removeshare', {
+        collectionId: collectionId
+    }, {
+        withCredentials: true
     })
 }
 
@@ -64,13 +79,13 @@ const deleteCard = ({contentId}:{contentId:number}) =>  {
 
 //////////////////////////////////exported cutom hooks
 export const useAddContentQuery = () => {
-    const client = useQueryClient(); 
+    const client = useQueryClient();
     return useMutation<any, Error, addContentType>({
-        mutationFn: ({collectionId, title,hyperlink,note,type,existingTags,newTags}) => addContent({collectionId, title,hyperlink,note,type,existingTags,newTags}),
-        onSuccess : (_, variables) => {
-            client.invalidateQueries({ queryKey: ['fetchData',variables.collectionId] });
+        mutationFn: ({ collectionId, title, hyperlink, note, type, existingTags, newTags }) => addContent({ collectionId, title, hyperlink, note, type, existingTags, newTags }),
+        onSuccess: (_, variables) => {
+            client.invalidateQueries({ queryKey: ['fetchData', variables.collectionId] });
         }
-    })    
+    })
 }
 
 
@@ -86,20 +101,47 @@ export const useCreateCollection = () => {
 }
 
 
-export const useShareBrain = ({collectionId} : shareBraintype) => {
+export const useShareBrain = ({ collectionId }: shareBraintype) => {
+    const client = useQueryClient();
     return useMutation<any, Error, shareBraintype>({
         mutationKey: ['sharebrain', collectionId],
-        mutationFn : sharebrain
+        mutationFn: sharebrain,
+        onSuccess: () => {
+            client.invalidateQueries({ queryKey: ['getList'] });
+        }
     })
 }
 
 export const useDeletecardQuery = () => {
     const queryClient = useQueryClient();
 
-    return useMutation<any,Error,{contentId: number, collectionId: number}>({ 
+    return useMutation<any, Error, { contentId: number, collectionId: number }>({
         mutationFn: ({ contentId, collectionId }: { contentId: number, collectionId: number }) => deleteCard({ contentId }),
-        onSuccess: (_,variables) => {
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['fetchData', variables.collectionId] });
         }
     });
 };
+
+
+export const useDeleteCollectionQuery = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation<any, Error, { collectionId: number }>({
+        mutationFn: ({ collectionId }) => deleteCollection({ collectionId }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['getList'] });
+        }
+    })
+}
+
+export const useRemoveShareQuery = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation<any, Error, { collectionId: number }>({
+        mutationFn: ({ collectionId }) => removerShare({ collectionId }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['getList'] });
+        }
+    })  
+}

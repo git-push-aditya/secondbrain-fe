@@ -2,7 +2,7 @@ import { atom, useRecoilState } from 'recoil';
 
 const deleteId = atom<number>({
     key : 'deleteId',
-    default : 0
+    default : -1
 })
-
+ 
 export const useDeleteID = () => useRecoilState(deleteId);

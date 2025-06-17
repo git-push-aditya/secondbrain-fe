@@ -3,6 +3,8 @@ import { ButtonEl } from "../components/button";
 import type { AuthUser } from "../App";
 import { useAuthInQuery, useAuthUpQuery, useCheckMe } from '../api/auth/mutate';
 import { useNavigate } from "react-router-dom";
+import { easeInOut, motion } from "framer-motion";
+import { LogoIcon } from "../icons/particularIcons";
 
 interface AuthProps {
     user: AuthUser | null;
@@ -79,15 +81,30 @@ const Auth = ({ user, setUser }: AuthProps) => {
         );
     };
 
-
-    //on remember me sellect, save jwt as localstorage and not session storage
-    //pass in dummy data for username and password and auto click thesignin button and irrespective fo rememebr me clicked or not,save the cookie as session storage
-
-
-    //add bottom title or tob tile on image for large scree written second brain with logo and like a bottom flash flight(or top depending where name is ) and for small screens abovelogin or sign up
+  
+ 
     return <div className="h-screen flex w-screen overflow-hidden">
-        <div className="transition-all duration-300 ease-in-out hidden lg:block w-[62%] h-full bg-[#E4E7E6] overflow-hidden border-r-2 border-slate-500" >
-            <img src="/authBg.png" className="transition-all duration-300 ease-in-out scale:108 authBreakPoint:scale-125 object-none w-full h-full " />
+        <div className="relative flex justify-center items-center transition-all duration-300 ease-in-out hidden lg:block w-[62%] h-full bg-[#E4E7E6] overflow-hidden border-r-2 border-slate-500" >
+            <img src="/authBg.png" className="absolute transition-all duration-300 ease-in-out scale:108 authBreakPoint:scale-125 object-none w-full h-full opacity-30 " />
+            <div className="relative cursor-default flex flex-col justify-center items-center text-black h-full -translate-y-20">
+                <div className="flex items-center overflow-hidden">
+                    <motion.div initial={{x:200, scale:1.2}} animate={{x:0,scale:1}} transition={{duration:0.8,ease:easeInOut}} className="opacity-100 scale:90 authBreakPoint:scale:100"  ><LogoIcon dim="140" /></motion.div>
+                    <motion.div initial={{x:200,width:'0%',opacity:0.7 }} animate={{width:'100%',opacity:1, x:0}} transition={{duration:1, ease:easeInOut}} className="opacity-100 overflow-x-hidden whitespace-nowrap text-[3rem] authBreakPoint:text-[4rem] font-[600] text-[#13141e] text-shadow-lg">Second Brain App</motion.div>
+                </div>
+                <motion.ul
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1.5 ,ease:easeInOut}}
+                    className="list-disc list-inside space-y-2 mt-4 text-left text-xl font-[650] text-black"
+                    >
+                        <li>Capture and Organize Your Thoughts Effortlessly</li>
+                        <li>Access Anywhere, Anytime</li>
+                        <li>Private, Secure, and Shareable</li>
+                </motion.ul>
+
+
+
+            </div>
         </div>
         <div className="h-full transition-all duration-300 ease-in-out  w-full lg:w-[38%] bg-[#F5F5F6] lg:bg-white overflow-hidden cursor-default flex  justify-center items-center">
             <div className="w-[65%] mx-auto">

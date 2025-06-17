@@ -9,7 +9,7 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {RecoilRoot } from 'recoil';
-import { useCardCountAtom, usePopUpAtom } from "./recoil/clientStates";
+import { useCardCountAtom, usePopUpAtom, useTabAtom } from "./recoil/clientStates";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +31,7 @@ function App() {
 	const [layout, setLayout] = useState<"grid" | "list">("grid");
 	const [user, setUser] = useState<AuthUser | null>(null); 
 	const [cardsCount]  = useCardCountAtom();
+	const [tab] = useTabAtom();
 
 	useEffect(() => {
 		loadTwitterScript().then(() => {
@@ -45,7 +46,7 @@ function App() {
 		window.twttr?.widgets?.load();
 		redditScriptLoader();
 		window.instgrm?.Embeds?.process();
-	}, [layout,cardsCount])
+	}, [layout,cardsCount,tab])
 
 
 	useEffect(() => {
@@ -68,8 +69,7 @@ function App() {
 
 							<Route element={<ProtectedRoute user={user} redirectTo="/" />}>
 								<Route path="/user" element={<Dashboard setUser={setUser} user={user} layout={layout} setLayout={setLayout} />} />
-							</Route>
-							///dashboard sharedcollectiom
+							</Route> 
 
 							<Route path="/sharedbrain" element={<SharedCollection layout={layout} setLayout={setLayout} />} />
 

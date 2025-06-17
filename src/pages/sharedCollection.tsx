@@ -1,5 +1,3 @@
-
-//note collection dashboard is reffered as orimary; rest other shared collections are simply shared by the name of that collection
 import { useLocation } from "react-router-dom"
 import { CardElement } from "../components/card"
 import { GridIcon, ListIcon } from "../icons/commonIcons"
