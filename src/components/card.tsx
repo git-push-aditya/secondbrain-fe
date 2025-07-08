@@ -149,7 +149,7 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
                         cardType === 'WEB' &&
                         <div className="flex justify-center">
                             <a href={link} target="_blank">
-                                {<iframe className="w-[99%] mx-auto h-50 mt-2 rounded-lg  " title="YouTube video player" src={link} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>}
+                                {<iframe className="w-[99%] mx-auto h-50 mt-2 rounded-lg  " src={link}   referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>}
                                 <div className="text-center text-mon0 text-xl text-primaryButtonBlue mt-[-30px]">
                                     {link.substring(link.indexOf('www'), minEndingIndex(link)).split('https://')[1]}
                                 </div>
@@ -157,7 +157,7 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
                         </div>
                     }
 
-                    {note && <div className="px-2 cursor-default font-sans font-[440] text-slate-500 text-xl pt-4 px-3 text-justify ">
+                    {note && <div className="px-2 mt-4 cursor-default font-sans font-[440] text-slate-500 text-xl text-justify ">
                         {note}
                     </div>}
 

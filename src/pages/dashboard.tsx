@@ -4,13 +4,11 @@ import SideBar from "../components/sideBar";
 import Modal from "../components/modal";
 import { AnimatePresence } from "framer-motion"; 
 import type { AuthUser } from "../App";
-import { ChatBot } from "../components/Chatbot";
-import { useQueryClient } from '@tanstack/react-query';
-import { usePopUpAtom, useTabAtom } from "../recoil/clientStates";
+import { ChatBot } from "../components/Chatbot"; 
+import { useTabAtom } from "../recoil/clientStates";
 
-type ModalType = "addContent" | "shareBrain" | "logout" | "addCollection"| "addCommunity"|"joinCommunity" |"close";
-
-// const queryClient = useQueryClient();
+export type ModalType = "addContent" | "shareBrain" | "logout" | "addCollection"| "addCommunity"|"joinCommunity" |"close";
+ 
 
 export interface ChildProps {
   setModalNeededBy: React.Dispatch<React.SetStateAction<ModalType>>;
@@ -19,18 +17,15 @@ export interface ChildProps {
   layout?: "grid" | "list";
   setLayout?:React.Dispatch<React.SetStateAction<"grid" | "list">>;
   user: AuthUser | null;
-  setUser ?: React.Dispatch<React.SetStateAction<AuthUser | null>>;
-  collectionList: {id : number, title: string}[];
-  setCollectionList : React.Dispatch<React.SetStateAction<{id: number;title: string;}[]>>
+  setUser ?: React.Dispatch<React.SetStateAction<AuthUser | null>>; 
 }
 
 
 const Dashboard = ({ user, setUser, layout,setLayout}:{user : AuthUser | null,   layout: "grid" | "list",setLayout: React.Dispatch<React.SetStateAction<"grid" | "list">>, setUser: React.Dispatch<React.SetStateAction<AuthUser | null>>}) => {
-
-    const [popUpLive, setPopUpLive] = usePopUpAtom();
+ 
     const [modalNeeded, setModalNeededBy] = useState<ModalType >("close");
     const [collectionList, setCollectionList] = useState<{id : number, title: string}[]>([]);
-///have to look into this as to how to use tanstack query chache w/o data duplicacy
+ 
  
     useEffect(()=>{setLayout('grid')},[])
     const closeModal = () => setModalNeededBy("close");
@@ -39,13 +34,14 @@ const Dashboard = ({ user, setUser, layout,setLayout}:{user : AuthUser | null,  
 
 
 
+
     return<>
         <div className="flex h-screen w-screen">
             <AnimatePresence mode="wait">
                 {modalNeeded !== "close" && <Modal cause={modalNeeded} closeModal={closeModal}  />}
             </AnimatePresence>
-            <SideBar setModalNeededBy={setModalNeededBy} collectionList={collectionList} setCollectionList={setCollectionList} user={user} setUser={setUser} />
-            {tab === 'chatbot' ? <ChatBot /> : <MainBlock setModalNeededBy={setModalNeededBy} user={user} layout= {layout} setLayout={setLayout} collectionList={collectionList} setCollectionList={setCollectionList}   />}
+            <SideBar setModalNeededBy={setModalNeededBy}  setUser={setUser} />
+            {tab === 'chatbot' ? <ChatBot /> : <MainBlock setModalNeededBy={setModalNeededBy} user={user} layout= {layout} setLayout={setLayout}    />}
             
             
         </div> 

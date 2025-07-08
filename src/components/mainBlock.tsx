@@ -16,15 +16,17 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
     const { data: listData, isFetched, isSuccess: isListSuccess } = useGetListQuery()
 
     let collectionList: { name: string, id: number, shared: boolean }[]; 
+    let allCommunities: {name : string, id: number }[];
 
 
     const [currentCollection, setCurrentCollection] = useState<string>('dashboard');
     const [currentCollectionId, setCurrentCollectionId] = useState<number>(-1);
     const [cardsCount, setCardCount] = useCardCountAtom();
-
+    
 
     if (isFetched) {
         collectionList = listData?.data?.payload.collectionList;
+        allCommunities = listData?.data?.payload.allCommunities;
     }
 
     useEffect(() => {
@@ -33,11 +35,16 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
         if (tab.startsWith('dashboard')) {
             setCurrentCollection("dashboard");
             setCurrentCollectionId(collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1);
-        } else {
+        } else if(tab.startsWith('collection')){
             const tabId = parseInt(tab.split('-')[1]);
             const matched = collectionList.find((coll) => coll.id === tabId);
             setCurrentCollection(matched?.name ?? "dashboard");
             setCurrentCollectionId(tabId);
+        }else{
+            const tabId = parseInt(tab.split('-')[1]);
+            const matched = allCommunities.find((comm) => comm.id === tabId);
+            setCurrentCollection(matched?.name ?? "commons");
+            setCurrentCollectionId(tabId)
         }
     }, [tab, listData, isListSuccess]);
 
@@ -62,10 +69,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
             setCardCount(totalCards);
         }
     }, [pagesData, contentLoading])
-
-    const clicked = () => {
-        alert('clicked');
-    }
+ 
 
 
     //habdling deletion of a collection 
@@ -119,33 +123,40 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                     <GridIcon dim="50" onClickHandler={() => setLayout?.("grid")} style={layoutStyle + (layout === "grid" ? " border-2  hover:border-0" : "")} />
                     <ListIcon dim="50" onClickHandler={() => setLayout?.("list")} style={layoutStyle + (layout === "list" ? " border-2 hover:border-0" : "")} />
                 </div>
-                <div className="w-[600px] text-clamp text-3xl font-[450] font-cardTitleHeading text-[#51488C] ml-4">Collection : {currentCollection}</div>
+                <div className="w-[600px] text-clamp text-3xl font-[450] font-cardTitleHeading text-[#51488C] ml-4">{tab.startsWith("community") ? "Community"  :"Collection"} : {currentCollection}</div>
             </div>
             <div className="flex items-center justify-around">
-                <div className="flex items-center justify-around mr-6 gap-2 rounded-lg ">
-                    {
-                        !tab.startsWith('dashboard') &&
-                        <ButtonEl
-                            onClickHandler={deleteCollection}
-                            buttonType="rightTopbar"
-                            particularStyle={`bg-red-300 hover:bg-red-400 w-52 ${deleting ? ' bg-red-400 ' : ""}`}
-                            startIcon={!deleting ? <DeleteIcon style="size-6 m-0 p-0" /> : null}
-                            placeholder={!deleting ? "Delete collection" : ""}
-                            endIcon={deleting ? <Loader style="block size-14  text-white" dimh="10" dimw="20" /> : null}
-                        />
+                <div className="flex items-center justify-around mr-6 gap-2 rounded-lg">
+  {
+    !tab.startsWith("community") ? (
+      <>
+        {
+          !tab.startsWith("dashboard") && (
+            <ButtonEl
+              onClickHandler={deleteCollection}
+              buttonType="rightTopbar"
+              particularStyle={`bg-red-300 hover:bg-red-400 w-52 ${deleting ? ' bg-red-400 ' : ""}`}
+              startIcon={!deleting ? <DeleteIcon style="size-6 m-0 p-0" /> : null}
+              placeholder={!deleting ? "Delete collection" : ""}
+              endIcon={deleting ? <Loader style="block size-14  text-white" dimh="10" dimw="20" /> : null}
+            />
+          )
+        }{
+        <ButtonEl
+          onClickHandler={handleRemoveShare}
+          buttonType="rightTopbar"
+          particularStyle={`bg-red-300 hover:bg-red-400 ${removingShare ? " bg-red-400" : ""}`}
+          startIcon={!removingShare ? <DeleteIcon style="size-6 m-0 p-0" /> : null}
+          placeholder={!removingShare ? "unShare brain" : ""}
+          endIcon={removingShare ? <Loader style="block size-14 text-white" dimh="10" dimw="20" /> : null}
+        />
+        }
+      </>
+    ) : (
+        <ButtonEl placeholder="Send Login" onClickHandler={ () => alert("hhhh")} buttonType={"rightTopbar"} particularStyle={`bg-green-300 hover:bg-green-400 ${removingShare ? " bg-red-400" : ""}`} />  )
+  }
+</div>
 
-                    }{
-                    <ButtonEl
-                        onClickHandler={handleRemoveShare}
-                        buttonType="rightTopbar"
-                        particularStyle={`bg-red-300 hover:bg-red-400${removingShare ? " bg-red-400" : ""}`}
-                        startIcon={!removingShare ? <DeleteIcon style="size-6 m-0 p-0" /> : null}
-                        placeholder={!removingShare ? "unShare brain" : ""}
-                        endIcon={removingShare ? <Loader style="block size-14 text-white" dimh="10" dimw="20" /> : null}
-                    />
-
-                    }
-                </div>
             </div>
         </div>
         <div className=" mt-6  w-full flex justify-center ">

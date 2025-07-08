@@ -14,7 +14,7 @@ export const ChatBot = () => {
             </div>
             <div className="h-[29%]  w-full flex justify-center items-center ">
                 <div className="w-[73%] z-50 h-[60%] rounded-[3rem] flex items-center pl-5 bg-white shadow-xl hover:shadow-3xl  mb-3">
-                    <input ref={inputRef} type='text' className="border-1 text-wrap overflow-y-auto scrollbarSB outline-none px-5 h-[60%] text-2xl font-[550] w-[85%]" placeholder="Whats on your mind..." />
+                    <textarea  className="text-token-text-primary resize-none placegolder:ps-px scrollbar-hidden outline-none px-5 h-[60%] text-2xl font-[550] w-[85%]" data-virtualKeyboard="true" placeholder="Whats on your mind..." />
                 </div>
             </div>
         </div>

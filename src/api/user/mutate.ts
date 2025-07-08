@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from 'axios';
 
 //////////query paramerets types
@@ -21,6 +21,14 @@ interface shareBraintype {
     collectionId: number;
 }
 
+
+interface createCommunity {
+    emailLead: string;
+    name: string;
+    descp: string;
+    membersCanPost: boolean;
+    password: string;
+}
 
 
 ///////////queryFuntionsss
@@ -68,6 +76,19 @@ const removerShare = ({ collectionId }: { collectionId: number }) => {
     }, {
         withCredentials: true
     })
+}
+
+
+const createCommunityFn = (body: createCommunity) => {
+    const { name, descp, password, membersCanPost, emailLead } = body;
+    return axios.post('http://localhost:2233/user/createcommunity', {
+        name, descp, password, membersCanPost, emailLead
+    }, {
+        headers : {
+            'Content-Type': 'application/json'
+        },
+        withCredentials: true
+    }).then(res => res.data);
 }
 
 
@@ -135,6 +156,8 @@ export const useDeleteCollectionQuery = () => {
     })
 }
 
+
+
 export const useRemoveShareQuery = () => {
     const queryClient = useQueryClient();
 
@@ -143,5 +166,18 @@ export const useRemoveShareQuery = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['getList'] });
         }
-    })  
+    })
+}
+
+
+
+export const useCreateCommunity = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation<any, Error, createCommunity>({
+        mutationFn: (body: createCommunity) => createCommunityFn(body),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['getList'] });
+        }
+    })
 }

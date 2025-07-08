@@ -2,16 +2,24 @@ import { useEffect, useState } from "react";
 import { Dasboard, DropdownIcon, DropUpIcon, PlusIcon } from "../icons/commonIcons";
 import { CollectionIcon, ChatbotIcon, CommunityIcon, InstagramIcon, LogoIcon, RedditIcon, TwitterIcon, WebIcon, YoutubeIcon } from "../icons/particularIcons";
 import { ButtonEl } from "./button";
-import type { ChildProps } from "../pages/dashboard";
 import { useLogOutQuery } from "../api/auth/mutate";
 import { useNavigate } from "react-router-dom";
 import { useTabAtom } from "../recoil/clientStates";
 import { useGetListQuery } from "../api/user/query"; 
+import React from "react";
+import type { AuthUser } from "../App";
+import type { ModalType } from "../pages/dashboard";
 
 const headingStyle: string = "text-4xl font-[600]  font-head text-secondBrainHeading";
 
+interface sideBarTypes {
+    setModalNeededBy : React.Dispatch<React.SetStateAction<ModalType>>;
+    setUser : React.Dispatch<React.SetStateAction<AuthUser | null>>;
+}
 
-const SideBar = ({ setModalNeededBy, setUser }: ChildProps) => {
+
+
+const SideBar = ({ setModalNeededBy, setUser }: sideBarTypes) => {
 
     const navigate = useNavigate(); 
 
@@ -86,7 +94,9 @@ const SideBar = ({ setModalNeededBy, setUser }: ChildProps) => {
                                 <ButtonEl onClickHandler={() => setModalNeededBy("addCommunity")} placeholder="start a Community" particularStyle=" pl-7" buttonType="sidebar" startIcon={<PlusIcon dim={"40"} />} />
                                 <ButtonEl onClickHandler={() => setModalNeededBy("joinCommunity")} placeholder="join a Community" particularStyle=" pl-7" buttonType="sidebar" startIcon={<PlusIcon dim={"40"} />} />
 
-                                {/* { communityList.map((community) =>( <ButtonEl onClickHandler={clicked} placeholder={community} particularStyle=" pl-7" buttonType="sidebar" startIcon={<CommunityIcon dim={"40"} />} />))} */}
+                                {
+                                    listSuccess && Array.isArray(lists?.data?.payload?.allCommunities) && lists.data.payload.allCommunities.map((collection: { id: number, name: string }) => (<ButtonEl onClickHandler={() => setTab("community-" + collection.id.toString())} placeholder={collection.name} particularStyle=" pl-7 truncate " buttonType="sidebar" startIcon={<CommunityIcon dim={"40"} />} />))
+                                }
                             </>)
                     }
                 </div>
@@ -100,4 +110,4 @@ const SideBar = ({ setModalNeededBy, setUser }: ChildProps) => {
     </div>
 }
 
-export default SideBar;
+export default React.memo(SideBar)

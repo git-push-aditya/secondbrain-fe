@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Dropdown from "./dropdown";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Tag from "./tags";
-import { useAddContentQuery, useCreateCollection, useShareBrain } from "../api/user/mutate";
+import { useAddContentQuery, useCreateCollection, useCreateCommunity, useShareBrain } from "../api/user/mutate";
 import { useQueryClient } from "@tanstack/react-query";
 import { type AxiosResponse } from 'axios';
 import { usePopUpAtom, useTabAtom } from "../recoil/clientStates";
@@ -298,12 +298,11 @@ const AddCollection = ({ closeCard }: cardComponent) => {
     </motion.div>
 }
 
-const StartCommunity = ({ closeCard }: cardComponent) => {
-    const [allowMessage, setAllowMessage] = useState<Boolean>(false);
-    const [allowPost, setAllowPost] = useState<boolean | undefined>(false);
+const StartCommunity = ({ closeCard }: cardComponent) => { 
+    const [allowPost, setAllowPost] = useState<boolean>(false);
     const [communityName, setcommunityName] = useState<string>("");
     const [communityDesc, setcommunityDesc] = useState<string>("");
-    const [founderEmail, setfounderEmail] = useState<string>("");
+    const [emailLead, setemailLead] = useState<string>("");
     const [password, setpassword] = useState<string>("");
 
 
@@ -319,11 +318,26 @@ const StartCommunity = ({ closeCard }: cardComponent) => {
         }
     }
 
+    const {mutateAsync,isPending,error} = useCreateCommunity();
+
+    const handleCreateCommunity = async () => {
+        try{
+            await mutateAsync({name : communityName.trim(), descp : communityDesc.trim(), password : password.trim(),emailLead : emailLead.trim(), membersCanPost : allowPost});
+            if(!isPending && !error){
+                console.log("successfully community created")
+            }
+        }catch(e){
+            console.log(error);
+            alert("some server issue in createing community")
+        } 
+        closeCard();
+    }
+
     const checkboxDivStyle = "flex items-center mt-2 pl-16 text-2xl font-cardTitleHeading font-[400] text-slate-700 "
     const checkboxInputStyle = "size-6 mr-4 cursor-pointer accent-[#6056AA] hover:scale-120 hover:inset-ring-2 hover:inset-ring-[#6056AA]/30 border-slate-600   transition-hover duration-200 ease-in-out";
     const inputStyle = "w-[85%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-2xl font-cardTitleHeading border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-700 focus:outline-none";
 
-    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} transition={{ duration: 0.2 }} className={`h-[65%] md:h-[57%] xl:h-[58%] w-[70%] xl:w-[45%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB overflow-x-hidden`} >
+    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} transition={{ duration: 0.2 }} className={`h-[65%] md:h-[57%] xl:min-h-[30%] w-[70%] xl:w-[45%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB overflow-x-hidden`} >
         <div className="flex justify-between items-center mx-8 nd:mx-10 xl:mx-16 mt-8">
             <div className="font-[650]  text-3xl text-modalHead font-inter">Start your Community!!</div>
             <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2" />} />
@@ -334,41 +348,34 @@ const StartCommunity = ({ closeCard }: cardComponent) => {
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: -300, opacity: 0 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}>
-                <div className="mt-5 text-xl mx-16  font-[450] text-gray-500">
-                    Passionate about something?
-                    Build a space where others can explore it with you.
+                <div className="mt-5 text-[1.3rem] mx-16 text-center tracking-[0.05rem]  font-[550] text-gray-500"> 
+                        Passionate about something? Build a space where others can explore it with you.
                 </div>
 
-                <div className="text-center mt-1">
+                <div className="text-center mt-4">
                     <input type="text" onChange={(e) => setcommunityName(e.target.value)} value={communityName} placeholder="Name your community" className={inputStyle + ""} />
 
                     <textarea placeholder="Describe you community.." value={communityDesc} onChange={(e) => setcommunityDesc(e.target.value)} className={inputStyle} />
                 </div>
 
-                <div className={checkboxDivStyle}>
+                <div className={checkboxDivStyle + " mt-4"}>
                     <label className="flex items-center cursor-pointer">
                         <input type="checkbox" checked={allowPost} onChange={() => { setAllowPost((prev) => !prev) }} className={checkboxInputStyle} ></input>Allow members to post
                     </label>
                 </div>
-
-                <div className={checkboxDivStyle}>
-                    <label className="flex items-center cursor-pointer">
-                        <input type="checkbox" className={checkboxInputStyle} onClick={
-                            () => setAllowMessage((prev) => !prev)} />Enable member chat
-                    </label>
-                </div>
+ 
                 {inValidInput && <div className="text-center text-red-600 font-[500] mt-2">Invalid input-Community name and description field are necessary field</div>}
                 <ButtonEl buttonType="primary" onClickHandler={onStart} particularStyle="w-[85%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter " placeholder="Start your Community" />
             </motion.div> : <motion.div key="sliding-box2"
                 initial={{ x: 250, y: 0, opacity: 0 }}
                 animate={{ x: 0, y: 0, opacity: 1 }}
                 exit={{ x: 200, opacity: 0 }}
-                transition={{ duration: 0.6, ease: "easeInOut" }}
-            >
+                transition={{ duration: 0.6, ease: "easeInOut" }}>
+
                 <ButtonEl onClickHandler={() => setStartClicked(true)} startIcon={<LeftIcon dim="20" />} buttonType={"back"} placeholder="Back"
                     particularStyle=" ml-16 my-2 " />
                 <div className="text-center">
-                    <input type="text" onChange={(e) => setfounderEmail(e.target.value)} placeholder="Enter Email-id(lead)" className={inputStyle + ""} />
+                    <input type="text" onChange={(e) => setemailLead(e.target.value)} placeholder="Enter Email-id(lead)" className={inputStyle + ""} />
                     <input type="text" onChange={(e) => setpassword(e.target.value)} placeholder="Enter password for access" className={inputStyle + ""} />
                 </div>
                 <div className="text-lg text-justify my-3 text-red-600 mx-17">
@@ -380,7 +387,7 @@ const StartCommunity = ({ closeCard }: cardComponent) => {
                         <li>Group settings can be managed lead</li>
                     </ul>
                 </div>
-                <ButtonEl buttonType="primary" onClickHandler={clicked} particularStyle="w-[85%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter " placeholder="Final Submission" />
+                <ButtonEl buttonType="primary" onClickHandler={handleCreateCommunity} particularStyle="w-[85%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter " placeholder="Final Submission" />
             </motion.div>}
         </AnimatePresence>
     </motion.div>
@@ -393,7 +400,7 @@ const JoinCommunity = ({ closeCard }: cardComponent) => {
     const inputStyle = "w-[85%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-2xl font-cardTitleHeading border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none";
 
 
-    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} transition={{ duration: 0.2 }} className={`h-[65%] md:h-[57%] xl:h-[50%] w-[70%] xl:w-[40%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB `} >
+    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} transition={{ duration: 0.2 }} className={`h-[65%] md:h-[57%] xl:h-[45%] w-[70%] xl:w-[40%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB `} >
         <div className="flex justify-between items-center mx-8 nd:mx-10 xl:mx-15 mt-8">
             <div className="font-[650]  text-3xl text-modalHead font-inter ">Join a Community!!</div>
             <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2" />} />
@@ -403,8 +410,7 @@ const JoinCommunity = ({ closeCard }: cardComponent) => {
         </div>
         <div className="text-center mt-3">
             <input type="text" placeholder="Paste community link" className={inputStyle + " h-14"} />
-            <input type="password" placeholder="Enter code" className={inputStyle} />
-            <input type="text" placeholder="Enter email for OTP verification" className={inputStyle + " h-14"} />
+            <input type="password" placeholder="Enter code" className={inputStyle} /> 
         </div>
         <ButtonEl buttonType="primary" onClickHandler={clicked} particularStyle="w-[85%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter " placeholder="Join Community" />
     </motion.div>
