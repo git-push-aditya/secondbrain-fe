@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Dropdown from "./dropdown";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Tag from "./tags";
-import { useAddContentQuery, useCreateCollection, useCreateCommunity, useShareBrain } from "../api/user/mutate";
+import { useAddContentQuery, useCreateCollection, useCreateCommunity, useJoinCommunity, useShareBrain } from "../api/user/mutate";
 import { useQueryClient } from "@tanstack/react-query";
 import { type AxiosResponse } from 'axios';
 import { usePopUpAtom, useTabAtom } from "../recoil/clientStates";
@@ -318,13 +318,14 @@ const StartCommunity = ({ closeCard }: cardComponent) => {
         }
     }
 
-    const {mutateAsync,isPending,error} = useCreateCommunity();
+    const {mutateAsync,data,isPending,error} = useCreateCommunity();
 
     const handleCreateCommunity = async () => {
         try{
             await mutateAsync({name : communityName.trim(), descp : communityDesc.trim(), password : password.trim(),emailLead : emailLead.trim(), membersCanPost : allowPost});
             if(!isPending && !error){
-                console.log("successfully community created")
+                console.log("successfully community created");
+                console.log(data)
             }
         }catch(e){
             console.log(error);
@@ -396,6 +397,29 @@ const StartCommunity = ({ closeCard }: cardComponent) => {
 
 const JoinCommunity = ({ closeCard }: cardComponent) => {
 
+    const {mutateAsync, data, isPending, error} = useJoinCommunity();
+    const [communityId, setCommunityId] = useState<string>('');
+    const [password,setPassword] = useState<string>('');
+    const [inValidInput, setInvalidInput] = useState<boolean>(false);
+
+    const handleJoinCommunity = async () => {
+        const passwordTrimmed = password.trim();
+        const communityIdTrimmed = communityId.trim();
+        if(!passwordTrimmed && !communityIdTrimmed){
+            setInvalidInput(true);
+        }else{
+            try{
+                //await mutateAsync({password: passwordTrimmed, communityId :communityIdTrimmed});  
+                if(!isPending){
+                    console.log("joined community");
+                }
+            }catch(e){
+                console.log("Error happened \n\n");
+                console.log(error)
+            }            
+        }   
+    }
+
 
     const inputStyle = "w-[85%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-2xl font-cardTitleHeading border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none";
 
@@ -409,10 +433,11 @@ const JoinCommunity = ({ closeCard }: cardComponent) => {
             Discover and share the best content with like-minded people.
         </div>
         <div className="text-center mt-3">
-            <input type="text" placeholder="Paste community link" className={inputStyle + " h-14"} />
-            <input type="password" placeholder="Enter code" className={inputStyle} /> 
+            <input type="text" placeholder="Paste community link" value={communityId} onChange={(e) => setCommunityId(e.target.value)} className={inputStyle + " h-14"} />
+            <input type="password" placeholder="Enter code" value={password} onChange={(e)=>setPassword(e.target.value)} className={inputStyle} /> 
         </div>
-        <ButtonEl buttonType="primary" onClickHandler={clicked} particularStyle="w-[85%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter " placeholder="Join Community" />
+        {inValidInput && <div className="text-center text-red-600 font-[500] mt-2">Invalid input-Community Id password field are necessary.</div>}
+        <ButtonEl buttonType="primary" onClickHandler={handleJoinCommunity} particularStyle="w-[85%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter " placeholder="Join Community" />
     </motion.div>
 }
 

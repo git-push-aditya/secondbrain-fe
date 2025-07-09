@@ -31,25 +31,23 @@ const Auth = ({ user, setUser }: AuthProps) => {
 
     const inputStyle = "mt-3 px-3 shadow-lg/20 transition duration-200 ease-in-out border-2 border-white/0 rounded-md hover:border-black/80 hover:cursor-pointer w-full h-13 text-md text-slate-800 font-[600] font-inter bg-white";
 
-    const { mutate: logIN, isError: inIsError, error: inError, isSuccess: inIsSuccess, data: inData, isPending: inIsPending } = useAuthInQuery();
-    const { mutate: signUP, isError: upIsError, error: upError, isSuccess: upIsSuccess, data: upData, isPending: upIsPending } = useAuthUpQuery();
+    const { mutateAsync: logIN, isError: inIsError, error: inError, isSuccess: inIsSuccess, data: inData, isPending: inIsPending } = useAuthInQuery();
+    const { mutateAsync: signUP, isError: upIsError, error: upError, isSuccess: upIsSuccess, data: upData, isPending: upIsPending } = useAuthUpQuery();
 
-    const handleClick = () => {
+    const handleClick = async () => {
         if (authMode === "logIn") {
-            logIN({ userName, password, rememberMe });
+            await logIN({ userName, password, rememberMe });
+            if (inIsSuccess && inData?.data.status === "success") {
+                setUser({ userName: inData.data.payload.userName, profilePic: "fewfe", email: inData.data.payload.email });
+            }
         } else {
-            signUP({ userName, password, email: emailUser, rememberMe });
+            await signUP({ userName, password, email: emailUser, rememberMe });
+            if (upIsSuccess && upData?.data.status === "success") {
+                setUser({ userName: upData.data.payload.userName, profilePic: "fewfe", email: upData.data.payload.email });
+            }
         }
     }
-
-    useEffect(() => {
-        if (inIsSuccess && inData?.data.status === "success") {
-            setUser({ userName: inData.data.payload.userName, profilePic: "fewfe", email: inData.data.payload.email });
-        }
-        if (upIsSuccess && upData?.data.status === "success") {
-            setUser({ userName: upData.data.payload.userName, profilePic: "fewfe", email: upData.data.payload.email });
-        }
-    }, [inIsSuccess, upIsSuccess, upData, inData]);
+ 
 
     useEffect(() => {
         if (user) {
@@ -100,9 +98,7 @@ const Auth = ({ user, setUser }: AuthProps) => {
                         <li>Capture and Organize Your Thoughts Effortlessly</li>
                         <li>Access Anywhere, Anytime</li>
                         <li>Private, Secure, and Shareable</li>
-                </motion.ul>
-
-
+                </motion.ul> 
 
             </div>
         </div>
@@ -112,8 +108,11 @@ const Auth = ({ user, setUser }: AuthProps) => {
                 <div className="text-md font-[550] mt-2 text-gray-600 font-roboto ">{authMode == "logIn" ? "sign in to continue oraganizing" : "Sign up and start organizing your ideas"}</div>
 
 
-                {authMode === "signUp" && <><div className="text-xl ml-1 font-[600] mt-10 text-[#080B0A] font-roboto">Enter email</div>
-                    <input type="text" placeholder="email@domain.com" onChange={(e) => setEmailUser(e.target.value)} value={emailUser} className={inputStyle} /> </>}
+                {
+                    authMode === "signUp" && <><div className="text-xl ml-1 font-[600] mt-10 text-[#080B0A] font-roboto">Enter email</div>
+                        <input type="text" placeholder="email@domain.com" onChange={(e) => setEmailUser(e.target.value)} value={emailUser} className={inputStyle} /> 
+                    </>
+                }
 
 
                 <div className={`text-xl ml-1 font-[600] ${authMode === "signUp" ? "mt-6" : "mt-10"}  text-[#080B0A] font-roboto`}>Enter username</div>
@@ -133,7 +132,7 @@ const Auth = ({ user, setUser }: AuthProps) => {
 
 
 
-                <ButtonEl onClickHandler={handleClick} buttonType={"authin"} placeholder={authMode === "signUp" ? "Sign up" : "Sign in"} particularStyle={`mt-6 rounded-sm ${(inIsPending || upIsPending) ? " animate-pulse " : " "}`} />
+                <ButtonEl onClickHandler={() => handleClick()} buttonType={"authin"} placeholder={authMode === "signUp" ? "Sign up" : "Sign in"} particularStyle={`mt-6 rounded-sm ${(inIsPending || upIsPending) ? " animate-pulse " : " "}`} />
 
                 <div className="flex w-full items-center mt-2">
                     <hr className="w-[46%] border-t-2 border-gray-300 " />

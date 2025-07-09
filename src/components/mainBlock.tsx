@@ -5,7 +5,7 @@ import { DeleteIcon, GridIcon, ListIcon, Loader, PlusIcon, ShareIcon } from "../
 import type { ChildProps } from "../pages/dashboard";
 import { useCardCountAtom, useTabAtom } from "../recoil/clientStates";
 import { useFetchQuery, useGetListQuery } from "../api/user/query";
-import { useDeletecardQuery, useDeleteCollectionQuery, useRemoveShareQuery } from "../api/user/mutate";
+import { useDeletecardQuery, useDeleteCollectionQuery, useRemoveShareQuery, useShareCommunityLogin } from "../api/user/mutate";
 import { useDeleteID } from "../recoil/deleteId";
 
 
@@ -69,6 +69,26 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
             setCardCount(totalCards);
         }
     }, [pagesData, contentLoading])
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+const {mutateAsync : shareLogin, isPending : shareLoginPending, error : shareError ,data : shareLoginData} = useShareCommunityLogin()
+    const handleShareCommunityCred = async () => {
+        try{
+            const communityId = tab.split('-')[1];
+            console.log("share login clicked with community id : ",communityId)
+            await shareLogin({communityId});
+            console.log("api call ended")
+            if(!shareLoginPending){
+                console.log(shareLoginData)
+                //await navigator.clipboard.writeText(shareLoginData.payload.message)
+            }   
+        }catch(e){
+            console.error("error occured :\n",shareError)
+        }
+    }
+
+
  
 
 
@@ -147,13 +167,13 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
           buttonType="rightTopbar"
           particularStyle={`bg-red-300 hover:bg-red-400 ${removingShare ? " bg-red-400" : ""}`}
           startIcon={!removingShare ? <DeleteIcon style="size-6 m-0 p-0" /> : null}
-          placeholder={!removingShare ? "unShare brain" : ""}
+          placeholder={!removingShare ? "Stop Sharing" : ""}
           endIcon={removingShare ? <Loader style="block size-14 text-white" dimh="10" dimw="20" /> : null}
         />
         }
       </>
     ) : (
-        <ButtonEl placeholder="Send Login" onClickHandler={ () => alert("hhhh")} buttonType={"rightTopbar"} particularStyle={`bg-green-300 hover:bg-green-400 ${removingShare ? " bg-red-400" : ""}`} />  )
+        <ButtonEl placeholder="Share Login" onClickHandler={() => handleShareCommunityCred()} buttonType={"rightTopbar"} particularStyle={`bg-green-300 hover:bg-green-400 ${removingShare ? " bg-red-400" : ""}`} />  )
   }
 </div>
 

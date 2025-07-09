@@ -96,7 +96,7 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
             <div className="flex justify-between gap-2 px-6 mt-1 pt-1 h-[15%] " >
                 <div className="flex justify-around gap-2 items-center">
                     {typeIcon[cardType]}
-                    <div className="font-[650] line-clamp-2 cursor-default text-cardTitle text-xl font-cardTitleHeading ">{title}</div>
+                    <div className="font-[550] line-clamp-2 cursor-default text-cardTitle text-xl font-cardTitleHeading ">{title}</div>
                 </div>
                 <div className="flex justify-around gap-4 items-center">
                     <ShareIcon style="size-7 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" onClickHandler={() => shareClicked(link)} />
