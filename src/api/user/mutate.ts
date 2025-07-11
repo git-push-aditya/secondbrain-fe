@@ -31,7 +31,7 @@ interface createCommunity {
 }
 
 interface basicCommunity {
-    communityId : string; 
+    communityId : number; 
 }
 
 
@@ -96,7 +96,7 @@ const createCommunityFn = (body: createCommunity) => {
 }
 
 
-const joinCommunityFn = (body : basicCommunity) => {
+const joinCommunityFn = (body : {communityId : string}) => {
     const { communityId } = body;
 
     return axios.post('http://localhost:2233/user/joincommunity',{
@@ -109,6 +109,8 @@ const joinCommunityFn = (body : basicCommunity) => {
 
 const shareCommunityCred = async (body : basicCommunity) => {
     const {communityId} = body;
+    console.log(communityId)
+    console.log("mmmmmm")
 
     const res = await axios.post('http://localhost:2233/user/sharelogin', {
         communityId
@@ -212,8 +214,8 @@ export const useCreateCommunity = () => {
 export const useJoinCommunity = () => {
     const queryClient = useQueryClient();
 
-    return useMutation<any , Error, basicCommunity>({
-        mutationFn : (body : basicCommunity) => joinCommunityFn(body),
+    return useMutation<any , Error, {communityId : string}>({
+        mutationFn : (body : {communityId : string}) => joinCommunityFn(body),
         onSuccess : () => {
             queryClient.invalidateQueries({ queryKey : ['getList']});
         }
@@ -223,7 +225,7 @@ export const useJoinCommunity = () => {
 
 export const useShareCommunityLogin = () => {
     return useMutation<any, Error, basicCommunity>({
-        mutationFn : (body : basicCommunity) => shareCommunityCred(body),
+        mutationFn : (body : basicCommunity) => shareCommunityCred(body), 
         onSuccess : () => {
             console.log("on success called")
         }

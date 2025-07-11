@@ -5,7 +5,7 @@ import Tag from "./tags";
 import { ButtonEl } from "./button";
 import { AnimatePresence, motion } from "framer-motion";
 import { minEndingIndex } from "../utils"
-import { usePopUpAtom } from "../recoil/clientStates";
+import { usePopUpAtom, usePopUpMessage } from "../recoil/clientStates";
 import type { SetterOrUpdater } from "recoil";
 import React from "react";
 import { useDeleteID } from "../recoil/deleteId";
@@ -50,7 +50,8 @@ interface layoutCard extends cardProp {
 
 export const CardElement = React.memo(({ title, collectionId, shared, cardType, layout, id, note, tags, createdAt, link }: cardProp) => {
 
-    const [deleteId, setDeleteId] = useDeleteID()
+    const [deleteId, setDeleteId] = useDeleteID();
+    const [popUpMessage, setPopUpMessage] = usePopUpMessage();
 
 
     const deleteCard = async () => {
@@ -66,6 +67,7 @@ export const CardElement = React.memo(({ title, collectionId, shared, cardType, 
     const [popUpLive, setPopUpLive] = usePopUpAtom();
     const [deletClicked, setDeleteClicked] = useState<Boolean>(false);
     const shareClicked = (link: string) => {
+        setPopUpMessage("Link coppied to clipboard!!");
         navigator.clipboard.writeText(link);
         setPopUpLive?.((prev) => !prev);
     }

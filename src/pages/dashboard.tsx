@@ -23,8 +23,7 @@ export interface ChildProps {
 
 const Dashboard = ({ user, setUser, layout,setLayout}:{user : AuthUser | null,   layout: "grid" | "list",setLayout: React.Dispatch<React.SetStateAction<"grid" | "list">>, setUser: React.Dispatch<React.SetStateAction<AuthUser | null>>}) => {
  
-    const [modalNeeded, setModalNeededBy] = useState<ModalType >("close");
-    const [collectionList, setCollectionList] = useState<{id : number, title: string}[]>([]);
+    const [modalNeeded, setModalNeededBy] = useState<ModalType >("close"); 
  
  
     useEffect(()=>{setLayout('grid')},[])

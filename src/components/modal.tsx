@@ -398,21 +398,17 @@ const StartCommunity = ({ closeCard }: cardComponent) => {
 const JoinCommunity = ({ closeCard }: cardComponent) => {
 
     const {mutateAsync, data, isPending, error} = useJoinCommunity();
-    const [communityId, setCommunityId] = useState<string>('');
-    const [password,setPassword] = useState<string>('');
+    const [communityId, setCommunityId] = useState<string>(''); 
     const [inValidInput, setInvalidInput] = useState<boolean>(false);
 
-    const handleJoinCommunity = async () => {
-        const passwordTrimmed = password.trim();
+    const handleJoinCommunity = async () => { 
         const communityIdTrimmed = communityId.trim();
-        if(!passwordTrimmed && !communityIdTrimmed){
+        if(!communityIdTrimmed){
             setInvalidInput(true);
         }else{
             try{
-                //await mutateAsync({password: passwordTrimmed, communityId :communityIdTrimmed});  
-                if(!isPending){
-                    console.log("joined community");
-                }
+                await mutateAsync({ communityId :communityIdTrimmed});
+                closeCard();
             }catch(e){
                 console.log("Error happened \n\n");
                 console.log(error)
@@ -424,7 +420,7 @@ const JoinCommunity = ({ closeCard }: cardComponent) => {
     const inputStyle = "w-[85%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-2xl font-cardTitleHeading border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none";
 
 
-    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} transition={{ duration: 0.2 }} className={`h-[65%] md:h-[57%] xl:h-[45%] w-[70%] xl:w-[40%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB `} >
+    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} transition={{ duration: 0.2 }} className={`h-[65%] md:h-[57%] xl:h-[37%] w-[70%] xl:w-[40%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB `} >
         <div className="flex justify-between items-center mx-8 nd:mx-10 xl:mx-15 mt-8">
             <div className="font-[650]  text-3xl text-modalHead font-inter ">Join a Community!!</div>
             <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2" />} />
@@ -433,8 +429,7 @@ const JoinCommunity = ({ closeCard }: cardComponent) => {
             Discover and share the best content with like-minded people.
         </div>
         <div className="text-center mt-3">
-            <input type="text" placeholder="Paste community link" value={communityId} onChange={(e) => setCommunityId(e.target.value)} className={inputStyle + " h-14"} />
-            <input type="password" placeholder="Enter code" value={password} onChange={(e)=>setPassword(e.target.value)} className={inputStyle} /> 
+            <input type="text" placeholder="Paste community link" value={communityId} onChange={(e) => setCommunityId(e.target.value)} className={inputStyle + " h-14"} /> 
         </div>
         {inValidInput && <div className="text-center text-red-600 font-[500] mt-2">Invalid input-Community Id password field are necessary.</div>}
         <ButtonEl buttonType="primary" onClickHandler={handleJoinCommunity} particularStyle="w-[85%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter " placeholder="Join Community" />

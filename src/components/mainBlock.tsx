@@ -3,8 +3,8 @@ import { ButtonEl } from "./button"
 import { CardElement } from "./card";
 import { DeleteIcon, GridIcon, ListIcon, Loader, PlusIcon, ShareIcon } from "../icons/commonIcons";
 import type { ChildProps } from "../pages/dashboard";
-import { useCardCountAtom, useTabAtom } from "../recoil/clientStates";
-import { useFetchQuery, useGetListQuery } from "../api/user/query";
+import { useCardCountAtom, usePopUpAtom, usePopUpMessage, useTabAtom } from "../recoil/clientStates";
+import { useFetchQueryCollection, useFetchQueryCommunity, useGetListQuery } from "../api/user/query";
 import { useDeletecardQuery, useDeleteCollectionQuery, useRemoveShareQuery, useShareCommunityLogin } from "../api/user/mutate";
 import { useDeleteID } from "../recoil/deleteId";
 
@@ -13,14 +13,18 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
 
 
     const [tab, setTab] = useTabAtom();
-    const { data: listData, isFetched, isSuccess: isListSuccess } = useGetListQuery()
+    const { data: listData, isFetched, isSuccess: isListSuccess } = useGetListQuery();
+    const [popUp, setPopUp] = usePopUpAtom();
+    const [popUpMessage, setPopupMessage] = usePopUpMessage();
 
     let collectionList: { name: string, id: number, shared: boolean }[]; 
     let allCommunities: {name : string, id: number }[];
 
 
     const [currentCollection, setCurrentCollection] = useState<string>('dashboard');
-    const [currentCollectionId, setCurrentCollectionId] = useState<number>(-1);
+    const [currentCollectionId, setCurrentCollectionId] = useState<number>(-1); 
+    const [currentCommunity, setCurrentCommunity] = useState<string>('');
+    const [currentCommunityId, setCurrentCommunityId] = useState<number>(-1);
     const [cardsCount, setCardCount] = useCardCountAtom();
     
 
@@ -40,16 +44,15 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
             const matched = collectionList.find((coll) => coll.id === tabId);
             setCurrentCollection(matched?.name ?? "dashboard");
             setCurrentCollectionId(tabId);
+            setCurrentCommunityId(-1);
         }else{
             const tabId = parseInt(tab.split('-')[1]);
             const matched = allCommunities.find((comm) => comm.id === tabId);
-            setCurrentCollection(matched?.name ?? "commons");
-            setCurrentCollectionId(tabId)
+            setCurrentCommunity(matched?.name ?? "");
+            setCurrentCommunityId(tabId);
+            setCurrentCollectionId(-1);
         }
     }, [tab, listData, isListSuccess]);
-
-
-    const { data: pagesData, isLoading: contentLoading, hasNextPage, fetchNextPage } = useFetchQuery({ collectionId: currentCollectionId });
 
     const [deleteId] = useDeleteID();
     const { mutate, isSuccess: deletedCard } = useDeletecardQuery();
@@ -59,6 +62,8 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
         }
     }, [deleteId])
 
+    //getting paginated data for collections
+    const { data: pagesData, isLoading: contentLoading, hasNextPage, fetchNextPage } = useFetchQueryCollection({ collectionId: currentCollectionId });
 
     useEffect(() => {
         if (!contentLoading) {
@@ -68,21 +73,34 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
 
             setCardCount(totalCards);
         }
-    }, [pagesData, contentLoading])
+    }, [pagesData, contentLoading]);
+
+
+    //getting paginated data for coommunity
+    const { data : communityPagesData , isLoading : communityDataLoading, hasNextPage : communityNextPage, fetchNextPage : fetchCommunityNextPage} = useFetchQueryCommunity({communityId : currentCommunityId});
+        useEffect(() => {
+        if (!communityDataLoading) {
+            const totalCards = communityPagesData?.pages
+                ?.map((page) => page.group?.payload?.content?.length ?? 0)
+                .reduce((a, b) => a + b, 0);
+
+            setCardCount(totalCards);
+        }
+    }, [pagesData, contentLoading]);
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+//          have to work on community card and fetching community card
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-const {mutateAsync : shareLogin, isPending : shareLoginPending, error : shareError ,data : shareLoginData} = useShareCommunityLogin()
+    const {mutateAsync : shareLogin, isPending : shareLoginPending, error : shareError ,data : shareLoginData} = useShareCommunityLogin()
     const handleShareCommunityCred = async () => {
-        try{
-            const communityId = tab.split('-')[1];
-            console.log("share login clicked with community id : ",communityId)
-            await shareLogin({communityId});
-            console.log("api call ended")
-            if(!shareLoginPending){
-                console.log(shareLoginData)
-                //await navigator.clipboard.writeText(shareLoginData.payload.message)
-            }   
+        try{  
+            const data = await shareLogin({communityId : currentCommunityId}); 
+            setPopupMessage("Community credentials coppied!!");
+            setPopUp(true)
+            navigator.clipboard.writeText(data.payload.message);
         }catch(e){
             console.error("error occured :\n",shareError)
         }
@@ -133,8 +151,7 @@ const {mutateAsync : shareLogin, isPending : shareLoginPending, error : shareErr
             <div className="xl:text-5xl md:text-3xl text-xl  font-dashboardHeading font-extrabold cursor-default line-colaps-2 text-4xl font-bold text-gradient  py-2 ">Welcome, {user?.userName}</div> 
             <div className="flex justify-around gap-6">
                 <ButtonEl onClickHandler={() => setModalNeededBy("shareBrain")} placeholder="Share Brain" particularStyle=" h-14 " buttonType="secondary" startIcon={<ShareIcon style="size-8.5 " />}></ButtonEl>
-                <ButtonEl onClickHandler={() => setModalNeededBy("addContent")} placeholder="Add Content" buttonType="primary" startIcon={<PlusIcon style="size-8.5 " />}></ButtonEl>
-
+                <ButtonEl onClickHandler={() => setModalNeededBy("addContent")} placeholder="Add Content" buttonType="primary" startIcon={<PlusIcon style="size-8.5 " />}></ButtonEl> 
             </div>
         </div>
         <div className="flex justify-between items-center mt-4 ml-7">
@@ -143,7 +160,7 @@ const {mutateAsync : shareLogin, isPending : shareLoginPending, error : shareErr
                     <GridIcon dim="50" onClickHandler={() => setLayout?.("grid")} style={layoutStyle + (layout === "grid" ? " border-2  hover:border-0" : "")} />
                     <ListIcon dim="50" onClickHandler={() => setLayout?.("list")} style={layoutStyle + (layout === "list" ? " border-2 hover:border-0" : "")} />
                 </div>
-                <div className="w-[600px] text-clamp text-3xl font-[450] font-cardTitleHeading text-[#51488C] ml-4">{tab.startsWith("community") ? "Community"  :"Collection"} : {currentCollection}</div>
+                <div className="w-[600px] text-clamp text-3xl font-[450] font-cardTitleHeading text-[#51488C] ml-4"> {tab.startsWith("community") ? <>{`Community : ${currentCommunity}`} </> : <>{`Collection :  ${currentCollection}`} </>} </div>
             </div>
             <div className="flex items-center justify-around">
                 <div className="flex items-center justify-around mr-6 gap-2 rounded-lg">
@@ -173,7 +190,7 @@ const {mutateAsync : shareLogin, isPending : shareLoginPending, error : shareErr
         }
       </>
     ) : (
-        <ButtonEl placeholder="Share Login" onClickHandler={() => handleShareCommunityCred()} buttonType={"rightTopbar"} particularStyle={`bg-green-300 hover:bg-green-400 ${removingShare ? " bg-red-400" : ""}`} />  )
+        <ButtonEl placeholder="Share Login" onClickHandler={() => handleShareCommunityCred()} disabled={shareLoginPending} buttonType={"rightTopbar"} particularStyle={`bg-green-300 hover:bg-green-400 ${removingShare ? " bg-red-400" : ""} ${shareLoginPending ? "animate-pulse cursor-not-allowed" : ""} `} />  )
   }
 </div>
 

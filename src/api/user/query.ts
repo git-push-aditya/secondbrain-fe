@@ -11,7 +11,7 @@ const getLists = () => {
 }
 
 
-const fetchContent = async (pageParam : number, collectionId: number) => {
+const fetchContentCollection = async (pageParam : number, collectionId: number) => {
     const res = await axios.get(`http://localhost:2233/user/fetchcontents?collectionId=${collectionId}&page=${pageParam}&limit=${12}`, {
         withCredentials: true
     });
@@ -19,7 +19,12 @@ const fetchContent = async (pageParam : number, collectionId: number) => {
 }
 
 
-
+const fetchContentCommunity = async (pageParam : number, communityId : number) => {
+    const res = await axios.get(`http://localhost:2233/user/getCommunityContent?communityId=${communityId}&page=${pageParam}&limit=${12}`, {
+        withCredentials: true
+    });
+    return res.data;
+}
 
 
 
@@ -42,12 +47,25 @@ export const useGetListQuery = () => {
     })
 }
 
-export const useFetchQuery = ({ collectionId }: { collectionId: number }) => {
+export const useFetchQueryCollection = ({ collectionId }: { collectionId: number }) => {
   return useInfiniteQuery({
     queryKey: ['fetchData', collectionId],
-    queryFn: ({ pageParam = 1 }) => fetchContent(pageParam, collectionId),
+    queryFn: ({ pageParam = 1 }) => fetchContentCollection(pageParam, collectionId),
     initialPageParam: 1,
     enabled: collectionId !== -1,
+    staleTime: 0, 
+    getNextPageParam: (lastPage,allPages) =>
+      lastPage.payload.more ? allPages.length + 1 : undefined
+  });
+};
+
+
+export const useFetchQueryCommunity = ({ communityId }: { communityId: number }) => {
+  return useInfiniteQuery({
+    queryKey: ['fetchData', communityId],
+    queryFn: ({ pageParam = 1 }) => fetchContentCommunity(pageParam, communityId),
+    initialPageParam: 1,
+    enabled: communityId !== -1,
     staleTime: 0, 
     getNextPageParam: (lastPage,allPages) =>
       lastPage.payload.more ? allPages.length + 1 : undefined
