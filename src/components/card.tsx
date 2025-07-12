@@ -18,8 +18,7 @@ export interface cardProp {
     note?: string;
     tags?: { tag: { title: string, id: number } }[];
     createdAt: string;
-    link: string;
-    setPopUpLive?: SetterOrUpdater<boolean>;
+    link: string; 
     id: number;
     layout?: "grid" | "list";
     shared: boolean;
@@ -73,16 +72,15 @@ export const CardElement = React.memo(({ title, collectionId, shared, cardType, 
     }
 
     return layout === "grid" ?
-        <GridStyle shared={shared} collectionId={collectionId} title={title} deleteCard={deleteCard} cardType={cardType} note={note} setPopUpLive={setPopUpLive} tags={tags} createdAt={formattedDate} link={link} layout={"grid"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} id={id} shareClicked={shareClicked} />
+        <GridStyle shared={shared} collectionId={collectionId} title={title} deleteCard={deleteCard} cardType={cardType} note={note} tags={tags} createdAt={formattedDate} link={link} layout={"grid"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} id={id} shareClicked={shareClicked} />
         :
-        <ListStyle shared={shared} title={title} deleteCard={deleteCard} collectionId={collectionId} cardType={cardType} note={note} setPopUpLive={setPopUpLive} tags={tags} createdAt={formattedDate} id={id} link={link} layout={"list"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} shareClicked={shareClicked} />
+        <ListStyle shared={shared} title={title} deleteCard={deleteCard} collectionId={collectionId} cardType={cardType} note={note} tags={tags} createdAt={formattedDate} id={id} link={link} layout={"list"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} shareClicked={shareClicked} />
 
 })
 
 
 
-const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, shareClicked, cardType, note, setPopUpLive, tags, createdAt, link }: layoutCard) => {
-    const [readMore, setReadMore] = useState<Boolean>(false);
+const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, shareClicked, cardType, note, tags, createdAt, link }: layoutCard) => { 
 
     const defaultStyle: string = `${!shared ? " w-85 " : " w-85 overflow-x-hidden "}   ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 " : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 h-115  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md scrollbar-hidden`;
 
@@ -178,10 +176,7 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
     </motion.div>
 }
 
-
-
-//                       {<WebPageDisplay />}
-
+ 
 
 
 
@@ -191,8 +186,7 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
 
 
 
-
-const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked, cardType, note, setPopUpLive, tags, createdAt, link, deleteCard }: layoutCard) => {
+const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked, cardType, note, tags, createdAt, link, deleteCard }: layoutCard) => {
     return <motion.div
         key={"listCard"}
         initial={{ y: 8, opacity: 0 }}

@@ -7,6 +7,7 @@ import { useCardCountAtom, usePopUpAtom, usePopUpMessage, useTabAtom } from "../
 import { useFetchQueryCollection, useFetchQueryCommunity, useGetListQuery } from "../api/user/query";
 import { useDeletecardQuery, useDeleteCollectionQuery, useRemoveShareQuery, useShareCommunityLogin } from "../api/user/mutate";
 import { useDeleteID } from "../recoil/deleteId";
+import { CommunityCard } from "./communityCard";
 
 
 const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) => {
@@ -199,45 +200,50 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
         <div className=" mt-6  w-full flex justify-center ">
 
             <div className={` ${layout === "grid" ? " grid 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 xl:gap-6  lg:gap-4 gap-2 gap-y-6 " : " w-full "}`}>
-                {
-                    pagesData?.pages.map((group, i) => (
-                        <Fragment key={i}>
-                            {
-                                group.payload.content.map((cardData: any, idx: number) =>
-                                    tab.split('-')[0] === 'collection' || !tab.split('-')[1] ? (
-                                        <CardElement
-                                            key={cardData.content.id}
-                                            id={cardData.content.id}
-                                            collectionId={group.payload.content.collectionId}
-                                            title={cardData.content.title}
-                                            cardType={cardData.content.type}
-                                            link={cardData.content.hyperlink}
-                                            note={cardData.content.note}
-                                            tags={cardData.content.tags}
-                                            createdAt={cardData.content.createdAt}
-                                            layout={layout}
-                                            shared={false}
-                                        />
-                                    ) : (
-                                        tab.split('-')[1] === cardData.content.type && <CardElement
-                                            key={cardData.content.id}
-                                            id={cardData.content.id}
-                                            collectionId={group.payload.content.collectionId}
-                                            title={cardData.content.title}
-                                            cardType={cardData.content.type}
-                                            link={cardData.content.hyperlink}
-                                            note={cardData.content.note}
-                                            tags={cardData.content.tags}
-                                            createdAt={cardData.content.createdAt}
-                                            layout={layout}
-                                            shared={false}
-                                        />
+                {   currentCollectionId !== -1 ?
+                    <>   
+                        {pagesData?.pages.map((group, i) => (
+                            <Fragment key={i}>
+                                {
+                                    group.payload.content.map((cardData: any, idx: number) =>
+                                        tab.split('-')[0] === 'collection' || !tab.split('-')[1] ? (
+                                            <CardElement
+                                                key={cardData.content.id}
+                                                id={cardData.content.id}
+                                                collectionId={group.payload.content.collectionId}
+                                                title={cardData.content.title}
+                                                cardType={cardData.content.type}
+                                                link={cardData.content.hyperlink}
+                                                note={cardData.content.note}
+                                                tags={cardData.content.tags}
+                                                createdAt={cardData.content.createdAt}
+                                                layout={layout}
+                                                shared={false}
+                                            />
+                                        ) : (
+                                            tab.split('-')[1] === cardData.content.type && <CardElement
+                                                key={cardData.content.id}
+                                                id={cardData.content.id}
+                                                collectionId={group.payload.content.collectionId}
+                                                title={cardData.content.title}
+                                                cardType={cardData.content.type}
+                                                link={cardData.content.hyperlink}
+                                                note={cardData.content.note}
+                                                tags={cardData.content.tags}
+                                                createdAt={cardData.content.createdAt}
+                                                layout={layout}
+                                                shared={false}
+                                            />
+                                        )
                                     )
-                                )
-                            }
-                        </Fragment>
-                    ))
+                                }
+                            </Fragment>
+                        ))}
 
+                    </> : (<>
+                        <CommunityCard createdAt={""} title={"wassup"} link={"https://youtu.be/JoJ8Sw5Yb4c?si=MrQspFY59ubK0l3f"} layout={layout!} communityId={1} id={20} note={"we are going through shit and we will overcome this by fighting tooth and nail"} cardType={"YOUTUBE"} posterId={0} isOwner={true} upVoteCount={10} ></CommunityCard>
+                        <CommunityCard createdAt={""} title={"wassup"} link={"https://x.com/AdityaDtwt/status/1929479477618229264"} layout={layout!} communityId={1} id={20} note={"we are going through shit and we will overcome this by fighting tooth and nail"} cardType={"TWITTER"} posterId={7} isOwner={false} upVoteCount={120} ></CommunityCard></>
+                    )
                 }
             </div>
         </div>
