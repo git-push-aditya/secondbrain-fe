@@ -40,9 +40,7 @@ const Dashboard = ({ user, setUser, layout,setLayout}:{user : AuthUser | null,  
                 {modalNeeded !== "close" && <Modal cause={modalNeeded} closeModal={closeModal}  />}
             </AnimatePresence>
             <SideBar setModalNeededBy={setModalNeededBy}  setUser={setUser} />
-            {tab === 'chatbot' ? <ChatBot /> : <MainBlock setModalNeededBy={setModalNeededBy} user={user} layout= {layout} setLayout={setLayout}    />}
-            
-            
+            {tab === 'chatbot' ? <ChatBot /> : <MainBlock setModalNeededBy={setModalNeededBy} user={user} layout= {layout} setLayout={setLayout} />}            
         </div> 
     </>
 }

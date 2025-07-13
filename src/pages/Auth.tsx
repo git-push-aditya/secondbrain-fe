@@ -5,6 +5,7 @@ import { useAuthInQuery, useAuthUpQuery, useCheckMe } from '../api/auth/mutate';
 import { useNavigate } from "react-router-dom";
 import { easeInOut, motion } from "framer-motion";
 import { LogoIcon } from "../icons/particularIcons";
+import { getUserProfilePhoto } from "../utils/profilePhoto";
 
 interface AuthProps {
     user: AuthUser | null;
@@ -12,11 +13,11 @@ interface AuthProps {
 }
 
 const Auth = ({ user, setUser }: AuthProps) => {
-    const { data: meReqData, refetch, isSuccess: meIsSuccess, isError: meIsError } = useCheckMe();
+    const { data: meReqData, isSuccess: meIsSuccess, isError: meIsError } = useCheckMe();
 
     useEffect(() => {
         if (meIsSuccess && meReqData?.data.status) {
-            setUser({ userName: meReqData.data.payload.userName, profilePic: "fewfe", email: meReqData.data.payload.email });
+            setUser({ userName: meReqData.data.payload.userName, profilePic: getUserProfilePhoto(), email: meReqData.data.payload.email });
         } else { }
     }, [meReqData, meIsSuccess, meIsError])
 
@@ -38,12 +39,12 @@ const Auth = ({ user, setUser }: AuthProps) => {
         if (authMode === "logIn") {
             await logIN({ userName, password, rememberMe });
             if (inIsSuccess && inData?.data.status === "success") {
-                setUser({ userName: inData.data.payload.userName, profilePic: "fewfe", email: inData.data.payload.email });
+                setUser({ userName: inData.data.payload.userName, profilePic: getUserProfilePhoto(), email: inData.data.payload.email });
             }
         } else {
             await signUP({ userName, password, email: emailUser, rememberMe });
             if (upIsSuccess && upData?.data.status === "success") {
-                setUser({ userName: upData.data.payload.userName, profilePic: "fewfe", email: upData.data.payload.email });
+                setUser({ userName: upData.data.payload.userName, profilePic: getUserProfilePhoto(), email: upData.data.payload.email });
             }
         }
     }
@@ -63,12 +64,11 @@ const Auth = ({ user, setUser }: AuthProps) => {
                 userName: 'aditya.Dubey',
                 password: 'Qwer1234+-*/',
                 rememberMe: false,
-            },
-            {
+            },{
                 onSuccess: () => {
                     setUser({
                         userName: 'randomuser',
-                        profilePic: 'ubuono',
+                        profilePic: getUserProfilePhoto(),
                         email: 'dummy@doom.com',
                     });
                 },

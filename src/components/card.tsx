@@ -1,14 +1,14 @@
-import { useState, type ReactElement } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { InstagramIcon, RedditIcon, TwitterIcon, WebIcon, WebPageDisplay, YoutubeIcon } from "../icons/particularIcons";
 import { DeleteIcon, RedirectIcon, ShareIcon } from "../icons/commonIcons";
 import Tag from "./tags";
 import { ButtonEl } from "./button";
 import { AnimatePresence, motion } from "framer-motion";
-import { minEndingIndex } from "../utils"
-import { usePopUpAtom, usePopUpMessage } from "../recoil/clientStates";
-import type { SetterOrUpdater } from "recoil";
+import { minEndingIndex } from "../utils/minEndingIndex"
+import { usePopUpAtom, usePopUpMessage } from "../recoil/clientStates"; 
 import React from "react";
 import { useDeleteID } from "../recoil/deleteId";
+import { redditScriptLoader } from "../scriptLoader";
 
 export type cardType = "YOUTUBE" | "WEB" | "TWITTER" | "REDDIT" | "INSTAGRAM";
 
@@ -23,11 +23,6 @@ export interface cardProp {
     layout?: "grid" | "list";
     shared: boolean;
     collectionId: number;
-}
-
-
-const clicked = () => {
-    alert("clikced");
 }
 
 
@@ -84,6 +79,17 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
 
     const defaultStyle: string = `${!shared ? " w-85 " : " w-85 overflow-x-hidden "}   ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 " : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 h-115  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md scrollbar-hidden`;
 
+
+    //note : find a another way for this
+    useEffect(() => {
+        if(cardType === "TWITTER" ){
+            if ( window.twttr?.widgets) {
+            window.twttr.widgets.load();
+            }
+        }else if(cardType === "REDDIT"){
+            redditScriptLoader();
+        }
+    }, []);
 
     return <motion.div
         key={"listCard"}

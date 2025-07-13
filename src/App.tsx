@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {RecoilRoot } from 'recoil';
 import { useCardCountAtom, usePopUpAtom, useTabAtom } from "./recoil/clientStates";
+import { useUserProfile } from "./recoil/user";
 
 const queryClient = new QueryClient();
 
@@ -28,10 +29,11 @@ interface protectedRouteProp {
 
 function App() {
 	const [popUpLive, setPopUpLive] = usePopUpAtom();
-	const [layout, setLayout] = useState<"grid" | "list">("grid");
-	const [user, setUser] = useState<AuthUser | null>(null); 
+	const [layout, setLayout] = useState<"grid" | "list">("grid"); 
 	const [cardsCount]  = useCardCountAtom();
 	const [tab] = useTabAtom();
+
+	const [user,setUser] = useUserProfile();
 
 	useEffect(() => {
 		loadTwitterScript().then(() => {
@@ -42,9 +44,7 @@ function App() {
 		instagramScriptLoader();
 	}, [])
 
-	useEffect(() => {
-		window.twttr?.widgets?.load();
-		redditScriptLoader();
+	useEffect(() => { 
 		window.instgrm?.Embeds?.process();
 	}, [layout,cardsCount,tab])
 
@@ -59,26 +59,26 @@ function App() {
 
 
 	return (
-			<QueryClientProvider client={queryClient}>
-				<AnimatePresence>
-					<BrowserRouter>
-						{popUpLive && <PopUp placeholder="Link coppied to clipboard!!" />}
-						<Routes>
+		<QueryClientProvider client={queryClient}>
+			<AnimatePresence>
+				<BrowserRouter>
+					{popUpLive && <PopUp placeholder="Link coppied to clipboard!!" />}
+					<Routes>
 
-							<Route path="/" element={<Auth user={user} setUser={setUser} />} />
+						<Route path="/" element={<Auth user={user} setUser={setUser} />} />
 
-							<Route element={<ProtectedRoute user={user} redirectTo="/" />}>
-								<Route path="/user" element={<Dashboard setUser={setUser} user={user} layout={layout} setLayout={setLayout} />} />
-							</Route> 
+						<Route element={<ProtectedRoute user={user} redirectTo="/" />}>
+							<Route path="/user" element={<Dashboard setUser={setUser} user={user} layout={layout} setLayout={setLayout} />} />
+						</Route> 
 
-							<Route path="/sharedbrain" element={<SharedCollection layout={layout} setLayout={setLayout} />} />
+						<Route path="/sharedbrain" element={<SharedCollection layout={layout} setLayout={setLayout} />} />
 
-							<Route path="*" element={<p>There's nothing here: 404!</p>} />
-						</Routes>
-					</BrowserRouter>
-				</AnimatePresence>
-				<ReactQueryDevtools initialIsOpen={false} position="bottom" /> 
-			</QueryClientProvider>  
+						<Route path="*" element={<p>There's nothing here: 404!</p>} />
+					</Routes>
+				</BrowserRouter>
+			</AnimatePresence>
+			<ReactQueryDevtools initialIsOpen={false} position="bottom" /> 
+		</QueryClientProvider>  
 	)
 }
 

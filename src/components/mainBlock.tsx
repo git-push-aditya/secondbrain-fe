@@ -3,7 +3,7 @@ import { ButtonEl } from "./button"
 import { CardElement } from "./card";
 import { DeleteIcon, GridIcon, ListIcon, Loader, PlusIcon, ShareIcon } from "../icons/commonIcons";
 import type { ChildProps } from "../pages/dashboard";
-import { useCardCountAtom, usePopUpAtom, usePopUpMessage, useTabAtom } from "../recoil/clientStates";
+import { useCardCountAtom, useCurrentCollection, useCurrentCommunity, usePopUpAtom, usePopUpMessage, useTabAtom } from "../recoil/clientStates";
 import { useFetchQueryCollection, useFetchQueryCommunity, useGetListQuery } from "../api/user/query";
 import { useDeletecardQuery, useDeleteCollectionQuery, useRemoveShareQuery, useShareCommunityLogin } from "../api/user/mutate";
 import { useDeleteID } from "../recoil/deleteId";
@@ -20,12 +20,10 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
 
     let collectionList: { name: string, id: number, shared: boolean }[]; 
     let allCommunities: {name : string, id: number }[];
-
-
-    const [currentCollection, setCurrentCollection] = useState<string>('dashboard');
-    const [currentCollectionId, setCurrentCollectionId] = useState<number>(-1); 
-    const [currentCommunity, setCurrentCommunity] = useState<string>('');
-    const [currentCommunityId, setCurrentCommunityId] = useState<number>(-1);
+    
+    const [currentCollection1, setCurrentCollection1] = useCurrentCollection();
+    const [currentCommunity1, setCurrentCommunity1] = useCurrentCommunity();
+ 
     const [cardsCount, setCardCount] = useCardCountAtom();
     
 
@@ -38,20 +36,19 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
         if (!isListSuccess) return;
 
         if (tab.startsWith('dashboard')) {
-            setCurrentCollection("dashboard");
-            setCurrentCollectionId(collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1);
+            setCurrentCollection1({name : "dashboard", id : collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1}) 
+            setCurrentCommunity1({name : "", id :-1});
         } else if(tab.startsWith('collection')){
             const tabId = parseInt(tab.split('-')[1]);
             const matched = collectionList.find((coll) => coll.id === tabId);
-            setCurrentCollection(matched?.name ?? "dashboard");
-            setCurrentCollectionId(tabId);
-            setCurrentCommunityId(-1);
+
+            setCurrentCollection1({name : matched?.name ?? "dashboard" , id : tabId}) ;
+            setCurrentCommunity1({name : "", id :-1});
         }else{
             const tabId = parseInt(tab.split('-')[1]);
-            const matched = allCommunities.find((comm) => comm.id === tabId);
-            setCurrentCommunity(matched?.name ?? "");
-            setCurrentCommunityId(tabId);
-            setCurrentCollectionId(-1);
+            const matched = allCommunities.find((comm) => comm.id === tabId); 
+            setCurrentCommunity1({name : matched?.name ?? "", id : tabId});
+            setCurrentCollection1({name : "", id : -1});
         }
     }, [tab, listData, isListSuccess]);
 
@@ -59,12 +56,12 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
     const { mutate, isSuccess: deletedCard } = useDeletecardQuery();
     useEffect(() => {
         if (deleteId !== -1) {
-            mutate({ contentId: deleteId, collectionId: currentCollectionId });
+            mutate({ contentId: deleteId, collectionId: currentCollection1.id });
         }
     }, [deleteId])
 
     //getting paginated data for collections
-    const { data: pagesData, isLoading: contentLoading, hasNextPage, fetchNextPage } = useFetchQueryCollection({ collectionId: currentCollectionId });
+    const { data: pagesData, isLoading: contentLoading, hasNextPage, fetchNextPage } = useFetchQueryCollection({ collectionId: currentCollection1.id });
 
     useEffect(() => {
         if (!contentLoading) {
@@ -78,8 +75,9 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
 
 
     //getting paginated data for coommunity
-    const { data : communityPagesData , isLoading : communityDataLoading, hasNextPage : communityNextPage, fetchNextPage : fetchCommunityNextPage} = useFetchQueryCommunity({communityId : currentCommunityId});
-        useEffect(() => {
+    const { data : communityPagesData , isLoading : communityDataLoading, hasNextPage : communityNextPage, fetchNextPage : fetchCommunityNextPage} = useFetchQueryCommunity({communityId : currentCommunity1.id});
+
+    useEffect(() => {
         if (!communityDataLoading) {
             const totalCards = communityPagesData?.pages
                 ?.map((page) => page.group?.payload?.content?.length ?? 0)
@@ -98,7 +96,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
     const {mutateAsync : shareLogin, isPending : shareLoginPending, error : shareError ,data : shareLoginData} = useShareCommunityLogin()
     const handleShareCommunityCred = async () => {
         try{  
-            const data = await shareLogin({communityId : currentCommunityId}); 
+            const data = await shareLogin({communityId : currentCommunity1.id}); 
             setPopupMessage("Community credentials coppied!!");
             setPopUp(true)
             navigator.clipboard.writeText(data.payload.message);
@@ -116,9 +114,8 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
     const { mutateAsync: deleteCollectionFn } = useDeleteCollectionQuery();
     const deleteCollection = async () => {
         try {
-            setDeleting(true);
-            await new Promise(resolve => setTimeout(resolve, 4000));
-            await deleteCollectionFn({ collectionId: currentCollectionId });
+            setDeleting(true); 
+            await deleteCollectionFn({ collectionId: currentCollection1.id });
             setTab('dashboard');
         } catch (err) {
             // handle error here if needed
@@ -133,9 +130,8 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
     const {mutateAsync : removerShare} = useRemoveShareQuery();
     const handleRemoveShare = async () => {
         try{
-            setRemovingShare(true);
-            await new Promise(resolve => setTimeout(resolve, 4000));
-            await removerShare({collectionId: currentCollectionId});
+            setRemovingShare(true); 
+            await removerShare({collectionId: currentCollection1.id});
         }catch(err){
             console.log("errororooorooo");
         }finally{
@@ -161,7 +157,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                     <GridIcon dim="50" onClickHandler={() => setLayout?.("grid")} style={layoutStyle + (layout === "grid" ? " border-2  hover:border-0" : "")} />
                     <ListIcon dim="50" onClickHandler={() => setLayout?.("list")} style={layoutStyle + (layout === "list" ? " border-2 hover:border-0" : "")} />
                 </div>
-                <div className="w-[600px] text-clamp text-3xl font-[450] font-cardTitleHeading text-[#51488C] ml-4"> {tab.startsWith("community") ? <>{`Community : ${currentCommunity}`} </> : <>{`Collection :  ${currentCollection}`} </>} </div>
+                <div className="w-[600px] text-clamp text-3xl font-[450] font-cardTitleHeading text-[#51488C] ml-4"> {tab.startsWith("community") ? <>{`Community : ${currentCommunity1.name}`} </> : <>{`Collection :  ${currentCollection1.name}`} </>} </div>
             </div>
             <div className="flex items-center justify-around">
                 <div className="flex items-center justify-around mr-6 gap-2 rounded-lg">
@@ -200,7 +196,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
         <div className=" mt-6  w-full flex justify-center ">
 
             <div className={` ${layout === "grid" ? " grid 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 xl:gap-6  lg:gap-4 gap-2 gap-y-6 " : " w-full "}`}>
-                {   currentCollectionId !== -1 ?
+                {   currentCollection1.id !== -1 ?
                     <>   
                         {pagesData?.pages.map((group, i) => (
                             <Fragment key={i}>
@@ -241,8 +237,8 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                         ))}
 
                     </> : (<>
-                        <CommunityCard createdAt={""} title={"wassup"} link={"https://youtu.be/JoJ8Sw5Yb4c?si=MrQspFY59ubK0l3f"} layout={layout!} communityId={1} id={20} note={"we are going through shit and we will overcome this by fighting tooth and nail"} cardType={"YOUTUBE"} posterId={0} isOwner={true} upVoteCount={10} ></CommunityCard>
-                        <CommunityCard createdAt={""} title={"wassup"} link={"https://x.com/AdityaDtwt/status/1929479477618229264"} layout={layout!} communityId={1} id={20} note={"we are going through shit and we will overcome this by fighting tooth and nail"} cardType={"TWITTER"} posterId={7} isOwner={false} upVoteCount={120} ></CommunityCard></>
+                        <CommunityCard createdAt={""} title={"wassup"} link={"https://youtu.be/JoJ8Sw5Yb4c?si=MrQspFY59ubK0l3f"} layout={layout!} communityId={1} id={20} note={"we are going through shit and we will overcome this by fighting tooth and nail"} cardType={"YOUTUBE"} posterName={"abhi"} isOwner={true} upVoteCount={10} ></CommunityCard>
+                        <CommunityCard createdAt={""} title={"wassup"} link={"https://x.com/AdityaDtwt/status/1929479477618229264"} layout={layout!} communityId={1} id={20} note={"we are going through shit and we will overcome this by fighting tooth and nail"} cardType={"TWITTER"} posterName={"abhi"} isOwner={false} upVoteCount={120} ></CommunityCard></>
                     )
                 }
             </div>
