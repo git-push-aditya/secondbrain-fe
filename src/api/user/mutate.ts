@@ -8,6 +8,7 @@ interface addContentType {
     note: string;
     type: 'WEB' | 'YOUTUBE' | 'REDDIT' | 'TWITTER' | 'INSTAGRAM';
     collectionId: number;
+    communityId : number;
     existingTags: string[];
     newTags: string[];
 }
@@ -130,7 +131,7 @@ const shareCommunityCred = async (body : basicCommunity) => {
 export const useAddContentQuery = () => {
     const client = useQueryClient();
     return useMutation<any, Error, addContentType>({
-        mutationFn: ({ collectionId, title, hyperlink, note, type, existingTags, newTags }) => addContent({ collectionId, title, hyperlink, note, type, existingTags, newTags }),
+        mutationFn: ({ collectionId, title, hyperlink, note, type, existingTags, newTags,communityId }) => addContent({ collectionId, title, hyperlink, note, type, existingTags, newTags,communityId }),
         onSuccess: (_, variables) => {
             client.invalidateQueries({ queryKey: ['fetchData', variables.collectionId] });
         }

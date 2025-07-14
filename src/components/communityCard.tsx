@@ -34,7 +34,7 @@ export const CommunityCard = ({createdAt,title,link,layout,communityId,id,note,c
     
     const [popUpMessage, setPopUpMessage] = usePopUpMessage();
     const [profilePhoto, setProfilePhoto] = useState<string>("");
-    const [user] = useUserProfile();
+    const [user,setUser] = useUserProfile();
     useEffect(()=>{
         if(isOwner){ 
             setProfilePhoto(user?.profilePic!);
@@ -88,16 +88,20 @@ const GridStyle = ({createdAt,title,link,layout,communityId,id,note, upVoteCount
         transition={{ duration: 0.4, ease: "easeInOut" }}
         className="scrollbar-hidden"
         > <div className={defaultStyle} >
-            <div className="h-[15%] mt-2 flex justify-between py-2 mx-4 items-center relative z-10">
-            <img src={profilePhoto} className={"rounded-3xl h-12 w-12 cursor-pointer"} /> 
-            <div className="mr-3 scale-95 opacity-0 group-hover/card:opacity-100 group-hover/card:scale-100 transition-all duration-300">
-                <div className="flex justify-between relative group/upVote">
-                    <div>    
-                        <UpArrow dim="10" style="bg-slate-200 hover:bg-green-100 transition duration-200 text-slate-900 hover:text-green-500 cursor-pointer h-11 rounded-l-xl w-10 p-1 border-2 hover:border-green-400 border-slate-200"
-                        />
-                        <div className="absolute whitespace-nowrap px-3 -translate-x-27 translate-y-2 py-1 bg-blue-400 text-white text-sm hover:opacity-0 rounded-lg opacity-0 group-hover/upVote:opacity-100 transition-opacity duration-300 z-30">
-                            {upVoteCount} upvotes
-                        </div>
+            <div className="h-[15%] mt-2 flex justify-between py-2 mx-4 items-center relative z-10 ">
+                <div className="flex items-center gap-2 text-cardTitleHeading text-xl font-[500]">
+                    <img src={profilePhoto} className={"rounded-3xl h-12 w-12 cursor-pointer"} /> 
+                    <div>by {isOwner ? "you" : posterName}</div>
+                </div>
+                
+                <div className="mr-3 scale-95 opacity-0 group-hover/card:opacity-100 group-hover/card:scale-100 transition-all duration-300">
+                    <div className="flex justify-between relative group/upVote">
+                        <div>    
+                            <UpArrow dim="10" style="bg-slate-200 hover:bg-green-100 transition duration-200 text-slate-900 hover:text-green-500 cursor-pointer h-11 rounded-l-xl w-10 p-1 border-2 hover:border-green-400 border-slate-200"
+                            />
+                            <div className="absolute whitespace-nowrap px-3 -translate-x-27 translate-y-2 py-1 bg-blue-400 text-white text-sm hover:opacity-0 rounded-lg opacity-0 group-hover/upVote:opacity-100 transition-opacity duration-300 z-30">
+                                {upVoteCount} upvotes
+                            </div>
                     </div>
 
                     <DownArrow
@@ -105,7 +109,6 @@ const GridStyle = ({createdAt,title,link,layout,communityId,id,note, upVoteCount
                         style="bg-slate-200 hover:bg-red-100 transition duration-200 text-slate-900 hover:text-red-500 cursor-pointer h-11 rounded-r-xl w-10 p-1 border-2 hover:border-red-400 border-slate-200"
                     />
                 </div>
-                
             </div>
         </div>
         <div className="font-[550] line-clamp-2 cursor-default text-cardTitle text-2xl font-cardTitleHeading mx-4 mb-4 ">{title}</div>

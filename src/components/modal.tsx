@@ -1,7 +1,6 @@
 import { CopyIcon, CrossIcon, LeftIcon, Loader } from "../icons/commonIcons";
 import { ButtonEl } from "./button";
-import { motion, AnimatePresence } from "framer-motion";
-import Dropdown from "./dropdown";
+import { motion, AnimatePresence } from "framer-motion"; 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Tag from "./tags";
 import { useAddContentQuery, useCreateCollection, useCreateCommunity, useJoinCommunity, useShareBrain } from "../api/user/mutate";
@@ -14,11 +13,13 @@ import type { SetterOrUpdater } from "recoil";
 export type type = 'WEB' | 'YOUTUBE' | 'REDDIT' | 'TWITTER' | 'INSTAGRAM';
 
 type CollectionType = { id: number; name: string };
+type CommunityType = { id :number; name : string; isFounder : boolean}
 
 export type GetListResponse = {
     status: string;
     payload: {
         collectionList: CollectionType[];
+        allCommunities : CommunityType[];
         tagsList: { title: string }[];
         message: string;
     };
@@ -63,19 +64,19 @@ const Modal = ({ cause, closeModal }: props) => {
 
 
 
-const AddContent = ({ closeCard }: cardComponent) => {
-    const linkType = ["Web", "Youtube", "TWITTER", "Reddit", "Instagram", "blank"];
+const AddContent = ({ closeCard }: cardComponent) => { 
     const queryClient = useQueryClient();
 
     const listData = queryClient.getQueryData<AxiosResponse<GetListResponse>>(['getList']);
     const collectionList = listData?.data?.payload?.collectionList || [];
-    console.log("Collection List:", collectionList); // should print array of objects with `name`
+
+    const [tab,setTab] = useTabAtom()
 
 
-    const [selectedLink, setSelectedLink] = useState<string>('blank');
-    const [selectedCollection, setSelectedCollection] = useState<string>("blank");
+    const [givenLinkType, setGivenLinkType] = useState<type>('WEB');
+    const [collectionId, setCollectionId] = useState<number>(-1);
+    const [communityId, setCommunityId] = useState<number>(-1)
     const [currentTag, setCurrentTag] = useState<string>("");
-
 
     const [tagsList, setTagsList] = useState<string[]>([]);
 
@@ -110,18 +111,26 @@ const AddContent = ({ closeCard }: cardComponent) => {
         ));
     }, [tagsList]);
 
-    const { mutate, data, isSuccess, isError, } = useAddContentQuery();
+    const { mutateAsync, isPending,isSuccess, isError } = useAddContentQuery();
+
     const addContentHandler = async () => {
 
         if (hyperLink.trim() === "" || title.trim() === "") return;
 
-        //collection id handled
-        let collectionId = -1;
-        if (selectedCollection === "blank") {
-            collectionId = collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1;
-        } else {
-            collectionId = collectionList.find((coll) => coll.name === selectedCollection)?.id ?? -1;
+        //collection id /\ community id
+        if (tab.startsWith('dashboard')) {
+            setCollectionId(collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1);
+            setCommunityId(-1);
+        } else if(tab.startsWith('collection')){
+            const tabId = parseInt(tab.split('-')[1]); 
+            setCollectionId(tabId) ; 
+            setCommunityId(-1);
+        }else{
+            const tabId = parseInt(tab.split('-')[1]); 
+            setCommunityId(tabId);
+            setCollectionId(-1);
         }
+
 
         //tags list handled
         const allTags = listData?.data?.payload.tagsList || [];
@@ -141,16 +150,22 @@ const AddContent = ({ closeCard }: cardComponent) => {
         })
 
         //linktype handled
-        let linkType: type = selectedLink === 'blank' ? 'WEB' : selectedLink.toUpperCase() as type;
+        if(hyperLink.includes('x.com')){
+            setGivenLinkType('TWITTER');
+        }else if(hyperLink.includes('reddit.com')){
+            setGivenLinkType('REDDIT')
+        }else if(hyperLink.includes('instagram.com')){
+            setGivenLinkType('INSTAGRAM')
+        }else if(hyperLink.includes('youtube.com') || hyperLink.includes('youtu.be')){
+            setGivenLinkType('YOUTUBE')
+        }
 
-
-        mutate({ title: title.trim(), hyperlink: hyperLink.trim(), note: note.trim(), type: linkType, collectionId: collectionId, existingTags: existingTags, newTags: newTags });
-
-        if (isSuccess) {
+        try{
+        mutateAsync({ title: title.trim(), hyperlink: hyperLink.trim(), note: note.trim(), type: givenLinkType, collectionId,communityId, existingTags: existingTags, newTags: newTags });
+ 
             alert('content added');
             console.log('clicked add content');
-        }
-        if (isError) {
+        }catch(e){
             alert('error occured');
             console.error('error adding conntetn');
         }
@@ -179,14 +194,7 @@ const AddContent = ({ closeCard }: cardComponent) => {
                 {renderedTags}
             </div>
 
-            <div className="w-[90%] mt-2 mx-auto mt-2 flex items-center justify-center" >
-                <Dropdown list={linkType} selected={selectedLink} title="Link type" setState={setSelectedLink} />
-            </div>
-            <div className="w-[90%] mt-2 mx-auto mt-3 flex items-center justify-center" >
-                <Dropdown list={collectionList.map((item) => item.name)} selected={selectedCollection} title="Collection" setState={setSelectedCollection} />
-            </div>
-
-            <ButtonEl buttonType="primary" onClickHandler={() => addContentHandler()} particularStyle="w-[80%] xl:w-[90%]  font-inter mt-4 h-16 mx-auto font-[550] font-inter " placeholder="Add Link" />
+            <ButtonEl buttonType="primary" onClickHandler={() => addContentHandler()} particularStyle={`w-[80%] xl:w-[90%]  font-inter mt-4 h-16 mx-auto font-[550] font-inter ${isPending ? "animate-pulse" : ""} `} placeholder="Add Link" />
 
 
         </div>
