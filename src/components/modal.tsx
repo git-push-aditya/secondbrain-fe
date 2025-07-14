@@ -1,6 +1,6 @@
 import { CopyIcon, CrossIcon, LeftIcon, Loader } from "../icons/commonIcons";
 import { ButtonEl } from "./button";
-import { motion, AnimatePresence } from "framer-motion"; 
+import { motion, AnimatePresence } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Tag from "./tags";
 import { useAddContentQuery, useCreateCollection, useCreateCommunity, useJoinCommunity, useShareBrain } from "../api/user/mutate";
@@ -13,13 +13,13 @@ import type { SetterOrUpdater } from "recoil";
 export type type = 'WEB' | 'YOUTUBE' | 'REDDIT' | 'TWITTER' | 'INSTAGRAM';
 
 type CollectionType = { id: number; name: string };
-type CommunityType = { id :number; name : string; isFounder : boolean}
+type CommunityType = { id: number; name: string; isFounder: boolean }
 
 export type GetListResponse = {
     status: string;
     payload: {
         collectionList: CollectionType[];
-        allCommunities : CommunityType[];
+        allCommunities: CommunityType[];
         tagsList: { title: string }[];
         message: string;
     };
@@ -64,18 +64,17 @@ const Modal = ({ cause, closeModal }: props) => {
 
 
 
-const AddContent = ({ closeCard }: cardComponent) => { 
+const AddContent = ({ closeCard }: cardComponent) => {
     const queryClient = useQueryClient();
 
     const listData = queryClient.getQueryData<AxiosResponse<GetListResponse>>(['getList']);
     const collectionList = listData?.data?.payload?.collectionList || [];
 
-    const [tab,setTab] = useTabAtom()
+    const [tab, setTab] = useTabAtom()
 
 
-    const [givenLinkType, setGivenLinkType] = useState<type>('WEB');
-    const [collectionId, setCollectionId] = useState<number>(-1);
-    const [communityId, setCommunityId] = useState<number>(-1)
+    let collectionId, communityId;
+    let linkType: type;
     const [currentTag, setCurrentTag] = useState<string>("");
 
     const [tagsList, setTagsList] = useState<string[]>([]);
@@ -111,24 +110,24 @@ const AddContent = ({ closeCard }: cardComponent) => {
         ));
     }, [tagsList]);
 
-    const { mutateAsync, isPending,isSuccess, isError } = useAddContentQuery();
+    const { mutateAsync, isPending, isSuccess, isError } = useAddContentQuery();
 
     const addContentHandler = async () => {
-
+        console.log(tab)
         if (hyperLink.trim() === "" || title.trim() === "") return;
 
         //collection id /\ community id
         if (tab.startsWith('dashboard')) {
-            setCollectionId(collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1);
-            setCommunityId(-1);
-        } else if(tab.startsWith('collection')){
-            const tabId = parseInt(tab.split('-')[1]); 
-            setCollectionId(tabId) ; 
-            setCommunityId(-1);
-        }else{
-            const tabId = parseInt(tab.split('-')[1]); 
-            setCommunityId(tabId);
-            setCollectionId(-1);
+            collectionId = collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1;
+            communityId = -1;
+        } else if (tab.startsWith('collection')) {
+            const tabId = parseInt(tab.split('-')[1]);
+            collectionId = tabId;
+            communityId = -1;
+        } else {
+            const tabId = parseInt(tab.split('-')[1]);
+            communityId = tabId;
+            collectionId = -1;
         }
 
 
@@ -150,25 +149,21 @@ const AddContent = ({ closeCard }: cardComponent) => {
         })
 
         //linktype handled
-        if(hyperLink.includes('x.com')){
-            setGivenLinkType('TWITTER');
-        }else if(hyperLink.includes('reddit.com')){
-            setGivenLinkType('REDDIT')
-        }else if(hyperLink.includes('instagram.com')){
-            setGivenLinkType('INSTAGRAM')
-        }else if(hyperLink.includes('youtube.com') || hyperLink.includes('youtu.be')){
-            setGivenLinkType('YOUTUBE')
+        if (hyperLink.includes('x.com')) {
+            linkType = 'TWITTER';
+        } else if (hyperLink.includes('reddit.com')) {
+            linkType = 'REDDIT';
+        } else if (hyperLink.includes('instagram.com')) {
+            linkType = 'INSTAGRAM';
+        } else if (hyperLink.includes('youtube.com') || hyperLink.includes('youtu.be')) {
+            linkType = 'YOUTUBE';
+        } else {
+            linkType = 'WEB'
         }
 
-        try{
-        mutateAsync({ title: title.trim(), hyperlink: hyperLink.trim(), note: note.trim(), type: givenLinkType, collectionId,communityId, existingTags: existingTags, newTags: newTags });
- 
-            alert('content added');
-            console.log('clicked add content');
-        }catch(e){
-            alert('error occured');
-            console.error('error adding conntetn');
-        }
+
+        mutateAsync({ title: title.trim(), hyperlink: hyperLink.trim(), note: note.trim(), type: linkType, collectionId, communityId, existingTags: existingTags, newTags: newTags });
+        console.log(tab);
         closeCard();
     }
 
@@ -188,12 +183,12 @@ const AddContent = ({ closeCard }: cardComponent) => {
 
             <textarea placeholder="Note..." className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none overflow-y-auto scrollbarSB" value={note} onChange={(e) => setNote(e.target.value)} />
 
-            <input type="text" placeholder="Enter tags for this post" className="w-[90%] mt-2 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none" value={currentTag} onChange={(e) => setCurrentTag(e.target.value)} onKeyDown={(e) => tagsKeyDownHandler(e)} />
+            {!tab.startsWith('community') && <>         <input type="text" placeholder="Enter tags for this post" className="w-[90%] mt-2 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none" value={currentTag} onChange={(e) => setCurrentTag(e.target.value)} onKeyDown={(e) => tagsKeyDownHandler(e)} />
 
-            <div className="mt-2 flex flex-wrap mx-12 gap-2 w-[90%] overflow-y-auto scrollbarSB max-h-[48px]">
-                {renderedTags}
-            </div>
-
+                <div className="mt-2 flex flex-wrap mx-12 gap-2 w-[90%] overflow-y-auto scrollbarSB max-h-[48px]">
+                    {renderedTags}
+                </div></>
+            }
             <ButtonEl buttonType="primary" onClickHandler={() => addContentHandler()} particularStyle={`w-[80%] xl:w-[90%]  font-inter mt-4 h-16 mx-auto font-[550] font-inter ${isPending ? "animate-pulse" : ""} `} placeholder="Add Link" />
 
 
@@ -306,7 +301,7 @@ const AddCollection = ({ closeCard }: cardComponent) => {
     </motion.div>
 }
 
-const StartCommunity = ({ closeCard }: cardComponent) => { 
+const StartCommunity = ({ closeCard }: cardComponent) => {
     const [allowPost, setAllowPost] = useState<boolean>(false);
     const [communityName, setcommunityName] = useState<string>("");
     const [communityDesc, setcommunityDesc] = useState<string>("");
@@ -326,19 +321,19 @@ const StartCommunity = ({ closeCard }: cardComponent) => {
         }
     }
 
-    const {mutateAsync,data,isPending,error} = useCreateCommunity();
+    const { mutateAsync, data, isPending, error } = useCreateCommunity();
 
     const handleCreateCommunity = async () => {
-        try{
-            await mutateAsync({name : communityName.trim(), descp : communityDesc.trim(), password : password.trim(),emailLead : emailLead.trim(), membersCanPost : allowPost});
-            if(!isPending && !error){
+        try {
+            await mutateAsync({ name: communityName.trim(), descp: communityDesc.trim(), password: password.trim(), emailLead: emailLead.trim(), membersCanPost: allowPost });
+            if (!isPending && !error) {
                 console.log("successfully community created");
                 console.log(data)
             }
-        }catch(e){
+        } catch (e) {
             console.log(error);
             alert("some server issue in createing community")
-        } 
+        }
         closeCard();
     }
 
@@ -357,8 +352,8 @@ const StartCommunity = ({ closeCard }: cardComponent) => {
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: -300, opacity: 0 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}>
-                <div className="mt-5 text-[1.3rem] mx-16 text-center tracking-[0.05rem]  font-[550] text-gray-500"> 
-                        Passionate about something? Build a space where others can explore it with you.
+                <div className="mt-5 text-[1.3rem] mx-16 text-center tracking-[0.05rem]  font-[550] text-gray-500">
+                    Passionate about something? Build a space where others can explore it with you.
                 </div>
 
                 <div className="text-center mt-4">
@@ -372,7 +367,7 @@ const StartCommunity = ({ closeCard }: cardComponent) => {
                         <input type="checkbox" checked={allowPost} onChange={() => { setAllowPost((prev) => !prev) }} className={checkboxInputStyle} ></input>Allow members to post
                     </label>
                 </div>
- 
+
                 {inValidInput && <div className="text-center text-red-600 font-[500] mt-2">Invalid input-Community name and description field are necessary field</div>}
                 <ButtonEl buttonType="primary" onClickHandler={onStart} particularStyle="w-[85%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter " placeholder="Start your Community" />
             </motion.div> : <motion.div key="sliding-box2"
@@ -405,23 +400,23 @@ const StartCommunity = ({ closeCard }: cardComponent) => {
 
 const JoinCommunity = ({ closeCard }: cardComponent) => {
 
-    const {mutateAsync, data, isPending, error} = useJoinCommunity();
-    const [communityId, setCommunityId] = useState<string>(''); 
+    const { mutateAsync, data, isPending, error } = useJoinCommunity();
+    const [communityId, setCommunityId] = useState<string>('');
     const [inValidInput, setInvalidInput] = useState<boolean>(false);
 
-    const handleJoinCommunity = async () => { 
+    const handleJoinCommunity = async () => {
         const communityIdTrimmed = communityId.trim();
-        if(!communityIdTrimmed){
+        if (!communityIdTrimmed) {
             setInvalidInput(true);
-        }else{
-            try{
-                await mutateAsync({ communityId :communityIdTrimmed});
+        } else {
+            try {
+                await mutateAsync({ communityId: communityIdTrimmed });
                 closeCard();
-            }catch(e){
+            } catch (e) {
                 console.log("Error happened \n\n");
                 console.log(error)
-            }            
-        }   
+            }
+        }
     }
 
 
@@ -437,7 +432,7 @@ const JoinCommunity = ({ closeCard }: cardComponent) => {
             Discover and share the best content with like-minded people.
         </div>
         <div className="text-center mt-3">
-            <input type="text" placeholder="Paste community link" value={communityId} onChange={(e) => setCommunityId(e.target.value)} className={inputStyle + " h-14"} /> 
+            <input type="text" placeholder="Paste community link" value={communityId} onChange={(e) => setCommunityId(e.target.value)} className={inputStyle + " h-14"} />
         </div>
         {inValidInput && <div className="text-center text-red-600 font-[500] mt-2">Invalid input-Community Id password field are necessary.</div>}
         <ButtonEl buttonType="primary" onClickHandler={handleJoinCommunity} particularStyle="w-[85%] gap-5 font-inter mt-6 h-16 mx-auto font-[550] font-inter " placeholder="Join Community" />

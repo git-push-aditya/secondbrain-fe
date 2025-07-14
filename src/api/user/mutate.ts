@@ -40,9 +40,15 @@ interface basicCommunity {
 
 
 const addContent = (data: addContentType) => {
-    return axios.post('http://localhost:2233/user/addcontent', data, {
-        withCredentials: true
-    }).then(res => res.data)
+    if(data.communityId === -1){
+        return axios.post('http://localhost:2233/user/addcontent', data, {
+            withCredentials: true
+        }).then(res => res.data)
+    }else{
+        return axios.post('http://localhost:2233/user/addcommunitycontent',data,{
+            withCredentials : true
+        }).then(res => res.data)
+    } 
 }
 
 
@@ -133,7 +139,12 @@ export const useAddContentQuery = () => {
     return useMutation<any, Error, addContentType>({
         mutationFn: ({ collectionId, title, hyperlink, note, type, existingTags, newTags,communityId }) => addContent({ collectionId, title, hyperlink, note, type, existingTags, newTags,communityId }),
         onSuccess: (_, variables) => {
-            client.invalidateQueries({ queryKey: ['fetchData', variables.collectionId] });
+            if(variables.communityId === -1){
+                client.invalidateQueries({ queryKey: ['fetchData', variables.collectionId] });
+            }else{
+                client.invalidateQueries({ queryKey: ['fetchData', variables.communityId] });
+            }
+            
         }
     })
 }
