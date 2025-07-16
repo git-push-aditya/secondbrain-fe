@@ -9,19 +9,20 @@ interface authInTypes{
  
 interface authUpTypes extends authInTypes{
   email : string;
+  gender : 'male' | 'female';
 }
 
 
 const logIn = ({userName,password,rememberMe}:authInTypes) => {
     return axios.post('http://localhost:2233/auth/signin',
-        { userName, password, rememberMe },
+        { userName, password, rememberMe},
         {withCredentials: true}
     )
 }
 
-const signUp = ({email, userName, password, rememberMe}: authUpTypes) => {
+const signUp = ({email, userName, password, rememberMe,gender}: authUpTypes) => {
   return axios.post('http://localhost:2233/auth/signup',
-    {userName,email,rememberMe,password},
+    {userName,email,rememberMe,password, gender},
     {withCredentials:true}
   )
 }
@@ -52,8 +53,8 @@ export const useAuthInQuery = ()=> {
 
 export const useAuthUpQuery = () => {
   return useMutation<any, Error, authUpTypes>({
-    mutationFn: ({email, userName, password, rememberMe}: authUpTypes) =>
-      signUp({email, userName, password, rememberMe}) 
+    mutationFn: ({email, userName, password, rememberMe, gender}: authUpTypes) =>
+      signUp({email, userName, password, rememberMe , gender}) 
   })
 }
 

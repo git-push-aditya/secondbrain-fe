@@ -252,16 +252,17 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                                                 cardType={cardData.content.type} 
                                                 posterName={cardData.content.user.userName} 
                                                 isOwner={cardData.isOwner} 
-                                                upVoteCount={cardData.upVotes} 
+                                                upVoteCount={cardData.upVotes}
+                                                downVoteCount={cardData.downVotes}
+                                                usersVote={cardData.usersVote}
+                                                gender={cardData.content.user.gender}
                                             />
                                         ))
                                     }
                                 </Fragment>
                             ))
                         }
-                        <CommunityCard createdAt={""} title={"wassup"} link={"https://youtu.be/JoJ8Sw5Yb4c?si=MrQspFY59ubK0l3f"} layout={layout!} communityId={1} id={20} note={"we are going through shit and we will overcome this by fighting tooth and nail"} cardType={"YOUTUBE"} posterName={"abhi"} isOwner={true} upVoteCount={10} ></CommunityCard>
-                        <CommunityCard createdAt={""} title={"wassup"} link={"https://x.com/AdityaDtwt/status/1929479477618229264"} layout={layout!} communityId={1} id={20} note={"we are going through shit and we will overcome this by fighting tooth and nail"} cardType={"TWITTER"} posterName={"abhi"} isOwner={false} upVoteCount={120} ></CommunityCard></>
-                    )
+                    </>)
                 }
             </div>
         </div>

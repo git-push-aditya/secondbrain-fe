@@ -1,5 +1,6 @@
 import { QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from 'axios';
+import type { vote } from "../../components/communityCard";
 
 //////////query paramerets types
 interface addContentType {
@@ -33,6 +34,12 @@ interface createCommunity {
 
 interface basicCommunity {
     communityId : number; 
+}
+
+interface voteContentType {
+    communityId: number;
+    contentId : number;
+    vote : vote
 }
 
 
@@ -116,8 +123,6 @@ const joinCommunityFn = (body : {communityId : string}) => {
 
 const shareCommunityCred = async (body : basicCommunity) => {
     const {communityId} = body;
-    console.log(communityId)
-    console.log("mmmmmm")
 
     const res = await axios.post('http://localhost:2233/user/sharelogin', {
         communityId
@@ -125,6 +130,17 @@ const shareCommunityCred = async (body : basicCommunity) => {
         withCredentials: true
     });
     return res.data;
+}
+
+
+const voteContent = (body :voteContentType) => {
+    const { communityId, contentId, vote } = body;
+
+    return axios.post('http://localhost:2233/user/vote',{
+        communityId, contentId, vote 
+    },{
+        withCredentials : true
+    }).then(res => res.data)
 }
 
 
@@ -140,9 +156,9 @@ export const useAddContentQuery = () => {
         mutationFn: ({ collectionId, title, hyperlink, note, type, existingTags, newTags,communityId }) => addContent({ collectionId, title, hyperlink, note, type, existingTags, newTags,communityId }),
         onSuccess: (_, variables) => {
             if(variables.communityId === -1){
-                client.invalidateQueries({ queryKey: ['fetchData', variables.collectionId] });
+                client.invalidateQueries({ queryKey: ['fetchDataCollection', variables.collectionId] });
             }else{
-                client.invalidateQueries({ queryKey: ['fetchData', variables.communityId] });
+                client.invalidateQueries({ queryKey: ['fetchDataCommunity', variables.communityId] });
             }
             
         }
@@ -179,7 +195,7 @@ export const useDeletecardQuery = () => {
     return useMutation<any, Error, { contentId: number, collectionId: number }>({
         mutationFn: ({ contentId, collectionId }: { contentId: number, collectionId: number }) => deleteCard({ contentId }),
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['fetchData', variables.collectionId] });
+            queryClient.invalidateQueries({ queryKey: ['fetchDataCollection', variables.collectionId] });
         }
     });
 };
@@ -237,9 +253,13 @@ export const useJoinCommunity = () => {
 
 export const useShareCommunityLogin = () => {
     return useMutation<any, Error, basicCommunity>({
-        mutationFn : (body : basicCommunity) => shareCommunityCred(body), 
-        onSuccess : () => {
-            console.log("on success called")
-        }
+        mutationFn : (body : basicCommunity) => shareCommunityCred(body)
+    })
+}
+
+
+export const useVoteContent = () => {
+    return useMutation<any, Error, voteContentType>({
+        mutationFn : (body) => voteContent(body)
     })
 }

@@ -18,6 +18,7 @@ export interface AuthUser {
 	userName: string;
 	profilePic: string;
 	email: string;
+	gender : 'male' | 'female';
 }
 
 

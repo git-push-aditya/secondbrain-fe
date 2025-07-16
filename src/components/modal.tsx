@@ -167,7 +167,7 @@ const AddContent = ({ closeCard }: cardComponent) => {
         closeCard();
     }
 
-    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} exit={{ y: 8, opacity: 0 }} transition={{ duration: 0.1 }} className={` max-h-[800px]  w-[80%] xl:w-[50%] md:w-[60%] rounded-3xl bg-modalCard  cursor-default scrollbarSB  pb-8`} >
+    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} exit={{ y: 8, opacity: 0 }} transition={{ duration: 0.1 }} className={` max-h-[800px]  w-[80%] xl:w-[48%] md:w-[60%] rounded-3xl bg-modalCard  cursor-default scrollbarSB  pb-8`} >
         <div className="flex justify-between items-center mx-8 md:mx-10 xl:mx-12 mt-10">
             <div className="font-[650]  text-4xl text-modalHead font-inter ">Save a New Link</div>
             <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2" />} />

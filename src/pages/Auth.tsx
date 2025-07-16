@@ -4,8 +4,8 @@ import type { AuthUser } from "../App";
 import { useAuthInQuery, useAuthUpQuery, useCheckMe } from '../api/auth/mutate';
 import { useNavigate } from "react-router-dom";
 import { easeInOut, motion } from "framer-motion";
-import { LogoIcon } from "../icons/particularIcons";
-import { getUserProfilePhoto } from "../utils/profilePhoto";
+import { LogoIcon } from "../icons/particularIcons"; 
+import { getGenderProfilePhoto } from "../utils/profilePhoto";
 
 interface AuthProps {
     user: AuthUser | null;
@@ -17,7 +17,7 @@ const Auth = ({ user, setUser }: AuthProps) => {
 
     useEffect(() => {
         if (meIsSuccess && meReqData?.data.status) {
-            setUser({ userName: meReqData.data.payload.userName, profilePic: getUserProfilePhoto(), email: meReqData.data.payload.email });
+            setUser({ userName: meReqData.data.payload.userName, profilePic: getGenderProfilePhoto(meReqData.data.payload.gender), email: meReqData.data.payload.email , gender : meReqData.data.payload.gender});
         } else { }
     }, [meReqData, meIsSuccess, meIsError])
 
@@ -39,12 +39,15 @@ const Auth = ({ user, setUser }: AuthProps) => {
         if (authMode === "logIn") {
             await logIN({ userName, password, rememberMe });
             if (inIsSuccess && inData?.data.status === "success") {
-                setUser({ userName: inData.data.payload.userName, profilePic: getUserProfilePhoto(), email: inData.data.payload.email });
+                setUser({ userName: inData.data.payload.userName, profilePic: getGenderProfilePhoto(inData.data.payload.gender), email: inData.data.payload.email  ,gender : inData.data.payload.gender});
             }
         } else {
-            await signUP({ userName, password, email: emailUser, rememberMe });
+            //////////////////////////////////////////////////
+            /////////////////////////////////////////////////
+            ///////////////////////////////////////////////////
+            await signUP({ userName, password, email: emailUser, rememberMe, gender :'male' });
             if (upIsSuccess && upData?.data.status === "success") {
-                setUser({ userName: upData.data.payload.userName, profilePic: getUserProfilePhoto(), email: upData.data.payload.email });
+                setUser({ userName: upData.data.payload.userName, profilePic: getGenderProfilePhoto(upData.data.payload.gender), email: upData.data.payload.email, gender : upData.data.payload.gender });
             }
         }
     }
@@ -68,8 +71,9 @@ const Auth = ({ user, setUser }: AuthProps) => {
                 onSuccess: () => {
                     setUser({
                         userName: 'randomuser',
-                        profilePic: getUserProfilePhoto(),
+                        profilePic: getGenderProfilePhoto('male'),
                         email: 'dummy@doom.com',
+                        gender : 'male'
                     });
                 },
                 onError: (err) => {
@@ -77,7 +81,7 @@ const Auth = ({ user, setUser }: AuthProps) => {
                 },
             }
         );
-    };
+    }; 
 
   
  
@@ -109,7 +113,8 @@ const Auth = ({ user, setUser }: AuthProps) => {
 
 
                 {
-                    authMode === "signUp" && <><div className="text-xl ml-1 font-[600] mt-10 text-[#080B0A] font-roboto">Enter email</div>
+                    authMode === "signUp" && <>
+                        <div className="text-xl ml-1 font-[600] mt-10 text-[#080B0A] font-roboto">Enter email</div>
                         <input type="text" placeholder="email@domain.com" onChange={(e) => setEmailUser(e.target.value)} value={emailUser} className={inputStyle} /> 
                     </>
                 }

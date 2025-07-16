@@ -49,11 +49,13 @@ export const useGetListQuery = () => {
 
 export const useFetchQueryCollection = ({ collectionId }: { collectionId: number }) => {
   return useInfiniteQuery({
-    queryKey: ['fetchData', collectionId],
+    queryKey: ['fetchDataCollection', collectionId],
     queryFn: ({ pageParam = 1 }) => fetchContentCollection(pageParam, collectionId),
     initialPageParam: 1,
     enabled: collectionId !== -1,
-    staleTime: 0, 
+    staleTime: 0,
+    refetchInterval: 300000,
+    refetchIntervalInBackground: true,
     getNextPageParam: (lastPage,allPages) =>
       lastPage.payload.more ? allPages.length + 1 : undefined
   });
@@ -62,10 +64,13 @@ export const useFetchQueryCollection = ({ collectionId }: { collectionId: number
 
 export const useFetchQueryCommunity = ({ communityId }: { communityId: number }) => {
   return useInfiniteQuery({
-    queryKey: ['fetchData', communityId],
+    queryKey: ['fetchDataCommunity', communityId],
     queryFn: ({ pageParam = 1 }) => fetchContentCommunity(pageParam, communityId),
     initialPageParam: 1,
     enabled: communityId !== -1,
+    refetchInterval: 300000,
+    refetchIntervalInBackground: true,
+
     staleTime: 0, 
     getNextPageParam: (lastPage,allPages) =>
       lastPage.payload.more ? allPages.length + 1 : undefined
