@@ -1,14 +1,16 @@
 import { useState, useEffect, Fragment } from "react";
 import { ButtonEl } from "./button"
 import { CardElement } from "./card";
-import { DeleteIcon, GridIcon, ListIcon, Loader, PlusIcon, ShareIcon } from "../icons/commonIcons";
+import { DeleteIcon, GridIcon, ListIcon, Loader, PlusIcon, ShareIcon, StopSharing } from "../icons/commonIcons";
 import type { ChildProps } from "../pages/dashboard";
 import { useCardCountAtom, useCurrentCollection, useCurrentCommunity, usePopUpAtom, usePopUpMessage, useTabAtom } from "../recoil/clientStates";
 import { useFetchQueryCollection, useFetchQueryCommunity, useGetListQuery } from "../api/user/query";
-import { useDeletecardQuery, useDeleteCollectionQuery, useRemoveShareQuery, useShareCommunityLogin } from "../api/user/mutate";
+import { useDeletecardQuery, useDeleteCollectionQuery, useGetCommunityMembers, useRemoveShareQuery, useShareCommunityLogin } from "../api/user/mutate";
 import { useDeleteID } from "../recoil/deleteId";
 import { CommunityCard } from "./communityCard";
-
+import { CardsLoaderSkeleton } from "../icons/skeleton";
+import { CommunityIcon } from "../icons/particularIcons";
+import { RenderMembers } from "./membersList";
 
 const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) => {
 
@@ -50,6 +52,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
             setCurrentCommunity1({ name: matched?.name ?? "", id: tabId });
             setCurrentCollection1({ name: "", id: -1 });
         }
+        setMembersList(false);
     }, [tab, listData, isListSuccess]);
 
     const [deleteId] = useDeleteID();
@@ -59,6 +62,24 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
             mutate({ contentId: deleteId, collectionId: currentCollection1.id });
         }
     }, [deleteId])
+
+    //getting the memebers of a community
+    const [membersList, setMembersList] = useState<boolean>(false)
+    const {isPending : membersListPending, mutateAsync : getCommunityMembers, data : membersData} = useGetCommunityMembers();
+
+    const getMembers = async () => {
+        if(membersList){
+            console.log("closed");
+            setMembersList(false);
+            return;
+        }
+
+        console.log("opened");
+        setMembersList(true);
+        await getCommunityMembers({communityId : currentCommunity1.id});
+    
+    }
+
 
     //getting paginated data for collections
     const { data: pagesData, isLoading: contentLoading, hasNextPage, fetchNextPage } = useFetchQueryCollection({ collectionId: currentCollection1.id });
@@ -125,11 +146,13 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
     const handleRemoveShare = async () => {
         try {
             setRemovingShare(true);
-            await removerShare({ collectionId: currentCollection1.id });
+            await removerShare({ collectionId: currentCollection1.id });            
         } catch (err) {
             console.log("errororooorooo");
         } finally {
             setRemovingShare(false);
+            setPopupMessage('Collection is no longer shared!!');
+            setPopUp(true);
         }
     }
 
@@ -141,8 +164,8 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
         <div className="flex justify-between bg-mainComponentBg border-b-2 border-slate-300 gap-4 p-6 left-0 top-0 sticky z-10 items-center">
             <div className="xl:text-5xl md:text-3xl text-xl  font-dashboardHeading font-extrabold cursor-default line-colaps-2 text-4xl font-bold text-gradient  py-2 ">Welcome, {user?.userName}</div>
             <div className="flex justify-around gap-6">
-                <ButtonEl onClickHandler={() => setModalNeededBy("shareBrain")} placeholder="Share Brain" particularStyle=" h-14 " buttonType="secondary" startIcon={<ShareIcon style="size-8.5 " />}></ButtonEl>
-                <ButtonEl onClickHandler={() => setModalNeededBy("addContent")} placeholder="Add Content" buttonType="primary" startIcon={<PlusIcon style="size-8.5 " />}></ButtonEl>
+                { !tab.startsWith('community') ? <ButtonEl onClickHandler={() => setModalNeededBy("shareBrain")} placeholder="Share Brain" particularStyle=" h-14 " buttonType="secondary" startIcon={<ShareIcon style="size-8.5 " />} /> : null}
+                <ButtonEl onClickHandler={() => setModalNeededBy("addContent")} placeholder="Add Content" buttonType="primary" startIcon={<PlusIcon style="size-8.5 " />} />
             </div>
         </div>
         <div className="flex justify-between items-center mt-4 ml-7">
@@ -171,26 +194,56 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                                     )
                                 }{
                                     <ButtonEl
-                                        onClickHandler={handleRemoveShare}
+                                        onClickHandler={() => handleRemoveShare()}
                                         buttonType="rightTopbar"
                                         particularStyle={`bg-red-300 hover:bg-red-400 ${removingShare ? " bg-red-400" : ""}`}
-                                        startIcon={!removingShare ? <DeleteIcon style="size-6 m-0 p-0" /> : null}
+                                        startIcon={!removingShare ? <StopSharing style="size-7 m-0 p-0"  /> : null}
                                         placeholder={!removingShare ? "Stop Sharing" : ""}
                                         endIcon={removingShare ? <Loader style="block size-14 text-white" dimh="10" dimw="20" /> : null}
                                     />
                                 }
                             </>
                         ) : (
-                            <ButtonEl placeholder="Share Login" onClickHandler={() => handleShareCommunityCred()} disabled={shareLoginPending} buttonType={"rightTopbar"} particularStyle={`bg-green-300 hover:bg-green-400 ${removingShare ? " bg-red-400" : ""} ${shareLoginPending ? "animate-pulse cursor-not-allowed" : ""} `} />
+                            <>
+                                <ButtonEl 
+                                    startIcon={<CommunityIcon dim="45" style="text-white" />} 
+                                    onClickHandler={getMembers} 
+                                    buttonType={"rightTopbar"} 
+                                    placeholder="All members" 
+                                    particularStyle={`bg-yellow-300  cursor-pointer hover:bg-yellow-400`} />
+                                <ButtonEl 
+                                    placeholder="Share Login" 
+                                    startIcon={<ShareIcon style=" size-6 text-white" />} 
+                                    onClickHandler={() => handleShareCommunityCred()} disabled={shareLoginPending} buttonType={"rightTopbar"} particularStyle={`bg-green-300 hover:bg-green-400 ${removingShare ? " bg-red-400" : ""} ${shareLoginPending ? "animate-pulse cursor-not-allowed" : ""} `} />
+                                {
+                                    membersList ? <div className="absolute z-2 top-51 right-53 w-60 flex justify-center items-center">                   
+                                            {
+                                                membersListPending ? 
+                                                    <div className="bg-slate-200 border-1 w-full animate-pulse text-xl flex justify-center  items-center rounded-lg">loading...</div> 
+                                                :   <div className=" relative top-0 max-h-[400px] scrollbar-hidden w-65">
+                                                    <RenderMembers membersList={membersData.payload.usersList} />
+                                                    </div>
+                                            }
+                                        </div> 
+                                            :
+                                        <></>
+                                }
+                            </>
                         )
                     }
                 </div>
+                
 
             </div>
+            
         </div>
         <div className=" mt-6  w-full flex justify-center ">
+            
 
             <div className={` ${layout === "grid" ? " grid 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 xl:gap-6  lg:gap-4 gap-2 gap-y-6 " : " w-full "}`}>
+                {
+                    communityDataLoading || contentLoading ? <CardsLoaderSkeleton /> : <></>
+                }
                 {currentCollection1.id !== -1 ?
                     <>
                         {pagesData?.pages.map((group, i) => (
@@ -260,8 +313,9 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                                         ))
                                     }
                                 </Fragment>
+                                
                             ))
-                        }
+                        } 
                     </>)
                 }
             </div>

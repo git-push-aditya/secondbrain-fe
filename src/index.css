@@ -122,3 +122,25 @@
     transition: background-color 300ms ease-in-out;
   }
 }
+
+@layer utilities {
+  .scrollbarList::-webkit-scrollbar {
+    width: 7px; 
+    height: 1px;
+  }
+
+  .scrollbarList::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: #f1f5f9;  
+  }
+
+  .scrollbarList::-webkit-scrollbar-thumb {
+    background: #dadee1;
+    border-radius: 100vh;
+  }
+
+  .scrollbarList::-webkit-scrollbar-thumb:hover {
+    background: #b2b2b3;  
+    transition: background 0.3s ease-in-out;
+  }
+}

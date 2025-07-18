@@ -143,6 +143,13 @@ const voteContent = (body :voteContentType) => {
     }).then(res => res.data)
 }
 
+const getCommunityMembers = async (communityId : number) => {
+    return axios.post('http://localhost:2233/user/getmembers',{
+        communityId
+    },{
+        withCredentials : true
+    }).then(res => res.data)
+}
 
 
 
@@ -261,5 +268,12 @@ export const useShareCommunityLogin = () => {
 export const useVoteContent = () => {
     return useMutation<any, Error, voteContentType>({
         mutationFn : (body) => voteContent(body)
+    })
+}
+
+
+export const useGetCommunityMembers = () => {
+    return useMutation<any,Error,{communityId : number}>({
+        mutationFn : ({communityId}) => getCommunityMembers(communityId)
     })
 }

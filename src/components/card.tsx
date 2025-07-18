@@ -80,7 +80,7 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
     const defaultStyle: string = `${!shared ? " w-85 " : " w-85 overflow-x-hidden "}   ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 " : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 h-115  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md scrollbar-hidden`;
 
 
-    //note : find a another way for this
+
     useEffect(() => {
         if(cardType === "TWITTER" ){
             if ( window.twttr?.widgets) {
