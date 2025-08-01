@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { redditScriptLoader } from "../scriptLoader";
 import { useUserProfile } from "../recoil/user";
 import { useVoteContent } from "../api/user/mutate";
-import { getGenderProfilePhoto } from "../utils/profilePhoto";
+import { getProfilePicPath } from "../utils/profilePhoto";
 
 interface communityCard {
     createdAt: string;
@@ -22,8 +22,8 @@ interface communityCard {
     isOwner: boolean;
     upVoteCount: number;
     downVoteCount: number;
-    usersVote ?: vote;
-    gender ?: 'male' | 'female';
+    usersVote ?: vote; 
+    profilePic : 'b1' | 'b2' | 'b3' | 'g1' | 'g2' | 'g3';
 }
 
 export type vote = 'upVote' | 'downVote' | 'NONE';
@@ -36,7 +36,7 @@ interface layoutType extends communityCard {
     usersPrevVote : vote;
 }
 
-export const CommunityCard = ({ createdAt, title, link, layout, communityId, id, note, cardType, posterName, isOwner, upVoteCount, downVoteCount, usersVote, gender }: communityCard) => {
+export const CommunityCard = ({ createdAt, title, link, layout, communityId, id, note, cardType, posterName, isOwner, upVoteCount, downVoteCount, usersVote,profilePic }: communityCard) => {
 
     const [popUpMessage, setPopUpMessage] = usePopUpMessage();
     const [profilePhoto, setProfilePhoto] = useState<string>("");
@@ -45,7 +45,7 @@ export const CommunityCard = ({ createdAt, title, link, layout, communityId, id,
         if (isOwner) {
             setProfilePhoto(user?.profilePic!);
         } else {
-            setProfilePhoto(getGenderProfilePhoto(gender!));
+            setProfilePhoto(getProfilePicPath(profilePic ?? "b1"));
         }
     }, []);
 
@@ -100,9 +100,9 @@ export const CommunityCard = ({ createdAt, title, link, layout, communityId, id,
     }
 
     return layout === "grid" ?
-        <GridStyle profilePhoto={profilePhoto} upVoteCount={upVoteCount} communityId={communityId} title={title} cardType={cardType} note={note} createdAt={formattedDate} link={link} layout={"grid"} id={id} shareClicked={shareClicked} posterName={posterName} isOwner={isOwner} downVoteCount={downVoteCount} voteCount={voteCount} usersPrevVote={usersPrevVote} upVoteDownVote={upVoteDownVote} gender={gender} />
+        <GridStyle profilePhoto={profilePhoto} upVoteCount={upVoteCount} communityId={communityId} title={title} cardType={cardType} note={note} createdAt={formattedDate} link={link} layout={"grid"} id={id} shareClicked={shareClicked} posterName={posterName} isOwner={isOwner} downVoteCount={downVoteCount} voteCount={voteCount} usersPrevVote={usersPrevVote} upVoteDownVote={upVoteDownVote} profilePic={profilePic} />
         :
-        <ListStyle profilePhoto={profilePhoto} upVoteCount={upVoteCount} title={title} posterName={posterName} isOwner={isOwner} communityId={communityId} cardType={cardType} note={note} createdAt={formattedDate} id={id} link={link} layout={"list"} shareClicked={shareClicked} downVoteCount={downVoteCount} voteCount={voteCount} usersPrevVote={usersPrevVote} upVoteDownVote={upVoteDownVote} gender={gender}  />
+        <ListStyle profilePhoto={profilePhoto} upVoteCount={upVoteCount} title={title} posterName={posterName} isOwner={isOwner} communityId={communityId} cardType={cardType} note={note} createdAt={formattedDate} id={id} link={link} layout={"list"} shareClicked={shareClicked} downVoteCount={downVoteCount} voteCount={voteCount} usersPrevVote={usersPrevVote} upVoteDownVote={upVoteDownVote} profilePic={profilePic}  />
 
 }
 
@@ -112,6 +112,7 @@ const GridStyle = ({ createdAt, title, link, communityId, id, note, cardType, sh
     const defaultStyle: string = `  w-85 overflow-x-hidden  ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 " : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 h-115  bg-cardBackground border-2  rounded-3xl shadow-md scrollbar-hidden ${isOwner ? " border-slate-400" : " border-slate-300 "} group/card `;
 
     useEffect(() => {
+        console.log(profilePhoto)
         if (cardType === "TWITTER") {
             if (window.twttr?.widgets) {
                 window.twttr.widgets.load();

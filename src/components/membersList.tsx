@@ -1,20 +1,20 @@
 import { user, useUserProfile } from "../recoil/user";
-import { getGenderProfilePhoto } from "../utils/profilePhoto"
+import { getProfilePicPath } from "../utils/profilePhoto"
 
 interface memberType {
     userName: string;
-    gender: 'male' | 'female';
+    profilePic : 'b1' | 'b2' | 'b3' | 'g1' | 'g2' | 'g3';
     isFounder: boolean;
     id: number;
 }
 
-const Member = ({ userName, gender, isFounder, id }: memberType) => {
+const Member = ({ userName, profilePic, isFounder, id }: memberType) => {
     const [user] = useUserProfile();
 
     const src =
         user && userName === user.userName && user.profilePic
             ? user.profilePic
-            : getGenderProfilePhoto(gender) || '/dp/b1.png';
+            : getProfilePicPath(profilePic) || '/dp/b1.png';
 
     return (
         <div
@@ -43,16 +43,11 @@ export const RenderMembers = ({ membersList }: { membersList: memberType[] }) =>
                     id={member.id ?? idx}
                     key={(member.id ?? idx).toString()}
                     isFounder={member.isFounder}
-                    gender={member.gender}
+                    profilePic={member.profilePic}
                 />
             ))
             
         }
-        <Member userName={"abda"} gender={"male"} isFounder={false} id={90} />
-        <Member userName={"abda"} gender={"female"} isFounder={false} id={34} />
-        <Member userName={"abda"} gender={"male"} isFounder={false} id={109} />
-        <Member userName={"abda"} gender={"female"} isFounder={false} id={34} />
-        <Member userName={"abda"} gender={"male"} isFounder={false} id={109} />
     </div>
 }
 

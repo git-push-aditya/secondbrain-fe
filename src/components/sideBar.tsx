@@ -42,9 +42,14 @@ const SideBar = ({ setModalNeededBy, setUser }: sideBarTypes) => {
     const { mutateAsync } = useLogOutQuery();
     const handleAsyncLogout = async () => {
         try {
-            await mutateAsync();
-            setUser?.(null);
-            navigate('/');
+            await mutateAsync(undefined,
+                {
+                    onSuccess : () => {
+                        setUser?.(null);
+                        navigate('/');
+                    }
+                }
+            );            
         } catch (e) {
             console.error(e)
         }
@@ -107,9 +112,9 @@ const SideBar = ({ setModalNeededBy, setUser }: sideBarTypes) => {
         </div>
         <div className="fixed bottom-0 h-[9.3%] w-[18%] z-20 bg-sidebarBg  border-r-2 border-slate-300 "> 
             <div className={`fixed -translate-y-13 text-2xl w-50 text-center ml-16 border-white font-roboto hover:scale-105 transition-all duration-300 ease-in-out cursor-pointer bg-slate-300 rounded-3xl h-10 flex items-center justify-center border-3 ${logOutButton ? " block" : " hidden"} font-[520]`} onClick={() => handleAsyncLogout()}>log out </div>
-            <div className="flex p-2 rounded-[2.5rem] justify-between  mx-6 mr-9 items-center hover:bg-slate-300 transition-hover duration-300  max-h-[90%]">
-                <img src={user?.profilePic} className="rounded-[4rem] size-15" />
-                <div className="text-3xl font-[600] font-cardTitleHeading truncate mr-2 cursor-pointer" onClick={() => setLogoutHidden((prev) => !prev)}> 
+            <div onClick={() => setLogoutHidden((prev) => !prev)} className="flex p-2 rounded-[2.5rem] justify-between cursor-pointer mx-6 mr-9 items-center hover:bg-slate-300 transition-hover duration-300  max-h-[90%]">
+                <img src={user?.profilePic} className="rounded-[4rem] size-15 " />
+                <div className="text-3xl font-[600] font-cardTitleHeading truncate mr-2   w-full text-center" > 
                     {user?.userName}
                 </div>
             </div>

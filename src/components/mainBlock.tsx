@@ -308,7 +308,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                                                 upVoteCount={cardData.upVotes}
                                                 downVoteCount={cardData.downVotes}
                                                 usersVote={cardData.usersVote}
-                                                gender={cardData.content.user.gender}
+                                                profilePic={cardData.content.user.profilePic}
                                             />
                                         ))
                                     }

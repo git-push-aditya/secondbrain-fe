@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from 'axios';
+import axios from 'axios'; 
+import type {profilePicId} from "../../pages/Auth.tsx";
 
 interface authInTypes{
     userName : String;
@@ -9,7 +10,7 @@ interface authInTypes{
  
 interface authUpTypes extends authInTypes{
   email : string;
-  gender : 'male' | 'female';
+  profilePic : profilePicId;
 }
 
 
@@ -20,9 +21,9 @@ const logIn = ({userName,password,rememberMe}:authInTypes) => {
     )
 }
 
-const signUp = ({email, userName, password, rememberMe,gender}: authUpTypes) => {
+const signUp = ({email, userName, password, rememberMe,profilePic}: authUpTypes) => {
   return axios.post('http://localhost:2233/auth/signup',
-    {userName,email,rememberMe,password, gender},
+    {userName,email,rememberMe,password, profilePic},
     {withCredentials:true}
   )
 }
@@ -53,8 +54,8 @@ export const useAuthInQuery = ()=> {
 
 export const useAuthUpQuery = () => {
   return useMutation<any, Error, authUpTypes>({
-    mutationFn: ({email, userName, password, rememberMe, gender}: authUpTypes) =>
-      signUp({email, userName, password, rememberMe , gender}) 
+    mutationFn: ({email, userName, password, rememberMe, profilePic }: authUpTypes) =>
+      signUp({email, userName, password, rememberMe , profilePic}) 
   })
 }
 
