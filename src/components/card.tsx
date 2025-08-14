@@ -79,7 +79,19 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
 
     const defaultStyle: string = `${!shared ? " w-85 " : " w-85 overflow-x-hidden "}   ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 " : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 h-115  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md scrollbar-hidden`;
 
-
+    const [newLink, setNewLink] = useState<string>(link);
+    const extractVideoId = (videoUrl : string) => {
+        const regex = /(?:youtube\.com\/.*v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/;
+        const match = videoUrl.match(regex);
+        return match ? match[1] : null;
+    };
+    
+    useEffect(()=>{
+        if(cardType === "YOUTUBE"){
+            const id = extractVideoId(link);
+            setNewLink(`https://www.youtube.com/embed/${id}`);
+        }
+    },[setNewLink])
 
     useEffect(() => {
         if(cardType === "TWITTER" ){
@@ -127,7 +139,7 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
                         </motion.div>
                         : null}</AnimatePresence>
 
-                    {cardType === "YOUTUBE" && <iframe className="w-[99%] mx-auto h-50 mt-2 rounded-lg  " title="YouTube video player" src={link.includes('youtu.be') ? link.replace('youtu.be', 'youtube.com/embed') : link} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>}
+                    {cardType === "YOUTUBE" && <iframe className="w-[99%] mx-auto h-50 mt-2 rounded-lg  " title="YouTube video player" src={newLink} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>}
 
                     {cardType === 'TWITTER' && <div className="w-full mb-[-10px] mt-[-1px] mx-auto">
                         <blockquote className="twitter-tweet w-full max-w-full"  >

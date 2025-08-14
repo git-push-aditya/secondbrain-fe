@@ -17,7 +17,7 @@ export const ChatBot = () => {
                     <motion.div initial={{ y: 8, opacity: 0 }} animate={{ y: 0, x: 0, opacity: 1 }}      exit={{ x: -10, opacity: 0 }} transition={{ duration: 0.2, ease: "easeInOut" }}>
                         <div className={`text-center cursor-default ${messages === null ? " block " : " hidden "}`}>
                             <div className="text-[3.5rem] font-[1000] text-shadow-lg font-head text-primaryButtonBlue/95 ">Ask your secondbrain</div>
-                            <div className="text-lg text-cardTitle"> Get instant answers powered by your personal knowledge base.<br/>
+                            <div className="text-lg font-inter text-slate-700/80"> Get instant answers powered by your personal knowledge base.<br/>
                             This chatbot uses your saved notes and documents to provide relevant, context-aware responses.</div>
                         </div>
                     </motion.div>
@@ -30,7 +30,6 @@ export const ChatBot = () => {
                     <textarea  className="text-token-text-primary resize-none placegolder:ps-px scrollbar-hidden outline-none px-5 h-[60%] text-2xl font-[550] w-[85%]" data-virtualKeyboard="true" placeholder="Whats on your mind..." />
                     <ChatbotEnter dim="20" style={`p-2 hover:bg-gray-100 size-19 cursor-pointer rounded-[3rem] transition-all duration-300`} />
                 
-                            
                 </motion.div>
                 </AnimatePresence>
             </div>
