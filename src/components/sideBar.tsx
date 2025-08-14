@@ -45,8 +45,7 @@ const SideBar = ({ setModalNeededBy, setUser }: sideBarTypes) => {
             await mutateAsync(undefined,
                 {
                     onSuccess : () => {
-                        setUser?.(null);
-                        navigate('/');
+                        setUser?.(null); 
                     }
                 }
             );            
@@ -54,6 +53,13 @@ const SideBar = ({ setModalNeededBy, setUser }: sideBarTypes) => {
             console.error(e)
         }
     }
+
+    useEffect(()=>{
+        if(user === null){
+            setTab('dashboard');
+            navigate('/');
+        }
+    },[user])
  
 
     return <div className="w-[18%] border-r-2 border-slate-300 bg-sidebarBg h-[90.9%] overflow-y-scroll overflow-x-hidden scrollbarSB relative z-10 scroll-smooth">
