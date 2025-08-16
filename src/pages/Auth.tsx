@@ -107,17 +107,18 @@ const Auth = ({ user, setUser }: AuthProps) => {
 
     return <div className="h-screen flex w-screen ">
         <div className="relative flex justify-center items-center transition-all duration-300 ease-in-out hidden lg:block w-[62%] h-full bg-[#E4E7E6] overflow-hidden border-r-2 border-slate-500" >
-            <img src="/authBg.png" className="absolute transition-all duration-300 ease-in-out scale:108 authBreakPoint:scale-125 object-none w-full h-full opacity-30 " />
+            <video src="./brain.mp4" autoPlay loop muted playsInline className="absolute top-0 left-0 w-full h-full object-cover" ></video>
+
             <div className="relative cursor-default flex flex-col justify-center items-center text-black h-full -translate-y-20">
                 <div className="flex items-center overflow-hidden">
                     <motion.div initial={{ x: 200, scale: 1.2 }} animate={{ x: 0, scale: 1 }} transition={{ duration: 0.8, ease: easeInOut }} className="opacity-100 scale:90 authBreakPoint:scale:100"  ><LogoIcon dim="140" /></motion.div>
-                    <motion.div initial={{ x: 200, width: '0%', opacity: 0.7 }} animate={{ width: '100%', opacity: 1, x: 0 }} transition={{ duration: 1, ease: easeInOut }} className="opacity-100 overflow-x-hidden whitespace-nowrap text-[3rem] authBreakPoint:text-[4rem] font-[600] text-[#13141e] text-shadow-lg">Second Brain App</motion.div>
+                    <motion.div initial={{ x: 200, width: '0%', opacity: 0.7 }} animate={{ width: '100%', opacity: 1, x: 0 }} transition={{ duration: 1, ease: easeInOut }} className="opacity-100 overflow-x-hidden whitespace-nowrap text-[3rem] authBreakPoint:text-[4rem] font-[600] text-white text-shadow-lg">Second Brain App</motion.div>
                 </div>
                 <motion.ul
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1.5, ease: easeInOut }}
-                    className="list-disc list-inside space-y-2 mt-4 text-left text-xl font-[650] text-black"
+                    className="list-disc list-inside space-y-2 mt-4 text-left text-xl font-[650] text-white"
                 >
                     <li>Capture and Organize Your Thoughts Effortlessly</li>
                     <li>Access Anywhere, Anytime</li>

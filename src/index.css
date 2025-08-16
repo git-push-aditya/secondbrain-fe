@@ -99,6 +99,33 @@
   }
 }
  
+@layer utilities {
+  .scrollbarCB::-webkit-scrollbar {
+    width: 13px; 
+    height: 1px;
+  }
+
+  .scrollbarCB::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: #E6EAEA;
+  }
+
+  .scrollbarCB::-webkit-scrollbar-thumb {
+    background: #d6d6d9;
+    border-radius: 100vh;
+    border: 3px solid #E6EAEA;
+  }
+
+  .scrollbarCB::-webkit-scrollbar-thumb:hover {
+    background: #A5A5AA;
+    transition: background 8s ease-in-out;
+  }
+}
+ 
+
+
+
+
 
 @layer utilities {
   .scrollbarMC::-webkit-scrollbar {

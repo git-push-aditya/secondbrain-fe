@@ -1,7 +1,7 @@
 import { useState, useEffect, Fragment } from "react";
 import { ButtonEl } from "./button"
 import { CardElement } from "./card";
-import { DeleteIcon, GridIcon, ListIcon, Loader, PlusIcon, ShareIcon, StopSharing } from "../icons/commonIcons";
+import { DeleteIcon, GridIcon, ListIcon, Loader, PlusIcon, ShareIcon, BlockIcon } from "../icons/commonIcons";
 import type { ChildProps } from "../pages/dashboard";
 import { useCardCountAtom, useCurrentCollection, useCurrentCommunity, usePopUpAtom, usePopUpMessage, useTabAtom } from "../recoil/clientStates";
 import { useFetchQueryCollection, useFetchQueryCommunity, useGetListQuery } from "../api/user/query";
@@ -197,7 +197,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                                         onClickHandler={() => handleRemoveShare()}
                                         buttonType="rightTopbar"
                                         particularStyle={`bg-red-300 hover:bg-red-400 ${removingShare ? " bg-red-400" : ""}`}
-                                        startIcon={!removingShare ? <StopSharing style="size-7 m-0 p-0"  /> : null}
+                                        startIcon={!removingShare ? <BlockIcon style="size-7 m-0 p-0"  /> : null}
                                         placeholder={!removingShare ? "Stop Sharing" : ""}
                                         endIcon={removingShare ? <Loader style="block size-14 text-white" dimh="10" dimw="20" /> : null}
                                     />
