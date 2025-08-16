@@ -9,7 +9,7 @@ interface addContentType {
     note: string;
     type: 'WEB' | 'YOUTUBE' | 'REDDIT' | 'TWITTER' | 'INSTAGRAM';
     collectionId: number;
-    communityId : number;
+    communityId: number;
     existingTags: string[];
     newTags: string[];
 }
@@ -33,13 +33,13 @@ interface createCommunity {
 }
 
 interface basicCommunity {
-    communityId : number; 
+    communityId: number;
 }
 
 interface voteContentType {
     communityId: number;
-    contentId : number;
-    vote : vote
+    contentId: number;
+    vote: vote
 }
 
 
@@ -47,15 +47,15 @@ interface voteContentType {
 
 
 const addContent = (data: addContentType) => {
-    if(data.communityId === -1){
+    if (data.communityId === -1) {
         return axios.post('http://localhost:2233/user/addcontent', data, {
             withCredentials: true
         }).then(res => res.data)
-    }else{
-        return axios.post('http://localhost:2233/user/addcommunitycontent',data,{
-            withCredentials : true
+    } else {
+        return axios.post('http://localhost:2233/user/addcommunitycontent', data, {
+            withCredentials: true
         }).then(res => res.data)
-    } 
+    }
 }
 
 
@@ -102,7 +102,7 @@ const createCommunityFn = (body: createCommunity) => {
     return axios.post('http://localhost:2233/user/createcommunity', {
         name, descp, password, membersCanPost, emailLead
     }, {
-        headers : {
+        headers: {
             'Content-Type': 'application/json'
         },
         withCredentials: true
@@ -110,19 +110,19 @@ const createCommunityFn = (body: createCommunity) => {
 }
 
 
-const joinCommunityFn = (body : {communityId : string}) => {
+const joinCommunityFn = (body: { communityId: string }) => {
     const { communityId } = body;
 
-    return axios.post('http://localhost:2233/user/joincommunity',{
+    return axios.post('http://localhost:2233/user/joincommunity', {
         communityId
-    },{
-        withCredentials : true
-    }).then(res => res.data )
+    }, {
+        withCredentials: true
+    }).then(res => res.data)
 }
 
 
-const shareCommunityCred = async (body : basicCommunity) => {
-    const {communityId} = body;
+const shareCommunityCred = async (body: basicCommunity) => {
+    const { communityId } = body;
 
     const res = await axios.post('http://localhost:2233/user/sharelogin', {
         communityId
@@ -133,23 +133,34 @@ const shareCommunityCred = async (body : basicCommunity) => {
 }
 
 
-const voteContent = (body :voteContentType) => {
+const voteContent = (body: voteContentType) => {
     const { communityId, contentId, vote } = body;
 
-    return axios.post('http://localhost:2233/user/vote',{
-        communityId, contentId, vote 
-    },{
-        withCredentials : true
+    return axios.post('http://localhost:2233/user/vote', {
+        communityId, contentId, vote
+    }, {
+        withCredentials: true
     }).then(res => res.data)
 }
 
-const getCommunityMembers = async (communityId : number) => {
-    return axios.post('http://localhost:2233/user/getmembers',{
+const getCommunityMembers = async (communityId: number) => {
+    return axios.post('http://localhost:2233/user/getmembers', {
         communityId
-    },{
-        withCredentials : true
+    }, {
+        withCredentials: true
     }).then(res => res.data)
 }
+
+
+const getChatbot = async (userQuery: string) => {
+    return axios.post('http://localhost:2233/user/chatbot', {
+        userQuery
+    }, {
+        withCredentials: true
+    }).then(res => res.data)
+}
+
+
 
 
 
@@ -160,14 +171,14 @@ const getCommunityMembers = async (communityId : number) => {
 export const useAddContentQuery = () => {
     const client = useQueryClient();
     return useMutation<any, Error, addContentType>({
-        mutationFn: ({ collectionId, title, hyperlink, note, type, existingTags, newTags,communityId }) => addContent({ collectionId, title, hyperlink, note, type, existingTags, newTags,communityId }),
+        mutationFn: ({ collectionId, title, hyperlink, note, type, existingTags, newTags, communityId }) => addContent({ collectionId, title, hyperlink, note, type, existingTags, newTags, communityId }),
         onSuccess: (_, variables) => {
-            if(variables.communityId === -1){
+            if (variables.communityId === -1) {
                 client.invalidateQueries({ queryKey: ['fetchDataCollection', variables.collectionId] });
-            }else{
+            } else {
                 client.invalidateQueries({ queryKey: ['fetchDataCommunity', variables.communityId] });
             }
-            
+
         }
     })
 }
@@ -249,10 +260,10 @@ export const useCreateCommunity = () => {
 export const useJoinCommunity = () => {
     const queryClient = useQueryClient();
 
-    return useMutation<any , Error, {communityId : string}>({
-        mutationFn : (body : {communityId : string}) => joinCommunityFn(body),
-        onSuccess : () => {
-            queryClient.invalidateQueries({ queryKey : ['getList']});
+    return useMutation<any, Error, { communityId: string }>({
+        mutationFn: (body: { communityId: string }) => joinCommunityFn(body),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['getList'] });
         }
     })
 }
@@ -260,20 +271,26 @@ export const useJoinCommunity = () => {
 
 export const useShareCommunityLogin = () => {
     return useMutation<any, Error, basicCommunity>({
-        mutationFn : (body : basicCommunity) => shareCommunityCred(body)
+        mutationFn: (body: basicCommunity) => shareCommunityCred(body)
     })
 }
 
 
 export const useVoteContent = () => {
     return useMutation<any, Error, voteContentType>({
-        mutationFn : (body) => voteContent(body)
+        mutationFn: (body) => voteContent(body)
     })
 }
 
 
 export const useGetCommunityMembers = () => {
-    return useMutation<any,Error,{communityId : number}>({
-        mutationFn : ({communityId}) => getCommunityMembers(communityId)
+    return useMutation<any, Error, { communityId: number }>({
+        mutationFn: ({ communityId }) => getCommunityMembers(communityId)
+    })
+}
+
+export const useChatBot = () => {
+    return useMutation<any, Error, { userQuery: string }>({
+        mutationFn: ({ userQuery }) => getChatbot(userQuery)
     })
 }
