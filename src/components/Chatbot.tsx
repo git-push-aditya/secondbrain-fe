@@ -8,12 +8,27 @@ import { MessageBubble } from "./messageBubble";
 
 const ttl = 2 * 24 * 60 * 60 * 1000;         //ttl for chat of 2 days
 
+export interface cardContent {
+    title: string;
+    hyperlink: string;
+    note: string | null;
+    id: number;
+    type: string;
+    createdAt: string;
+    tags: {
+        tag: {
+            title: string;
+        };
+    }[];
+}
+
 
 export const ChatBot = () => {
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const [chatHistory, setChatHistory] = useChatHistory();
     useEffect(() => { inputRef?.current?.focus() }, []);
-    const recentChat = useRef<HTMLDivElement | null>(null)
+    const recentChat = useRef<HTMLDivElement | null>(null);
+    const [cardData, setCardData] = useState<cardContent | null>(null);
 
     const [buttonVisible, setButtonVisible] = useState<Boolean>(true);
     const { mutateAsync, isPending } = useChatBot();
@@ -101,6 +116,7 @@ export const ChatBot = () => {
                 }
                 return updated;
             });
+            setCardData(data.payload.content);
         } catch (err) {
             console.error(err);
         }
@@ -146,6 +162,7 @@ export const ChatBot = () => {
                             responding={message.content === "" ? true : false}
                             streamed={message.toStream}
                             callBack={callback}
+                            cardData={cardData}
                         />))}
                         <div ref={recentChat} className="border-2 border-mainComponentBg" />
                     </AnimatePresence>

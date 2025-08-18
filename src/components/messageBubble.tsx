@@ -3,8 +3,10 @@ import { useState, type ReactNode, useRef, useEffect } from "react";
 import { ChatLoader } from "../icons/commonIcons";
 import { ChatbotIcon } from "../icons/particularIcons";
 import { useUserProfile } from "../recoil/user";
+import type { cardContent } from "./Chatbot";
+import { CardElement, type cardType } from "./card";
 
-export const MessageBubble = ({ role, message, responding, streamed = false, callBack }: { role: "assistant" | "user", message: string, responding: boolean, streamed: boolean, callBack: () => void }) => {
+export const MessageBubble = ({ role, message, responding, cardData, streamed = false, callBack }: { role: "assistant" | "user", cardData: cardContent | null, message: string, responding: boolean, streamed: boolean, callBack: () => void }) => {
     const [display, setDisplay] = useState<ReactNode[]>([]);
     const timerRef = useRef<number | null>(null);
     const [user] = useUserProfile();
@@ -18,7 +20,7 @@ export const MessageBubble = ({ role, message, responding, streamed = false, cal
         });
     };
 
-    
+
 
 
 
@@ -115,6 +117,7 @@ export const MessageBubble = ({ role, message, responding, streamed = false, cal
                 {role === "assistant" && message === "" && responding && <ChatLoader dim="70" />}
                 {role === "assistant" && (streamed ? <span>{display}</span> : renderWithBold(message))}
                 {role === "user" && message}
+                {role === "assistant" && cardData !== null && <div className=" m-8 flex justify-center items-center"><CardElement title={cardData.title} cardType={cardData.type as cardType} createdAt={cardData.createdAt as string} layout="grid" link={cardData.hyperlink} id={cardData.id} shared={true} collectionId={0}  /></div>}
 
             </motion.div>
             {role === "user" && <motion.div
