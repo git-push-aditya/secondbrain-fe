@@ -1,8 +1,9 @@
 import {atom, useRecoilState} from "recoil";
 
-interface message{
-    sender : "user" | "chatbot";
-    text : string;
+export interface message{
+    role : "user" | "assistant";
+    content : string; 
+    toStream : boolean;
 }
 
 const chatHistory = atom<message[] | null>({

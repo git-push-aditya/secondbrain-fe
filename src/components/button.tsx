@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 
 interface buttonProps {
+    tooltip ?: string;
     placeholder?: string;
     onClickHandler: () => void;
     particularStyle?: string;
@@ -27,8 +28,8 @@ const specificStyle: { [key: string]: string } = {
 
 const defaultStyle = "   flex items-center  gap-3 cursor-pointer group  ease-out transition-hover duration-300 ";
 
-export const ButtonEl = ({ placeholder, onClickHandler, disabled = false, particularStyle, buttonType, startIcon, endIcon }: buttonProps) => {
-    return <div ><button onClick={onClickHandler} disabled={disabled} className={`${defaultStyle}  ${specificStyle[buttonType]}  ${particularStyle}`}>
+export const ButtonEl = ({tooltip, placeholder, onClickHandler, disabled = false, particularStyle, buttonType, startIcon, endIcon }: buttonProps) => {
+    return <div title={tooltip} ><button onClick={onClickHandler} disabled={disabled} className={`${defaultStyle}  ${specificStyle[buttonType]}  ${particularStyle}`}>
         {startIcon}
         <span className="truncate">
             {placeholder}</span>

@@ -1,19 +1,78 @@
-import { useEffect, useRef } from "react";
-import { BlockIcon, ChatbotEnter, ChatLoader } from "../icons/commonIcons";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { BlockIcon, BottomArrow, ChatbotEnter, ChatLoader } from "../icons/commonIcons";
 import { useChatHistory } from "../recoil/chatStates";
 import { AnimatePresence, motion } from "framer-motion";
-import { useUserProfile } from "../recoil/user";
-import { ChatbotIcon } from "../icons/particularIcons";
 import { useChatBot } from "../api/user/mutate";
+import type { message } from "../recoil/chatStates";
+import { MessageBubble } from "./messageBubble";
+
+const ttl = 2 * 24 * 60 * 60 * 1000;         //ttl for chat of 2 days
 
 
 export const ChatBot = () => {
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const [chatHistory, setChatHistory] = useChatHistory();
     useEffect(() => { inputRef?.current?.focus() }, []);
+    const recentChat = useRef<HTMLDivElement | null>(null)
 
+    const [buttonVisible, setButtonVisible] = useState<Boolean>(true);
     const { mutateAsync, isPending } = useChatBot();
 
+
+    useEffect(() => {
+        recentChat.current?.scrollIntoView({ behavior: "smooth" });
+    }, [chatHistory])
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => setButtonVisible(!entry.isIntersecting));
+            },
+            { threshold: 0.1 }
+        );
+
+        if (recentChat.current) {
+            observer.observe(recentChat.current);
+        }
+
+        return () => {
+            if (recentChat.current) observer.unobserve(recentChat.current);
+        };
+    }, []);
+
+    //In dev enviornment for desingin purposes i am deactivation this storing chat to two days
+
+    // useEffect(() => {
+    //     const rawPastChats = localStorage.getItem("pastChats");
+    //     if (!rawPastChats) {
+    //         setChatHistory(null);  
+    //         return;
+    //     }
+
+    //     try {
+    //         const parsed = JSON.parse(rawPastChats);
+    //         if (parsed.expiry && parsed.expiry > Date.now()) {
+    //             setChatHistory(parsed.value);
+    //         } else { 
+    //             localStorage.removeItem("pastChats");
+    //             setChatHistory(null);
+    //         }
+    //     } catch (err) {
+    //         console.error("Failed to parse pastChats:", err);
+    //         setChatHistory(null);
+    //     }
+    // }, []);
+
+
+    // useEffect(() => {
+    //     const now = new Date;
+    //     const pastChats = {
+    //         value: chatHistory,
+    //         expiry: now.getTime() + ttl,
+    //     }
+
+    //     localStorage.setItem("pastChats", JSON.stringify(pastChats))
+    // }, [chatHistory])
 
 
     const handleMessage = async () => {
@@ -22,17 +81,46 @@ export const ChatBot = () => {
 
         if (userMessage.trim() === "") return;
 
-        setChatHistory((prev) => [...(prev ?? []), { sender: "user", text: userMessage }]);
+        setChatHistory((prev) => [
+            ...(prev ?? []),
+            { role: "user", content: userMessage, toStream: false },
+            { role: "assistant", content: "", toStream: false }
+        ]);
+
+        const lastSevenMessages: message[] = [...chatHistory?.slice(-6) ?? [], { role: "user", content: userMessage, toStream: false }];
+
 
         try {
-            const data = await mutateAsync({ userQuery: userMessage });
-            setChatHistory((prev) => [...(prev ?? []), { sender: "chatbot", text: data.payload.message }]);
+            const data = await mutateAsync({ lastSevenMessages });
+            setChatHistory((prev) => {
+                const updated = [...(prev ?? [])];
+                updated[updated.length - 1] = {
+                    role: "assistant",
+                    content: data.payload.message,
+                    toStream: true
+                }
+                return updated;
+            });
         } catch (err) {
             console.error(err);
         }
     };
 
+    const slideToRecent = () => {
+        recentChat.current?.scrollIntoView({ behavior: "smooth" });
+    }
 
+    const callback = () => {
+        setChatHistory((prev) => {
+            const updated = [...(prev ?? [])];
+            updated[updated.length - 1] = {
+                role: "assistant",
+                content: updated[updated.length - 1].content,
+                toStream: false
+            }
+            return updated;
+        });
+    }
 
 
 
@@ -44,36 +132,59 @@ export const ChatBot = () => {
                         <div className={`text-center cursor-default ${chatHistory === null ? " block " : " hidden "}`}>
                             <div className="text-[3.5rem] font-[1000] text-shadow-lg font-head text-primaryButtonBlue/95 ">Ask your secondbrain</div>
                             <div className="text-lg font-inter text-slate-700/80"> Get instant answers powered by your personal knowledge base.<br />
-                                This chatbot uses your saved notes and documents to provide relevant, context-aware responses.</div>
+                                This assistant uses your saved notes and documents to provide relevant, context-aware responses.</div>
                         </div>
                     </motion.div>
                 </AnimatePresence>
 
                 <div className={`${chatHistory === null ? " hidden " : " block "} xl:w-[73%] w-[90%]`}>
                     <AnimatePresence mode="wait">
-                        {chatHistory?.map((message) => (<MessageBubble sender={message.sender} message={message.text} responding={false} />))}
-                        {isPending && <MessageBubble responding={true} sender={"chatbot"} message={""} />}
+                        {chatHistory?.map((message, idx) => (<MessageBubble
+                            key={idx}
+                            role={message.role}
+                            message={message.content}
+                            responding={message.content === "" ? true : false}
+                            streamed={message.toStream}
+                            callBack={callback}
+                        />))}
+                        <div ref={recentChat} className="border-2 border-mainComponentBg" />
                     </AnimatePresence>
                 </div>
 
             </div>
-            <div className="h-[20%]  w-full flex justify-center items-center ">
+            <div className="h-[20%]  w-full flex flex-col justify-center items-center ">
                 <AnimatePresence mode="wait">
+                    {chatHistory !== null && buttonVisible && (<motion.div
+                        initial={{ y: -100, opacity: 0 }}
+                        animate={{ y: -140, opacity: 1 }}
+                        exit={{ y: -180, opacity: 0 }}
+                        transition={{ duration: 0.1, ease: "easeInOut" }}
+                        className=" z-100 fixed"
+                    >
+                        <BottomArrow
+                            dim={"40"}
+                            style="cursor-pointer rounded-[3rem] p-2 bg-gray-100 opacity-95 border-1 "
+                            onClickHandler={slideToRecent}
+                        />
+                    </motion.div>)}
+                </AnimatePresence>
+                <AnimatePresence mode="wait">
+
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="xl:w-[73%] w-[85%] z-50 h-[70%]  rounded-[3rem] flex gap-10 items-center pl-5 bg-white shadow-xl hover:shadow-3xl  mb-3 group-hover" transition={{ duration: 0.2, ease: "easeInOut" }}>
-                        <textarea   
+                        <textarea
                             onKeyDown={(e) => {
-                                if(e.key === "Enter" && !e.shiftKey){
+                                if (e.key === "Enter" && !e.shiftKey) {
                                     e.preventDefault();
                                     handleMessage();
                                 }
                             }}
-                            className="text-token-text-primary resize-none placegolder:ps-px scrollbar-hidden outline-none px-5 h-[60%] text-2xl font-[550] w-[85%]" placeholder="Whats on your mind..." 
+                            className="text-token-text-primary resize-none placegolder:ps-px scrollbar-hidden outline-none px-5 h-[60%] text-2xl font-[550] w-[85%]" placeholder="Whats on your mind..."
                             ref={inputRef} />
-                        <ChatbotEnter 
-                            dim="20" 
+                        <ChatbotEnter
+                            dim="20"
                             style={`p-2 hover:bg-gray-100 size-19 cursor-pointer rounded-[3rem] transition-all duration-300 ${!isPending ? " block " : " hidden "}`}
                             onClickHandler={handleMessage} />
-                        <BlockIcon 
+                        <BlockIcon
                             style={`bg-gray-500/90 -p-1 hover:bg-gray-600/90 size-19 cursor-default rounded-[3rem] transition-all duration-300 
                             ${isPending ? " block " : " hidden "}`} />
                     </motion.div>
@@ -85,15 +196,6 @@ export const ChatBot = () => {
 }
 
 
-const MessageBubble = ({ sender, message, responding }: { sender: "chatbot" | "user", message: string, responding: boolean }) => {
-    const [user, setUser] = useUserProfile()
-    return <div className="mt-2 cursor-default">
-        <div className={`h-full flex ${sender === "chatbot" ? " justify-start " : " justify-end "} gap-2`}>
-            {sender === "chatbot" && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-[5%] flex justify-center items-center"> <ChatbotIcon dim="40" style=" xl:size-12 md:size-10 size-8" /> </motion.div>}
-            <motion.div initial={{ y: 5, opacity: 0 }} animate={{ y: 0, x: 0, opacity: 1 }} exit={{ x: -10, opacity: 0 }} transition={{ duration: 0.2, ease: "easeInOut" }} className={`${sender === "chatbot" ? " xl:w-[80%] lg:w-[85%] w-[95%]" : " xl:max-w-[80%] lg:max-w-[85%] max-w-[95%]"} xl:text-xl text-lg  ${sender === "user" ? " bg-slate-100 " : " "}  rounded-3xl p-5 text-slate-600 font-inter`}>
-                {message}{sender === "chatbot" && responding && <ChatLoader dim="70" />}
-            </motion.div>
-            {sender === "user" && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-[5%] flex justify-center items-center"> <img src={user?.profilePic} className="xl:size-12 md:size-10 size-8 rounded-[5rem]" /> </motion.div>}
-        </div>
-    </div>
-}   
+
+
+

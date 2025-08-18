@@ -156,7 +156,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
         }
     }
 
-    const layoutStyle = "hover:text-white hover:bg-[#6056AA]/60 text-black transition-hover duration-150 ease-in-out rounded-lg p-2  cursor-pointer bg-slate-300";
+    const layoutStyle = "hover:text-white hover:bg-[#6056AA]/60 text-black transition-hover duration-150 ease-in-out rounded-lg p-2  cursor-pointer ";
 
     return <div className="bg-mainComponentBg z-10 flex-1 pb-20 relative h-full overflow-y-auto scrollbarMC">
 
@@ -164,15 +164,25 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
         <div className="flex justify-between bg-mainComponentBg border-b-2 border-slate-300 gap-4 p-6 left-0 top-0 sticky z-10 items-center">
             <div className="xl:text-5xl md:text-3xl text-xl  font-dashboardHeading font-extrabold cursor-default line-colaps-2 text-4xl font-bold text-gradient  py-2 ">Welcome, {user?.userName}</div>
             <div className="flex justify-around gap-6">
-                { !tab.startsWith('community') ? <ButtonEl onClickHandler={() => setModalNeededBy("shareBrain")} placeholder="Share Brain" particularStyle=" h-14 " buttonType="secondary" startIcon={<ShareIcon style="size-8.5 " />} /> : null}
-                <ButtonEl onClickHandler={() => setModalNeededBy("addContent")} placeholder="Add Content" buttonType="primary" startIcon={<PlusIcon style="size-8.5 " />} />
+                { !tab.startsWith('community') ? <ButtonEl 
+                    onClickHandler={() => setModalNeededBy("shareBrain")} 
+                    particularStyle=" h-14 gap-0 "  
+                    buttonType="secondary" 
+                    placeholder="Share Brain"
+                    startIcon={<ShareIcon style="size-8.5 " />} /> : null
+                }
+                <ButtonEl onClickHandler={() => setModalNeededBy("addContent")} 
+                    buttonType="primary"
+                    placeholder="Add Content"
+                    startIcon={<PlusIcon style="size-8.5 " />} 
+                />
             </div>
         </div>
         <div className="flex justify-between items-center mt-4 ml-7">
             <div className="flex items-center justify-around">
                 <div className="flex items-center justify-around ml-6 w-26 gap-2 rounded-lg ">
-                    <GridIcon dim="50" onClickHandler={() => setLayout?.("grid")} style={layoutStyle + (layout === "grid" ? " border-2  hover:border-0" : "")} />
-                    <ListIcon dim="50" onClickHandler={() => setLayout?.("list")} style={layoutStyle + (layout === "list" ? " border-2 hover:border-0" : "")} />
+                    <GridIcon dim="50" onClickHandler={() => setLayout?.("grid")} style={layoutStyle + (layout === "grid" ? " text-white bg-[#6056AA]/60 " : " bg-slate-300 ")} />
+                    <ListIcon dim="50" onClickHandler={() => setLayout?.("list")} style={layoutStyle + (layout === "list" ? " text-white bg-[#6056AA]/60 " : " bg-slate-300 ")} />
                 </div>
                 <div className="w-[600px] text-clamp text-3xl font-[450] font-cardTitleHeading text-[#51488C] ml-4"> {tab.startsWith("community") ? <>{`Community : ${currentCommunity1.name}`} </> : <>{`Collection :  ${currentCollection1.name}`} </>} </div>
             </div>
@@ -320,7 +330,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                 }
             </div>
         </div>
-        <div className="mt-14"><ButtonEl onClickHandler={currentCommunity1.id === -1 ? () => fetchNextPage() : ()=>fetchCommunityNextPage()} disabled={currentCommunity1.id === -1 ? !hasNextPage: !communityNextPage} placeholder="Load more..." particularStyle={`${hasNextPage ? " hover:scale-105 " : " border-slate-300 bg-slate-100 text-slate-400 "} `} buttonType={"loadMore"} /></div>
+        <div className="mt-14"><ButtonEl onClickHandler={currentCommunity1.id === -1 ? () => fetchNextPage() : ()=>fetchCommunityNextPage()} disabled={currentCommunity1.id === -1 ? !hasNextPage: !communityNextPage} placeholder="Load more..." particularStyle={`${hasNextPage ? " hover:scale-105 " : " border-slate-300 bg-slate-100  text-slate-400 "} `} buttonType={"loadMore"} /></div>
     </div>
 }
 
