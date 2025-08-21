@@ -18,6 +18,7 @@ export interface cardContent {
     tags: {
         tag: {
             title: string;
+            id: number;
         };
     }[];
 }
@@ -27,8 +28,7 @@ export const ChatBot = () => {
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const [chatHistory, setChatHistory] = useChatHistory();
     useEffect(() => { inputRef?.current?.focus() }, []);
-    const recentChat = useRef<HTMLDivElement | null>(null);
-    const [cardData, setCardData] = useState<cardContent | null>(null);
+    const recentChat = useRef<HTMLDivElement | null>(null); 
 
     const [buttonVisible, setButtonVisible] = useState<Boolean>(true);
     const { mutateAsync, isPending } = useChatBot();
@@ -98,11 +98,11 @@ export const ChatBot = () => {
 
         setChatHistory((prev) => [
             ...(prev ?? []),
-            { role: "user", content: userMessage, toStream: false },
-            { role: "assistant", content: "", toStream: false }
+            { role: "user", content: userMessage, toStream: false,cardContent : null },
+            { role: "assistant", content: "", toStream: false, cardContent: null }
         ]);
 
-        const lastSevenMessages: message[] = [...chatHistory?.slice(-6) ?? [], { role: "user", content: userMessage, toStream: false }];
+        const lastSevenMessages: message[] = [...chatHistory?.slice(-6) ?? [], { role: "user", content: userMessage, toStream: false, cardContent :null  }];
 
 
         try {
@@ -112,11 +112,11 @@ export const ChatBot = () => {
                 updated[updated.length - 1] = {
                     role: "assistant",
                     content: data.payload.message,
-                    toStream: true
+                    toStream: true,
+                    cardContent : data.payload.content ?? null
                 }
                 return updated;
             });
-            setCardData(data.payload.content);
         } catch (err) {
             console.error(err);
         }
@@ -132,7 +132,8 @@ export const ChatBot = () => {
             updated[updated.length - 1] = {
                 role: "assistant",
                 content: updated[updated.length - 1].content,
-                toStream: false
+                toStream: false,
+                cardContent : updated[updated.length - 1].cardContent
             }
             return updated;
         });
@@ -162,7 +163,7 @@ export const ChatBot = () => {
                             responding={message.content === "" ? true : false}
                             streamed={message.toStream}
                             callBack={callback}
-                            cardData={cardData}
+                            cardData={message.cardContent}
                         />))}
                         <div ref={recentChat} className="border-2 border-mainComponentBg" />
                     </AnimatePresence>

@@ -81,6 +81,7 @@
     width: 13px; 
     height: 1px;
   }
+  
 
   .scrollbarSB::-webkit-scrollbar-track {
     border-radius: 100vh;
@@ -98,6 +99,12 @@
     transition: background 8s ease-in-out;
   }
 }
+
+@layer utilities {
+  .overflow-anchor-none { overflow-anchor: none; }
+  .overflow-anchor-auto { overflow-anchor: auto; }
+}
+
  
 @layer utilities {
   .scrollbarCB::-webkit-scrollbar {

@@ -154,8 +154,9 @@ const getCommunityMembers = async (communityId: number) => {
 
 
 const getChatbot = async (lastSevenMessages: message[]) => {
+    const refinedMesseges = lastSevenMessages.map((prev) => ({role : prev.role, content : prev.content, toStream : prev.toStream}))
     return axios.post('http://localhost:2233/user/chatbot', {
-        lastSevenMessages
+        lastSevenMessages : refinedMesseges
     }, {
         withCredentials: true
     }).then(res => res.data)
