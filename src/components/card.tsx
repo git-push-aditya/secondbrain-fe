@@ -5,7 +5,7 @@ import Tag from "./tags";
 import { ButtonEl } from "./button";
 import { AnimatePresence, motion } from "framer-motion";
 import { minEndingIndex } from "../utils/minEndingIndex"
-import { usePopUpAtom, usePopUpMessage } from "../recoil/clientStates"; 
+import { usePopUpAtom, usePopUpMessage } from "../recoil/clientStates";
 import React from "react";
 import { useDeleteID } from "../recoil/deleteId";
 import { redditScriptLoader } from "../scriptLoader";
@@ -18,7 +18,7 @@ export interface cardProp {
     note?: string;
     tags?: { tag: { title: string, id: number } }[];
     createdAt: string;
-    link: string; 
+    link: string;
     id: number;
     layout?: "grid" | "list";
     shared: boolean;
@@ -75,30 +75,30 @@ export const CardElement = React.memo(({ title, collectionId, shared, cardType, 
 
 
 
-const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, shareClicked, cardType, note, tags, createdAt, link }: layoutCard) => { 
+const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, shareClicked, cardType, note, tags, createdAt, link }: layoutCard) => {
 
     const defaultStyle: string = `${!shared ? " w-85 " : " w-85 overflow-x-hidden "}   ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 " : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 h-115  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md scrollbar-hidden`;
 
     const [newLink, setNewLink] = useState<string>(link);
-    const extractVideoId = (videoUrl : string) => {
+    const extractVideoId = (videoUrl: string) => {
         const regex = /(?:youtube\.com\/.*v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/;
         const match = videoUrl.match(regex);
         return match ? match[1] : null;
     };
-    
-    useEffect(()=>{
-        if(cardType === "YOUTUBE"){
+
+    useEffect(() => {
+        if (cardType === "YOUTUBE") {
             const id = extractVideoId(link);
             setNewLink(`https://www.youtube.com/embed/${id}`);
         }
-    },[setNewLink])
+    }, [setNewLink])
 
     useEffect(() => {
-        if(cardType === "TWITTER" ){
-            if ( window.twttr?.widgets) {
-            window.twttr.widgets.load();
+        if (cardType === "TWITTER") {
+            if (window.twttr?.widgets) {
+                window.twttr.widgets.load();
             }
-        }else if(cardType === "REDDIT"){
+        } else if (cardType === "REDDIT") {
             redditScriptLoader();
         }
     }, []);
@@ -114,16 +114,28 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
             <div className="flex justify-between gap-2 px-6 mt-1 pt-1 h-[15%] " >
                 <div className="flex justify-around gap-2 items-center">
                     {typeIcon[cardType]}
-                    <div className="font-[550] line-clamp-2 cursor-default text-cardTitle text-xl font-cardTitleHeading ">{title}</div>
+                    <div 
+                        className="font-[550] line-clamp-2 cursor-default text-cardTitle text-xl font-cardTitleHeading ">
+                            {title}
+                    </div>
                 </div>
-                <div className="flex justify-around gap-4 items-center">
-                    <ShareIcon style="size-7 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" onClickHandler={() => shareClicked(link)} />
-                    {!shared && <DeleteIcon onClickHandler={() => setDeleteClicked((prev) => !prev)} style={`size-7.5 transition-translate duration-300 ease-in-out hover:-translate-y-0.5 ${deletClicked ? " text-red-600 " : " "}`} />}
+                <div 
+                    className="flex justify-around gap-4 items-center">
+                        <ShareIcon 
+                            style="size-7 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" 
+                            onClickHandler={() => shareClicked(link)} 
+                        />
+                        {   !shared && <DeleteIcon 
+                                onClickHandler={() => setDeleteClicked((prev) => !prev)} 
+                                style={`size-7.5 transition-translate duration-300 ease-in-out hover:-translate-y-0.5 ${deletClicked ? " text-red-600 " : " "}`} 
+                                />
+                        }
                 </div>
             </div>
             <div className=" flex flex-col justify-between h-[85%]">
-                <div className="px-2 max-h-[321px] overflow-y-auto scrollbar-hidden scroll-smooth overscroll-auto relative ">
-                    <AnimatePresence mode="wait"> {deletClicked ?
+                <div className="px-2 max-h-[321px] overflow-y-auto scrollbar-hidden scroll-smooth relative ">
+                    <AnimatePresence mode="wait"> 
+                        {deletClicked ?
                         <motion.div key="deletePopUp"
                             initial={{ y: -40, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
@@ -132,18 +144,38 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
                             <div className="px-5 cursor-pointer bg-red-100 rounded-2xl border-1 border-red-100 h-[62px] text-red-700 px-3 pb-1 pt-1 text-center text-sm font-medium hover:border-red-300 hover:border-1 mb-3 transition-hover duration-200 ease-in-out sticky left-0 top-0 shadow-md ">
                                 <b >Are you sure</b> you want to delete this link?
                                 <div className=" flex items-center justify-center gap-4 ">
-                                    <ButtonEl onClickHandler={() => setDeleteClicked((prev) => !prev)} placeholder="Cancel" buttonType={"cardButton"} particularStyle=" bg-green-400 text-white w-23 h-7 " />
-                                    <ButtonEl onClickHandler={deleteCard} placeholder="Delete" buttonType={"cardButton"} particularStyle=" text-white bg-red-400  w-23 h-7 " />
+                                    <ButtonEl 
+                                        onClickHandler={() => setDeleteClicked((prev) => !prev)} placeholder="Cancel" 
+                                        buttonType={"cardButton"} 
+                                        particularStyle=" bg-green-400 text-white w-23 h-7 " />
+                                    <ButtonEl 
+                                        onClickHandler={deleteCard} 
+                                        placeholder="Delete" 
+                                        buttonType={"cardButton"} 
+                                        particularStyle=" text-white bg-red-400  w-23 h-7 " 
+                                    />
                                 </div>
                             </div>
                         </motion.div>
                         : null}</AnimatePresence>
 
-                    {cardType === "YOUTUBE" && <iframe className="w-[99%] mx-auto h-50 mt-2 rounded-lg  " title="YouTube video player" src={newLink} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>}
+                    {cardType === "YOUTUBE" && <iframe
+                        className="w-[99%] mx-auto h-50 mt-2 rounded-lg  "
+                        loading="lazy"
+                        title="YouTube video player"
+                        src={newLink}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allowFullScreen>
+                    </iframe>
+                    }
 
                     {cardType === 'TWITTER' && <div className="w-full mb-[-10px] mt-[-1px] mx-auto">
                         <blockquote className="twitter-tweet w-full max-w-full"  >
-                            <a href={link.replace('x.com', 'twitter.com')} target="_blank" rel="noopener noreferrer" > </a>
+                            <a href={link.replace('x.com', 'twitter.com')} 
+                                target="_blank" 
+                                rel="noopener noreferrer" > 
+                            </a>
                         </blockquote>
                     </div>}
 
@@ -167,7 +199,14 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
                         cardType === 'WEB' &&
                         <div className="flex justify-center">
                             <a href={link} target="_blank">
-                                {<iframe className="w-[99%] mx-auto h-50 mt-2 rounded-lg  " src={link}   referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>}
+                                {<iframe
+                                    className="w-[99%] mx-auto h-50 mt-2 rounded-lg  "
+                                    src={link}
+                                    loading="lazy"
+                                    referrerPolicy="strict-origin-when-cross-origin"
+                                    sandbox="allow-scripts allow-same-origin allow-forms"
+                                    allowFullScreen>
+                                </iframe>}
                                 <div className="text-center text-mon0 text-xl text-primaryButtonBlue mt-[-30px]">
                                     {link.substring(link.indexOf('www'), minEndingIndex(link)).split('https://')[1]}
                                 </div>
@@ -175,18 +214,29 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
                         </div>
                     }
 
-                    {note && <div className="px-2 mt-4 cursor-default font-sans font-[440] text-slate-500 text-xl text-justify ">
+                    {note && <div 
+                        className="px-2 mt-4 cursor-default font-sans font-[440] text-slate-500 text-xl text-justify ">
                         {note}
                     </div>}
 
 
-                    {!shared && <div className="px-3 my-2 cursor-default text-lg font-[500] text-slate-500">Added on {createdAt}</div>}
+                    {!shared && <div 
+                        className="px-3 my-2 cursor-default text-lg font-[500] text-slate-500">
+                            Added on {createdAt}
+                    </div>}
                 </div>
 
                 <div className="flex items-center gap-2 justify-start mt-0 mb-4 mx-3 overflow-x-auto scrollbar-hidden">
                     {tags?.length != 0 ? tags?.map((tag, idx) => (
-                        <Tag key={idx} name={tag.tag.title} id={tag.tag.id.toString()} />
-                    )) : <Tag key={666} name={cardType.toLowerCase()} id={cardType.toLowerCase()} />}
+                        <Tag key={idx} 
+                            name={tag.tag.title} 
+                            id={tag.tag.id.toString()} 
+                        />
+                    )) : <Tag 
+                        key={666} 
+                        name={cardType.toLowerCase()} 
+                        id={cardType.toLowerCase()} 
+                    />}
                 </div>
             </div>
 
@@ -194,7 +244,7 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
     </motion.div>
 }
 
- 
+
 
 
 

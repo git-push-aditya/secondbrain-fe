@@ -26,7 +26,6 @@ interface protectedRouteProp {
 	redirectTo: string;
 }
 
-
 function App() {
 	const [popUpLive, setPopUpLive] = usePopUpAtom();
 	const [layout, setLayout] = useState<"grid" | "list">("grid"); 
