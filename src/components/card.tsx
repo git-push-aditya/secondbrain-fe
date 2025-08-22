@@ -207,7 +207,7 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
                                     sandbox="allow-scripts allow-same-origin allow-forms"
                                     allowFullScreen>
                                 </iframe>}
-                                <div className="text-center text-mon0 text-xl text-primaryButtonBlue mt-[-30px]">
+                                <div className="text-center text-mono line-clamp-1 t text-xl text-primaryButtonBlue mt-[-30px]">
                                     {link.substring(link.indexOf('www'), minEndingIndex(link)).split('https://')[1]}
                                 </div>
                             </a>

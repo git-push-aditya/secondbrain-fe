@@ -268,7 +268,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
         </div>
         <div className=" mt-6  w-full flex justify-center ">
 
-            {
+            {   contentLoading || communityDataLoading ? <CardsLoaderSkeleton /> :
                 <div className={` ${layout === "grid" ? " grid 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 xl:gap-6  lg:gap-4 gap-2 gap-y-6 " : " w-full "}`}>
 
                     {currentCollection1.id !== -1 ? <>
@@ -344,15 +344,10 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                 disabled={currentCommunity1.id === -1 ? !hasNextPage : !communityNextPage} placeholder="Load more..." 
                 particularStyle={`${hasNextPage ? " hover:scale-105 " : " border-slate-300 bg-slate-100  text-slate-400 "} `} 
                 buttonType={"loadMore"} 
-            />
-        </div>
+                
+            /></div>
     </div>
 }
-
-/**
- * deleted portion :
- * 
- */
 
 
 export default MainBlock;
