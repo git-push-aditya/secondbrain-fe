@@ -345,7 +345,8 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                 particularStyle={`${hasNextPage ? " hover:scale-105 " : " border-slate-300 bg-slate-100  text-slate-400 "} `} 
                 buttonType={"loadMore"} 
                 
-            /></div>
+            />
+        </div>
     </div>
 }
 

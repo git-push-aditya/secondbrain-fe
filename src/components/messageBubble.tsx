@@ -21,19 +21,27 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
     }
 
     const renderWithBold = (text: string) => {
-        const parts = text.split(/(^###\s.*$|\*\*[^*]+\*\*|\n)/gm).filter(Boolean);
+        const parts = text.split(/(^###\s.*$|\*\*[^*]+\*\*|---|\n)/gm).filter(Boolean);
 
         return (
             <div className="text-justify">
                 {parts.map((part, idx) => {
                     if (!part) return null;
 
+                    if (part === "---") {
+                        return <hr key={idx} />
+                    }
+
+                    if (part.trim() === "" && part.includes(" ")) {
+                        return " "; // keep spaces intact
+                    }
+
                     if (part.startsWith("###")) {
-                        const headingText = part.replace(/^###\s?/, "");
+                        const headingText = part.replace(/^###\s?/, "").replace(/^#\s?/, "").replace(/^\*\*\s?/, "").replace(/\s?\*\*\s?/, "");
                         return (
-                            <h2 key={idx} className="font-semibold text-lg mt-2 mb-1">
+                            <h1 key={idx} className="font-extrabold font-roboto text-3xl ">
                                 {headingText}
-                            </h2>
+                            </h1>
                         );
                     }
 
@@ -51,70 +59,78 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
             </div>
         );
     };
-useEffect(() => {
-    if (!message || role !== "assistant" || !streamed) {
-        return;
-    }
-    const tokens = message.split(/(\*\*.*?\*\*|\n)/g).filter(Boolean);
 
-    if (display.length === 0) {
-        setDisplay([]);
-    }
 
-    let i = display.length;
-    let boldMode = false;
-
-    const tick = () => {
-        if (i >= tokens.length) {
-            callBack();
+    useEffect(() => {
+        if (!message || role !== "assistant" || !streamed) {
             return;
         }
+        const tokens = message.match(/(####|###|\*\*|---|\n|[^\s\*#]+)/g) || [];
 
-        const t = tokens[i];
-
-        if (t === "\n") {
-            setDisplay(prev => [...prev, <br key={`br-${i}`} />]);
-        } else if (t.startsWith("**") && t.endsWith("**")) {
-            const word = t.slice(2, -2);
-            setDisplay(prev => [...prev, <b key={`b-${i}`}>{word}</b>, " "]);
-        } else if (t.startsWith("**")) {
-            boldMode = true;
-            const word = t.slice(2);
-            setDisplay(prev => [...prev, <b key={`b-${i}`}>{word}</b>, " "]);
-        } else if (t.endsWith("**") && boldMode) {
-            boldMode = false;
-            const word = t.slice(0, -2);
-            setDisplay(prev => [...prev, <b key={`b-${i}`}>{word}</b>, " "]);
-        } else if (boldMode) {
-            setDisplay(prev => [...prev, <b key={`b-${i}`}>{t}</b>, " "]);
-        } else {
-            setDisplay(prev => [...prev, <span key={`t-${i}`}>{t}</span>, " "]);
+        if (display.length === 0) {
+            setDisplay([]);
         }
 
-        i++;
+        let i = display.length;
+        let hash = false;
+        let boldMode = false;
 
-        if (i < tokens.length) {
-            // Slower speed
-            timerRef.current = window.setTimeout(tick, 60);
-        } else {
-            callBack();
-        }
-    };
+        const tick = () => {
+            if (i >= tokens.length) {
+                callBack();
+                return;
+            }
 
-    if (timerRef.current) {
-        clearTimeout(timerRef.current);
-    }
+            const t = tokens[i];
 
-    // Slower speed
-    timerRef.current = window.setTimeout(tick, 60);
+            if (t === "\n") {
+                if (hash) {
+                    hash = false;
+                } else {
+                    setDisplay(prev => [...prev, <br key={`br-${i}`} />]);
+                }
 
-    return () => {
+            } else if (t === "###" || t === "####") {
+                hash = true;
+            } else if (t === "**") {
+                boldMode = !boldMode;
+            } else if (t == "---") {
+                setDisplay(prev => [...prev, <hr />])
+            } else if (boldMode) {
+                setDisplay(prev => [...prev, <b key={`b-${i}`}>{t}</b>, " "]);
+            } else {
+                if (hash) {
+                    setDisplay(prev => [...prev, <h1 key={i} className="font-extrabold font-roboto text-3xl ">{t}</h1>, " "]);
+                } else {
+                    setDisplay(prev => [...prev, <span key={`t-${i}`}>{t}</span>, " "]);
+                }
+            }
+
+
+            i++;
+
+            if (i < tokens.length) {
+                // Slower speed
+                timerRef.current = window.setTimeout(tick, 60);
+            } else {
+                callBack();
+            }
+        };
+
         if (timerRef.current) {
             clearTimeout(timerRef.current);
-            timerRef.current = null;
         }
-    };
-}, [message, streamed, role]);
+
+        // Slower speed
+        timerRef.current = window.setTimeout(tick, 60);
+
+        return () => {
+            if (timerRef.current) {
+                clearTimeout(timerRef.current);
+                timerRef.current = null;
+            }
+        };
+    }, [message, streamed, role]);
 
 
     return <div className="mt-2 cursor-default">
@@ -156,7 +172,7 @@ useEffect(() => {
                     </div>
                     <p>
                         {role === "assistant" && message === "" && responding && <ChatLoader style="flex justify-start" dim="70" />}
-                        {role === "assistant" && (streamed ? <span className="text-justify">{display}</span> : renderWithBold(message))}
+                        {role === "assistant" && (streamed ? <div className="text-justify">{display}</div> : renderWithBold(message))}
                     </p>
 
                 </article>
@@ -169,7 +185,7 @@ useEffect(() => {
                         <CopyText
                             dim="45"
                             onClickHandler={copyResponse}
-                            style="hover:bg-slate-100 p-2 rounded-lg transition-hover duration-200"
+                            style={` hover:bg-slate-100 p-2 rounded-lg transition-hover duration-200`}
                         />
                     </div>
                 }

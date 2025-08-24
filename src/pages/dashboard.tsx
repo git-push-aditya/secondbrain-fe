@@ -29,10 +29,7 @@ const Dashboard = ({ user, setUser, layout,setLayout}:{user : AuthUser | null,  
     useEffect(()=>{setLayout('grid')},[])
     const closeModal = () => setModalNeededBy("close");
 
-    const [tab] = useTabAtom();
-
-
-
+    const [tab] = useTabAtom(); 
 
     return<>
         <div className="flex h-screen w-screen">

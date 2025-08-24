@@ -165,7 +165,7 @@ export const ChatBot = () => {
                             callBack={callback}
                             cardData={message.cardContent}
                         />))}
-                        <div ref={recentChat} className="border-2 border-mainComponentBg" />
+                        <div ref={recentChat} className="border-2  border-mainComponentBg" />
                     </AnimatePresence>
                 </div>
 
