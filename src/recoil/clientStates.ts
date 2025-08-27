@@ -10,6 +10,11 @@ const popUpAtom = atom<boolean>({
     default: false
 })
 
+const sideBarAtom = atom<boolean>({
+    key: "sidebar",
+    default : false
+})
+
 const popUpMessage = atom<string>({
     key: "message",
     default: "Link coppied to clipboard!!"
@@ -41,3 +46,5 @@ export const usePopUpMessage = () => useRecoilState(popUpMessage);
 export const useCurrentCommunity = () => useRecoilState(currentCommmunity);
 
 export const useCurrentCollection = () => useRecoilState(currentCollection);
+
+export const useSideBarAtom = () => useRecoilState(sideBarAtom);

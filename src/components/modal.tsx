@@ -247,12 +247,30 @@ const ShareBrain = ({ closeCard, setPopUpLive }: cardComponent) => {
             You can stop sharing your secondbrain at any time.
         </div>
         {
-            isPending ? <div className="w-[80%] xl:w-[88%] mt-6 h-16 mx-auto  bg-primaryButtonBlue rounded-xl h-14 justify-center hover:bg-hover1"><Loader dimh="30" dimw="60" style="" /></div> : !isSuccess ?
-                <ButtonEl buttonType="primary" onClickHandler={() => handleShareBrain()} particularStyle={`w-[80%] xl:w-[88%] gap-5 mt-6 h-16 mx-auto font-[550] font-inter `} placeholder="Generate sharable link" startIcon={<CopyIcon dim="40" style="color-white" />} />
-                :
-                <div className=" flex xl:max-w-[88%] max-w-[95%] bg-gray-200 justify-between items-center mx-auto h-18 mt-3 rounded-[3.5rem] border-2 border-gray-800 p-1">
-                    <div className="max-w-[80%] line-clamp-1 pl-3 text-[1.48rem] font-cardTitleHeading">{data?.payload?.generatedLink ?? "server issue, no link generated"}</div>
-                    <div className="cursor-pointer justify-center flex items-center h-full rounded-[3.5rem] bg-[#8F96C0] hover:bg-[#AAB1DA] w-[20%] shadow-2xl text-[1.43rem] font-[480] transition-hover duration-150" onClick={() => copyLink()}>Copy link</div>
+            isPending ? <div 
+                className="w-[80%] xl:w-[88%] mt-6 h-16 mx-auto  bg-primaryButtonBlue rounded-xl h-14 flex justify-center items-center hover:bg-hover1">
+                    <Loader 
+                        dimh="30" dimw="60" 
+                        style="" />
+                </div> : 
+            !isSuccess ? <ButtonEl 
+                buttonType="primary" 
+                onClickHandler={() => handleShareBrain()} 
+                particularStyle={`w-[80%] xl:w-[88%] gap-5 mt-6 h-16 mx-auto font-[550] font-inter `} placeholder="Generate sharable link" 
+                startIcon={<CopyIcon 
+                    dim="40" 
+                    style="color-white" />} />
+                : <div 
+                    className=" flex xl:max-w-[88%] max-w-[95%] bg-gray-200 justify-between items-center mx-auto h-18 mt-3 rounded-[3.5rem] border-2 border-gray-800 p-1">
+                    <div 
+                        className="max-w-[80%] line-clamp-1 pl-3 text-[1.48rem] font-cardTitleHeading">     
+                            {data?.payload?.generatedLink ?? "server issue, no link generated"}
+                    </div>
+                    <div 
+                        className="cursor-pointer justify-center flex items-center h-full rounded-[3.5rem] bg-[#8F96C0] hover:bg-[#AAB1DA] w-[20%] shadow-2xl text-[1.43rem] font-[480] transition-hover duration-150" 
+                        onClick={() => copyLink()}>
+                            Copy link
+                    </div>
                 </div>
         }
     </motion.div>

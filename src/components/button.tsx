@@ -5,7 +5,7 @@ interface buttonProps {
     placeholder?: string;
     onClickHandler: () => void;
     particularStyle?: string;
-    buttonType: 'primary' | 'secondary' | "sidebar" | "dropDown" | "" | "dropdown" | "back" | "cardButton" | "authin" | "authicon" | "loadMore" | "rightTopbar";
+    buttonType: 'primary' | 'secondary' | "sidebar" | "dropDown" | "" | "dropdown" | "back" | "cardButton" | "authin" | "authicon" | "loadMore" | "rightTopbar" | "optionalButton";
     startIcon?: ReactElement | null;
     endIcon?: ReactElement | null;
     disabled?: boolean;
@@ -23,6 +23,7 @@ const specificStyle: { [key: string]: string } = {
     "authin": " bg-black w-full h-14 justify-center font-roboto text-white text-xl ",
     "loadMore": "mx-auto border-2 px-8 py-1 rounded-3xl border-primaryButtonBlue text-xl bg-gray-300 font-[500]  ",
     "rightTopbar" : " w-50 h-12 rounded-xl justify-center text-white text-[1.35rem] font-cardTitleHeading font-[600] ",
+    "optionalButton" : "font-cardTitleHeading text-xl pl-4  font-[400] mx-auto  mt-2 hover:bg-gray-200  justify-start h-12  w-[95%] rounded-xl",
     "": ""
 };
 
@@ -36,3 +37,5 @@ export const ButtonEl = ({tooltip, placeholder, onClickHandler, disabled = false
         {endIcon}
     </button></div>
 }
+
+

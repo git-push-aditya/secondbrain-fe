@@ -180,12 +180,15 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
     return <div ref={containerRef} className="bg-mainComponentBg z-10 flex-1 pb-20 relative h-screen overflow-y-auto overflow-anchor-none [overflow-anchor:none] scrollbarMC">
 
 
-        <div className="flex justify-between bg-mainComponentBg border-b-2 border-slate-300 gap-4 p-6 left-0 top-0 sticky z-10 items-center">
-            <div className="xl:text-5xl md:text-3xl text-xl  font-dashboardHeading font-extrabold cursor-default line-colaps-2 text-4xl font-bold text-gradient  py-2 ">Welcome, {user?.userName}</div>
-            <div className="flex justify-around gap-6">
+        <div className="flex justify-between bg-mainComponentBg border-b-2 border-slate-300 gap-1  left-0 top-0 sticky z-10 items-center py-6 xl:pr-6">
+            <div 
+                className="xl:text-[3.2rem] lg:text-[2rem] text-[2.5rem] translate-x-6 lg:translate-x-0 font-welcome cursor-default truncate ml-8 text-gradient  ">
+                Welcome, {user?.userName}
+            </div>
+            <div className="lg:flex justify-around xl:gap-6 gap-3 hidden xl:scale-100 md:scale-84 scale-100 ">
                 {!tab.startsWith('community') ? <ButtonEl
                     onClickHandler={() => setModalNeededBy("shareBrain")}
-                    particularStyle=" h-14 gap-0 "
+                    particularStyle=" h-14 gap-0 scale-98"
                     buttonType="secondary"
                     placeholder="Share Brain"
                     startIcon={<ShareIcon style="size-8.5 " />} /> : null
@@ -193,6 +196,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                 <ButtonEl onClickHandler={() => setModalNeededBy("addContent")}
                     buttonType="primary"
                     placeholder="Add Content"
+                    particularStyle="scale-98"
                     startIcon={<PlusIcon style="size-8.5 " />}
                 />
             </div>
@@ -203,13 +207,19 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                     <GridIcon dim="50" onClickHandler={() => setLayout?.("grid")} style={layoutStyle + (layout === "grid" ? " text-white bg-[#6056AA]/60 " : " bg-slate-300 ")} />
                     <ListIcon dim="50" onClickHandler={() => setLayout?.("list")} style={layoutStyle + (layout === "list" ? " text-white bg-[#6056AA]/60 " : " bg-slate-300 ")} />
                 </div>
-                <div className="w-[600px] text-clamp text-3xl font-[450] font-cardTitleHeading text-[#51488C] ml-4"> {tab.startsWith("community") ? <>{`Community : ${currentCommunity1.name}`} </> : <>{`Collection :  ${currentCollection1.name}`} </>} </div>
+                <div 
+                    className="w-[600px] text-clamp text-3xl font-[450] font-cardTitleHeading text-[#51488C] ml-4"> 
+                        {tab.startsWith("community") ? <>
+                            {`Community : ${currentCommunity1.name}`} </> : 
+                            <>{`Collection :  ${currentCollection1.name}`} 
+                        </>} 
+                    </div>
             </div>
             <div className="flex items-center justify-around">
                 <div className="flex items-center justify-around mr-6 gap-2 rounded-lg">
                     {
                         !tab.startsWith("community") ? (
-                            <>
+                            <><div className="hidden lg:block">
                                 {
                                     !tab.startsWith("dashboard") && (
                                         <ButtonEl
@@ -231,6 +241,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                                         endIcon={removingShare ? <Loader style="block size-14 text-white" dimh="10" dimw="20" /> : null}
                                     />
                                 }
+                                </div>
                             </>
                         ) : (
                             <>

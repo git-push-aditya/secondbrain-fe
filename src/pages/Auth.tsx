@@ -75,9 +75,9 @@ const Auth = ({ user, setUser }: AuthProps) => {
     const handleGuestLogIn = () => {
         logIN(
             {
-                userName: 'aditya.Dubey',
+                userName: 'randomuser',
                 password: 'Qwer1234+-*/',
-                rememberMe: false,
+                rememberMe: true,
             }, {
             onSuccess: () => {
                 setUser({

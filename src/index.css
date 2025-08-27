@@ -1,11 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,100..900;1,100..900&family=Donegal+One&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap'); 
 @font-face {
   font-family: Source-Sans-3;
   src : url('/src/assets/fonts/SourceSans3-SemiBold.ttf')
+}
+@font-face {
+  font-family: Bricolage-Grotesque ;
+  src : url('src/assets/fonts/BricolageGrotesque_48pt-Bold.ttf')
 }
 
 
@@ -25,9 +26,11 @@
     --font-inter : Inter , "sans-serif";
     --font-cardTitleHeading : "Source-Sans-3", "sans-serif";
     --font-head: Bitter, "sans-serif";
-    --font-subHead :"LibreBaskerville", serif;
-    --font-notoSans : "Noto-Sans-JP",serif;
-    --font-roboto : "roboto",serif;
+    --font-subHead :"LibreBaskerville", serif; 
+
+    --font-welcome : "Bricolage-Grotesque", Inter;
+
+
 
     --boxShadow-even: 0 0 6px rgba(0, 0, 0, 0.2);
 
