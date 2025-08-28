@@ -23,13 +23,7 @@ const fetchContentCommunity = async (pageParam: number, communityId: number) => 
     return res.data;
 }
 
-
-
-
-
-
-
-
+ 
 
 
 
@@ -40,7 +34,8 @@ export const useGetListQuery = () => {
     return useQuery({
         queryKey: ['getList'],
         queryFn: getLists,
-        enabled: true
+        enabled: true,
+        staleTime: Infinity
     })
 }
 
@@ -50,7 +45,10 @@ export const useFetchQueryCollection = ({ collectionId }: { collectionId: number
         queryFn: ({ pageParam = 1 }) => fetchContentCollection(pageParam, collectionId),
         initialPageParam: 1,
         enabled: collectionId !== -1,
-        staleTime: 0,
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 10, 
+        refetchOnWindowFocus: true,  
+        refetchOnMount: false,
         refetchInterval: 300000,
         refetchIntervalInBackground: true,
         getNextPageParam: (lastPage, allPages) =>
@@ -67,8 +65,11 @@ export const useFetchQueryCommunity = ({ communityId }: { communityId: number })
         enabled: communityId !== -1,
         refetchInterval: 300000,
         refetchIntervalInBackground: true,
+        staleTime: 1000 * 60 * 5,  
+        gcTime: 1000 * 60 * 10, 
+        refetchOnWindowFocus: true,  
+        refetchOnMount: false,
 
-        staleTime: 0,
         getNextPageParam: (lastPage, allPages) =>
             lastPage.payload.more ? allPages.length + 1 : undefined
     });

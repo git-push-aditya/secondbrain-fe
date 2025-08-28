@@ -267,7 +267,7 @@ const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked
         <div className="flex  items-center w-[5%] justify-center">
             {typeIcon[cardType]}
         </div>
-        <div className=" w-[70%] h-full pl-1 py-2">
+        <div className=" md:w-[70%] w-[80%]  h-full px-2 py-2">
             <div className={`w-[100%] flex gap-10 items-center ${note !== "" ? "h-[60%] " : "h-full"}`}>
                 <div className="max-w-[50%] font-cardTitleHeading h-[100%] flex items-center text-2xl text-cardTitle font-[500] ">
                     <span className="truncate w-full">{title}</span>
@@ -283,7 +283,7 @@ const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked
                 {note}
             </div>
         </div>
-        <div className=" cursor-default w-[10%] text-md text-center text-clamp-2 font-[500] text-slate-500">
+        <div className=" cursor-default w-[10%] lg:text-md text-sm text-center text-clamp-2 font-[500] text-slate-500">
             Added on {createdAt}
         </div>
         <AnimatePresence mode="wait">
@@ -305,14 +305,14 @@ const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: -20, opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className={`flex w-[15%] ${!shared ? " justify-around" : " justify-center gap-12"} items-center h-full`}
+                    className={`flex md:w-[15%] w-[5%] ${!shared ? " justify-around" : " justify-center gap-12"} items-center h-full`}
                 >
                     <ShareIcon
-                        layout={"list"} style="size-8 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" onClickHandler={() => shareClicked(link)} />
+                        layout={"list"} style="size-8 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out  " onClickHandler={() => shareClicked(link)} />
                     {!shared && <DeleteIcon
-                        layout={"list"} onClickHandler={() => setDeleteClicked((prev) => !prev)} style={`size-8.5 transition-translate duration-300 ease-in-out hover:-translate-y-0.5 ${deletClicked ? " text-red-600 " : " "}`} />}
+                        layout={"list"} onClickHandler={() => setDeleteClicked((prev) => !prev)} style={`size-8.5 hidden md:block transition-translate duration-300 ease-in-out hover:-translate-y-0.5 ${deletClicked ? " text-red-600 " : " "}`} />}
                     <RedirectIcon
-                        layout={"list"} style="size-8 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" link={link} />
+                        layout={"list"} style="size-8 hover:-translate-y-0.5 hidden md:block transition-translate duration-300 ease-in-out" link={link} />
                 </motion.div>
             }
         </AnimatePresence>

@@ -42,7 +42,7 @@ const SideBar = ({ setModalNeededBy, setUser }: sideBarTypes) => {
 
     const handleTabChnage = (tab: string) => {
         setTab(tab);
-        if (sidebar) {
+        if (sidebar && window.innerWidth <= 1024) {
             setSideBar(prev => !prev)
         }
     }
@@ -84,23 +84,22 @@ const SideBar = ({ setModalNeededBy, setUser }: sideBarTypes) => {
             </div>
         </div>
         <div className="mt-2">
-            <ButtonEl onClickHandler={() => setModalNeededBy("addContent")}
+            {tab != "chatbot" && <> <ButtonEl onClickHandler={() => setModalNeededBy("addContent")}
                 buttonType="optionalButton"
                 placeholder="Add Content"
                 particularStyle=" lg:hidden block  mb-0 bg-primaryButtonBlue/60 text-white hover:bg-primaryButtonBlue/40 font-[500] text-[1.4rem]"
                 startIcon={<PlusIcon style="size-8.5 ml-2 mr-3 " />}
             />
-            {
-                !tab.startsWith('community') ? <ButtonEl
-                    onClickHandler={() => setModalNeededBy("shareBrain")}
-                    particularStyle="  gap-0 lg:hidden font-bold block text-[1.4rem] bg-secondaryButtonBlue  mt-0"
-                    buttonType="optionalButton"
-                    placeholder="Share Brain"
-                    startIcon={<ShareIcon style="size-7 ml-3 mr-4 my-0" />}
-                /> : null
-            }
+                {
+                    !tab.startsWith('community') ? <ButtonEl
+                        onClickHandler={() => setModalNeededBy("shareBrain")}
+                        particularStyle="  gap-0 lg:hidden font-bold block text-[1.4rem] bg-secondaryButtonBlue  mt-0"
+                        buttonType="optionalButton"
+                        placeholder="Share Brain"
+                        startIcon={<ShareIcon style="size-7 ml-3 mr-4 my-0" />}
+                    /> : null
+                }</>}
 
-            //gotta add the stop sharing and delete collection button and other community button as well
         </div>
 
         <ButtonEl
@@ -113,7 +112,13 @@ const SideBar = ({ setModalNeededBy, setUser }: sideBarTypes) => {
 
         <div >
             <div>
-
+                <ButtonEl
+                    onClickHandler={() => handleTabChnage('dashboard')}
+                    startIcon={<Dasboard dim="35" style=" mx-2 " />}
+                    particularStyle="  h-8 gap-3"
+                    buttonType="sidebar"
+                    placeholder="Dashboard"
+                />
 
 
                 <ButtonEl

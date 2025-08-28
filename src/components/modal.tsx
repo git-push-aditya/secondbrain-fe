@@ -51,7 +51,7 @@ const Modal = ({ cause, closeModal }: props) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3, ease: 'circIn' }}
-        className="h-screen w-screen  backdrop-blur-xs bg-[rgba(0,0,0,0.5)] fixed z-20 top-0 left-0 flex justify-center items-center" >
+        className="h-screen w-screen  backdrop-blur-xs bg-[rgba(0,0,0,0.5)] fixed z-300 top-0 left-0 flex justify-center items-center" >
         {cause == "addContent" && <AddContent closeCard={closeModal} />}
         {cause == "shareBrain" && <ShareBrain setPopUpLive={setPopUpLive} cause={cause} closeCard={closeModal} />}
         {cause == "logout" && <Logout closeCard={closeModal} />}

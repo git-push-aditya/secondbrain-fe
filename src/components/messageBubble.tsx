@@ -33,7 +33,7 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
                     }
 
                     if (part.trim() === "" && part.includes(" ")) {
-                        return " "; // keep spaces intact
+                        return " "; 
                     }
 
                     if (part.startsWith("###")) {
@@ -109,8 +109,7 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
 
             i++;
 
-            if (i < tokens.length) {
-                // Slower speed
+            if (i < tokens.length) { 
                 timerRef.current = window.setTimeout(tick, 60);
             } else {
                 callBack();
@@ -120,8 +119,7 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
         if (timerRef.current) {
             clearTimeout(timerRef.current);
         }
-
-        // Slower speed
+ 
         timerRef.current = window.setTimeout(tick, 60);
 
         return () => {
@@ -149,7 +147,7 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
                 animate={{ y: 0, x: 0, opacity: 1 }}
                 exit={{ x: -10, opacity: 0 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
-                className={`${role === "assistant" ? " xl:w-[80%] lg:w-[85%] w-[95%]" : " xl:max-w-[80%] lg:max-w-[85%] max-w-[95%]"} xl:text-xl text-lg  ${role === "user" ? " bg-slate-100 text-slate-600 " : " text-slate-700 "}  rounded-3xl p-5 text-slate-600 font-inter`}>
+                className={`${role === "assistant" ? " xl:w-[80%] lg:w-[85%] w-[95%]" : " xl:max-w-[80%] lg:max-w-[85%] max-w-[80%]"} xl:text-xl text-xl  ${role === "user" ? " bg-slate-100 text-slate-600 " : " text-slate-700 "}  rounded-3xl md:p-4 p-3 text-slate-600 font-inter`}>
                 <article >
 
                     <div className="float-right">
@@ -171,8 +169,20 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
                         }
                     </div>
                     <p>
-                        {role === "assistant" && message === "" && responding && <ChatLoader style="flex justify-start" dim="70" />}
-                        {role === "assistant" && (streamed ? <div className="text-justify">{display}</div> : renderWithBold(message))}
+                        {
+                            role === "assistant" && message === "" && responding && 
+                                <ChatLoader 
+                                    style="flex justify-start" 
+                                    dim="70" 
+                                />
+                        }
+                        {
+                            role === "assistant" && (streamed ? <div 
+                                className="text-justify">
+                                    {display}
+                                </div> : renderWithBold(message)
+                            )
+                        }
                     </p>
 
                 </article>
@@ -181,11 +191,11 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
 
                 {
                     role === "assistant" && !responding && <div
-                        className="relative bottom-0 -left-4 cursor-pointer  m-4">
+                        className="relative bottom-0 -left-4 cursor-pointer  lg:m-4 m-2">
                         <CopyText
                             dim="45"
                             onClickHandler={copyResponse}
-                            style={` hover:bg-slate-100 p-2 rounded-lg transition-hover duration-200`}
+                            style={` hover:bg-slate-100 lg:p-2 p-1 size-8 md:size-9  lg:size-11 rounded-lg transition-hover duration-200`}
                         />
                     </div>
                 }
@@ -194,8 +204,8 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="w-[5%] flex justify-center items-center">
-                <img src={user?.profilePic} className="xl:size-12 scale-x-[-1] md:size-10 size-8 rounded-[5rem]" />
+                className="md:w-[5%] w:[8%] flex justify-center items-center">
+                <img src={user?.profilePic} className="xl:size-12 scale-x-[-1] md:size-10 size-9 lg:rounded-[5rem] rounded-[2rem]" />
             </motion.div>}
         </div>
     </div>

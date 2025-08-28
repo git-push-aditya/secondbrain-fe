@@ -7,7 +7,7 @@
 @font-face {
   font-family: Bricolage-Grotesque ;
   src : url('src/assets/fonts/BricolageGrotesque_48pt-Bold.ttf')
-}
+} 
 
 
 
@@ -36,7 +36,9 @@
 
     --breakpoint-sharedBp2xl: 107rem;
     --breakpoint-authBreakPoint: 93.75rem;
-    --breakpoint-sharedBplg: 76.875rem;
+    --breakpoint-sharedBplg: 76.875rem; 
+    --breakpoint-1_5xl: 84rem;
+    --breakpoint-fourCards: 100rem;
 
     --color-sidebarBg : #F5F5F6;
     --color-secondBrainHeading: #2A2E40; 
@@ -102,6 +104,37 @@
     transition: background 8s ease-in-out;
   }
 }
+
+@layer utilities {
+  .scrollbarSB-x {
+    overflow-x: auto;
+    overflow-y: hidden; /* prevent vertical scroll */
+    white-space: nowrap; /* make children stay in a single line */
+  }
+
+  .scrollbarSB-x::-webkit-scrollbar {
+    height: 10px;   /* horizontal scrollbar thickness */
+  }
+
+  .scrollbarSB-x::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: #F5F5F6;
+  }
+
+  .scrollbarSB-x::-webkit-scrollbar-thumb {
+    background: #d6d6d9;
+    border-radius: 100vh;
+    border: 3px solid #f6f7ed;
+  }
+
+  .scrollbarSB-x::-webkit-scrollbar-thumb:hover {
+    background: #A5A5AA;
+    transition: background 0.3s ease-in-out;
+  }
+}
+
+
+
 
 @layer utilities {
   .overflow-anchor-none { overflow-anchor: none; }

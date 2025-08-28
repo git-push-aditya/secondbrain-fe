@@ -141,14 +141,14 @@ export const ChatBot = () => {
 
 
 
-    return <div className="bg-mainComponentBg z-10 w-[82%] h-screen scrollbarMC ">
+    return <div className="bg-mainComponentBg z-10 flex-1 h-screen relative h-screen overflow-y-auto scrollbarMC ">
         <div className="h-full w-full">
             <div className={`h-[80%] overflow-auto flex justify-center ${chatHistory !== null ? "items-start  " : " items-center"} py-10 scrollbarCB`}>
                 <AnimatePresence mode="wait">
                     <motion.div initial={{ y: 8, opacity: 0 }} animate={{ y: 0, x: 0, opacity: 1 }} exit={{ x: -10, opacity: 0 }} transition={{ duration: 0.2, ease: "easeInOut" }}>
                         <div className={`text-center cursor-default ${chatHistory === null ? " block " : " hidden "}`}>
-                            <div className="text-[3.5rem] font-[1000] text-shadow-lg font-head text-primaryButtonBlue/95 ">Ask your secondbrain</div>
-                            <div className="text-lg font-inter text-slate-700/80"> Get instant answers powered by your personal knowledge base.<br />
+                            <div className="xl:text-[3.5rem] lg:text-[2.8rem]  mx-2 text-[2rem] font-[600] xl:font-[1000] text-shadow-lg font-head text-primaryButtonBlue/95 ">Ask your secondbrain</div>
+                            <div className="xl:text-lg lg:text-[1rem] font-inter text-[0.9rem] text-slate-700/80 mx-4   "> Get instant answers powered by your personal knowledge base.<br />
                                 This assistant uses your saved notes and documents to provide relevant, context-aware responses.</div>
                         </div>
                     </motion.div>
@@ -188,7 +188,13 @@ export const ChatBot = () => {
                 </AnimatePresence>
                 <AnimatePresence mode="wait">
 
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="xl:w-[73%] w-[85%] z-50 h-[70%]  rounded-[3rem] flex gap-10 items-center pl-5 bg-white shadow-xl hover:shadow-3xl  mb-3 group-hover" transition={{ duration: 0.2, ease: "easeInOut" }}>
+                    <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0 }} 
+                        className="xl:w-[73%] w-[85%] z-50 xl:h-[70%] lg:h-[60%] h-[50%]  rounded-[3rem] flex gap-10 items-center pl-5 bg-white shadow-xl hover:shadow-3xl  mb-3 group-hover" 
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                        >
                         <textarea
                             onKeyDown={(e) => {
                                 if (e.key === "Enter" && !e.shiftKey) {
@@ -196,11 +202,11 @@ export const ChatBot = () => {
                                     handleMessage();
                                 }
                             }}
-                            className="text-token-text-primary resize-none placegolder:ps-px scrollbar-hidden outline-none px-5 h-[60%] text-2xl font-[550] w-[85%]" placeholder="Whats on your mind..."
+                            className="text-token-text-primary resize-none placegolder:ps-px scrollbar-hidden outline-none px-5 h-[60%] xl:text-2xl lg:text-xl text-lg font-[550] w-[85%]" placeholder="Whats on your mind..."
                             ref={inputRef} />
                         <ChatbotEnter
                             dim="20"
-                            style={`p-2 hover:bg-gray-100 size-19 cursor-pointer rounded-[3rem] transition-all duration-300 ${!isPending ? " block " : " hidden "}`}
+                            style={`p-2 hover:bg-gray-100 lg:size-19 size-16 cursor-pointer rounded-[3rem] transition-all duration-300 ${!isPending ? " block " : " hidden "}`}
                             onClickHandler={handleMessage} />
                         <BlockIcon
                             style={`bg-gray-500/90 -p-1 hover:bg-gray-600/90 size-19 cursor-default rounded-[3rem] transition-all duration-300 

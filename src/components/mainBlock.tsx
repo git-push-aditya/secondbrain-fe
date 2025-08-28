@@ -177,15 +177,15 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
 
     const layoutStyle = "hover:text-white hover:bg-[#6056AA]/60 text-black transition-hover duration-150 ease-in-out rounded-lg p-2  cursor-pointer ";
 
-    return <div ref={containerRef} className="bg-mainComponentBg z-10 flex-1 pb-20 relative h-screen overflow-y-auto overflow-anchor-none [overflow-anchor:none] scrollbarMC">
+    return <div ref={containerRef} className="bg-mainComponentBg z-10 flex-1 pb-20 relative h-screen overflow-y-auto scrollbarMC">
 
 
-        <div className="flex justify-between bg-mainComponentBg border-b-2 border-slate-300 gap-1  left-0 top-0 sticky z-10 items-center py-6 xl:pr-6">
+        <div className="flex justify-between bg-mainComponentBg border-b-2 border-slate-300 gap-1  left-0 top-0 sticky z-10 items-center py-6 2xl:pr-6">
             <div 
-                className="xl:text-[3.2rem] lg:text-[2rem] text-[2.5rem] translate-x-6 lg:translate-x-0 font-welcome cursor-default truncate ml-8 text-gradient  ">
+                className="xl:text-[2.7rem] 2xl:text-[3.2rem] lg:text-[2.3rem] text-[2.5rem] translate-x-6 lg:translate-x-0 font-welcome cursor-default truncate ml-8 text-gradient  ">
                 Welcome, {user?.userName}
             </div>
-            <div className="lg:flex justify-around xl:gap-6 gap-3 hidden xl:scale-100 md:scale-84 scale-100 ">
+            <div className="lg:flex justify-around xl:gap-6 gap-3 hidden 2xl:scale-100 md:scale-84 scale-100 ">
                 {!tab.startsWith('community') ? <ButtonEl
                     onClickHandler={() => setModalNeededBy("shareBrain")}
                     particularStyle=" h-14 gap-0 scale-98"
@@ -201,25 +201,36 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                 />
             </div>
         </div>
-        <div className="flex justify-between items-center mt-4 ml-7">
-            <div className="flex items-center justify-around">
-                <div className="flex items-center justify-around ml-6 w-26 gap-2 rounded-lg ">
-                    <GridIcon dim="50" onClickHandler={() => setLayout?.("grid")} style={layoutStyle + (layout === "grid" ? " text-white bg-[#6056AA]/60 " : " bg-slate-300 ")} />
-                    <ListIcon dim="50" onClickHandler={() => setLayout?.("list")} style={layoutStyle + (layout === "list" ? " text-white bg-[#6056AA]/60 " : " bg-slate-300 ")} />
+        <div className="md:flex md:justify-between md:items-center static mt-4 ">
+            <div className="flex items-center justify-start">
+                <div className="flex items-center justify-around ml-6 w-26 gap-2 rounded-lg  ">
+                    <GridIcon 
+                        dim="50" 
+                        onClickHandler={() => setLayout?.("grid")} 
+                        style={layoutStyle + (layout === "grid" ? " text-white bg-[#6056AA]/60 " : " bg-slate-300 ") + " scale-90 lg:scale-100 "} 
+                    />
+                    <ListIcon 
+                        dim="50" 
+                        onClickHandler={() => setLayout?.("list")} 
+                        style={layoutStyle + (layout === "list" ? " text-white bg-[#6056AA]/60 " : " bg-slate-300 ") + " scale-90 lg:scale-100 "} 
+                    />
                 </div>
                 <div 
-                    className="w-[600px] text-clamp text-3xl font-[450] font-cardTitleHeading text-[#51488C] ml-4"> 
+                    className=" text-clamp lg:text-3xl text-[1.7rem] font-welcome text-[#51488C] mx-4"> 
                         {tab.startsWith("community") ? <>
                             {`Community : ${currentCommunity1.name}`} </> : 
                             <>{`Collection :  ${currentCollection1.name}`} 
                         </>} 
-                    </div>
-            </div>
-            <div className="flex items-center justify-around">
+                </div>
+            </div> 
+            <div className="flex items-center justify-around"> 
                 <div className="flex items-center justify-around mr-6 gap-2 rounded-lg">
                     {
                         !tab.startsWith("community") ? (
-                            <><div className="hidden lg:block">
+                            <><br className="block md:hidden" />
+                            <br className="block md:hidden" />
+                            <br className="block md:hidden" />
+                             <div className="scale-90 lg:scale-100 flex gap-2 ">
                                 {
                                     !tab.startsWith("dashboard") && (
                                         <ButtonEl
@@ -240,11 +251,12 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                                         placeholder={!removingShare ? "Stop Sharing" : ""}
                                         endIcon={removingShare ? <Loader style="block size-14 text-white" dimh="10" dimw="20" /> : null}
                                     />
-                                }
-                                </div>
+                                }</div>
                             </>
                         ) : (
-                            <>
+                            <>  <br className="block lg:hidden" />
+                            <br className="block lg:hidden" />
+                            <br className="block lg:hidden" />
                                 <ButtonEl
                                     startIcon={<CommunityIcon dim="45" style="text-white" />}
                                     onClickHandler={getMembers}
@@ -254,9 +266,13 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                                 <ButtonEl
                                     placeholder="Share Login"
                                     startIcon={<ShareIcon style=" size-6 text-white" />}
-                                    onClickHandler={() => handleShareCommunityCred()} disabled={shareLoginPending} buttonType={"rightTopbar"} particularStyle={`bg-green-300 hover:bg-green-400 ${removingShare ? " bg-red-400" : ""} ${shareLoginPending ? "animate-pulse cursor-not-allowed" : ""} `} />
+                                    onClickHandler={() => handleShareCommunityCred()} 
+                                    disabled={shareLoginPending} 
+                                    buttonType={"rightTopbar"} 
+                                    particularStyle={`bg-green-300 hover:bg-green-400 ${removingShare ? " bg-red-400" : ""} ${shareLoginPending ? "animate-pulse cursor-not-allowed" : ""} `} 
+                                />
                                 {
-                                    membersList ? <div className="absolute z-2 top-51 right-53 w-60 flex justify-center items-center">
+                                    membersList ? <div className="absolute z-2 top-51 right-53 w-60 flex justify-center items-center translate-y-12 -translate-x-4 lg:translate-y-0 lg:-translate-x-0">
                                         {
                                             membersListPending ?
                                                 <div className="bg-slate-200 border-1 w-full animate-pulse text-xl flex justify-center  items-center rounded-lg">loading...</div>
@@ -277,10 +293,10 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
             </div>
 
         </div>
-        <div className=" mt-6  w-full flex justify-center ">
+        <div className=" mt-6  w-full flex justify-around px-4 ">
 
             {   contentLoading || communityDataLoading ? <CardsLoaderSkeleton /> :
-                <div className={` ${layout === "grid" ? " grid 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 xl:gap-6  lg:gap-4 gap-2 gap-y-6 " : " w-full "}`}>
+                <div className={` ${layout === "grid" ? " grid fourCards:grid-cols-4 1_5xl:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-x-4 gap-y-6 " : " w-full "}`}>
 
                     {currentCollection1.id !== -1 ? <>
                         {pagesData?.pages.map((group, pageIndex) => {
@@ -313,8 +329,6 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
 
 
                     </> : (<>
-
-
                         {
                             communityPagesData?.pages.map((group, i) => (
                                 <Fragment key={i}>

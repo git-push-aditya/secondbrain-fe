@@ -130,14 +130,28 @@ const Auth = ({ user, setUser }: AuthProps) => {
         <div className="min-h-screen transition-all duration-300 ease-in-out  w-full lg:w-[38%] bg-[#F5F5F6] lg:bg-white overflow-auto cursor-default  ">
             <div className="min-h-full flex items-center justify-center">
                 <div className="w-[65%]  h-full py-8">
-                    <div className="text-6xl font-[550] font-notoSans text-[#080B0A] ">{authMode == "logIn" ? "Log in" : "Sign up"}</div>
-                    <div className="text-md font-[550] mt-2 text-gray-600 font-roboto ">{authMode == "logIn" ? "sign in to continue oraganizing" : "Sign up and start organizing your ideas"}</div>
+                    <div 
+                        className="text-6xl font-[550] font-welcome text-[#080B0A] ">{authMode == "logIn" ? "Log in" : "Sign up"}
+                    </div>
+                    <div 
+                        className="text-md font-[550] mt-2 text-gray-600 font-welcome ">
+                            {authMode == "logIn" ? "sign in to continue oraganizing" : "Sign up and start organizing your ideas"}
+                    </div>
 
 
                     {
                         authMode === "signUp" && <>
-                            <div className="text-xl ml-1 font-[600] mt-6 text-[#080B0A] font-roboto">Enter email</div>
-                            <input type="text" placeholder="email@domain.com" onChange={(e) => setEmailUser(e.target.value)} value={emailUser} className={inputStyle} />
+                            <div 
+                                className="text-xl ml-1 font-[600] mt-6 text-[#080B0A] font-roboto">
+                                    Enter email
+                            </div>
+                            <input 
+                                type="text" 
+                                placeholder="email@domain.com" 
+                                onChange={(e) => setEmailUser(e.target.value)} 
+                                value={emailUser} 
+                                className={inputStyle} 
+                            />
                         </>
                     }
 
@@ -153,7 +167,7 @@ const Auth = ({ user, setUser }: AuthProps) => {
                         authMode === 'signUp' && <div>
                             <div className={`text-xl ml-1 font-[600] mt-6 text-[#080B0A] font-roboto`}> Select profile photo</div>
                             <div>
-                                <div className="flex justify-around mt-4">
+                                <div className="flex justify-around mt-4 py-2 overflow-x-auto scrollbarSB-x gap-1 lg:gap-0">
 
                                     <img src="/dp/b2.png" onClick={() => selectProfilePic("b2")} className={`${profilePicStyle} ${profilePic === "b2" ? " scale-109" : profilePic !== "" ? " opacity-50 " : ""}`} />
                                     <img src="/dp/b3.png" onClick={() => selectProfilePic("b3")} className={`${profilePicStyle} ${profilePic === "b3" ? " scale-109" : profilePic !== "" ? " opacity-50 " : ""}`} />
@@ -176,7 +190,12 @@ const Auth = ({ user, setUser }: AuthProps) => {
 
 
 
-                    <ButtonEl onClickHandler={() => handleClick()} buttonType={"authin"} placeholder={authMode === "signUp" ? "Sign up" : "Sign in"} particularStyle={`mt-6 rounded-sm ${(inIsPending || upIsPending) ? " animate-pulse " : " "}`} />
+                    <ButtonEl 
+                        onClickHandler={() => handleClick()} 
+                        buttonType={"authin"} 
+                        placeholder={authMode === "signUp" ? "Sign up" : "Sign in"} 
+                        particularStyle={`mt-6 rounded-sm font-inter ${(inIsPending || upIsPending) ? " animate-pulse " : " "}`}
+                     />
 
                     <div className="flex w-full items-center mt-2">
                         <hr className="w-[46%] border-t-2 border-gray-300 " />
@@ -185,11 +204,21 @@ const Auth = ({ user, setUser }: AuthProps) => {
                     </div>
 
 
-                    <ButtonEl onClickHandler={() => handleGuestLogIn()} buttonType={"authin"} placeholder="Continue as Guest" particularStyle="mt-2 rounded-sm" />
+                    <ButtonEl 
+                        onClickHandler={() => handleGuestLogIn()} 
+                        buttonType={"authin"} 
+                        placeholder="Continue as Guest" 
+                        particularStyle="mt-2 rounded-sm text-inter" 
+                    />
 
 
-                    <div className="mt-10 text-center text-gray-600 font-robot font-[410] text-lg">{authMode === "logIn" ? "New user ? Sign up now" : "Already have an account ? "}
-                        <a><b className="cursor-pointer" onClick={() => setAuthMode((prev) => prev === "signUp" ? "logIn" : "signUp")}>{authMode === "signUp" ? " Log In" : " Sign up"} </b></a>
+                    <div 
+                        className="mt-10 text-center text-gray-600 font-inter font-[410] text-lg">{authMode === "logIn" ? "New user ? Sign up now" : "Already have an account ? "}
+                        <a>
+                            <b className="cursor-pointer" onClick={() => setAuthMode((prev) => prev === "signUp" ? "logIn" : "signUp")}>
+                                {authMode === "signUp" ? " Log In" : " Sign up"} 
+                            </b>
+                        </a>
                     </div>
                 </div>
             </div>

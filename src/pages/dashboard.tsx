@@ -54,7 +54,7 @@ const Dashboard = ({ user, setUser, layout, setLayout }: { user: AuthUser | null
     const [tab] = useTabAtom();
 
     return <>
-        <div className="flex h-screen w-screen">
+        <div className="flex h-screen w-screen overflow-hidden">
             <AnimatePresence mode="wait">
                 {modalNeeded !== "close" && <Modal cause={modalNeeded} closeModal={closeModal} />}
             </AnimatePresence>
