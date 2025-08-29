@@ -32,35 +32,93 @@ const Auth = ({ user, setUser }: AuthProps) => {
 
     const navigate = useNavigate();
 
+    const [userError, setUserError] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>("");
+
 
     const inputStyle = "mt-3 px-3 shadow-lg/20 transition duration-200 ease-in-out border-2 border-white/0 rounded-md hover:border-black/80 hover:cursor-pointer w-full h-13 text-md text-slate-800 font-[600] font-inter bg-white";
 
     const { mutateAsync: logIN, isPending: inIsPending } = useAuthInQuery();
     const { mutateAsync: signUP, isPending: upIsPending } = useAuthUpQuery();
 
+
     const handleClick = async () => {
+        const username = userName.trim();
+        const pass = password.trim();
+
         if (authMode === "logIn") {
+
+
+            if (username === "" || pass === "") {
+                setUserError(true);
+                setErrorMessage("Username and Password are required fields");
+                return;
+            }
+
             await logIN(
                 {
                     userName, password, rememberMe
                 }, {
                 onSuccess: (data) => {
-                    setUser({ userName: data.data.payload.userName, profilePic: getProfilePicPath(data.data.payload.profilePic), email: data.data.payload.email });
+                    setUser({
+                        userName: data.data.payload.userName,
+                        profilePic: getProfilePicPath(data.data.payload.profilePic),
+                        email: data.data.payload.email
+                    });
+                    setErrorMessage("");
+                    setUserError(false);   
+                }, onError: () => {
+                    setUserError(true);
+                    setErrorMessage("That didn’t match our records. Please try again.");
+                    return;
                 }
             }
             );
         } else {
+
+            if (
+                !(password.length >= 8) ||
+                !(/[a-z]/.test(password)) ||    
+                !(/[A-Z]/.test(password)) ||    
+                !(/\d/.test(password)) ||       
+                !(/[@$!%*?&]/.test(password))   
+            ) {
+                setUserError(true);
+                setErrorMessage("Password too weak");
+                return;
+            }
+
             const profilePicSelected = profilePic !== "" ? profilePic : "b1";
+            const email = emailUser.trim();
+            if (email === "" || username === "" || pass === "") {
+                setUserError(true);
+                setErrorMessage("All field are necessary.");
+                return;
+            }
             await signUP(
                 {
-                    userName, password, email: emailUser, rememberMe, profilePic: profilePicSelected
+                    userName, password, email, rememberMe, profilePic: profilePicSelected
                 }, {
                 onSuccess: (data) => {
-                    setUser({ userName: data.data.payload.userName, profilePic: getProfilePicPath(data.data.payload.profilePic), email: data.data.payload.email })
+                    setUser({ userName: data.data.payload.userName, profilePic: getProfilePicPath(data.data.payload.profilePic), email: data.data.payload.email });
+                    setErrorMessage("");
+                    setUserError(false);
+                }, onError: () => {
+                    setUserError(true);
+                    setErrorMessage("Either username or email already in use.");
+                    return;
                 }
             }
             );
         }
+    }
+
+    const chnageAuthMode = () => {
+        setAuthMode((prev) => prev === "signUp" ? "logIn" : "signUp");
+        setUserName("");
+        setPassword("");
+        setErrorMessage("");
+        setUserError(false);
     }
 
 
@@ -130,38 +188,55 @@ const Auth = ({ user, setUser }: AuthProps) => {
         <div className="min-h-screen transition-all duration-300 ease-in-out  w-full lg:w-[38%] bg-[#F5F5F6] lg:bg-white overflow-auto cursor-default  ">
             <div className="min-h-full flex items-center justify-center">
                 <div className="w-[65%]  h-full py-8">
-                    <div 
+                    <div
                         className="text-6xl font-[550] font-welcome text-[#080B0A] ">{authMode == "logIn" ? "Log in" : "Sign up"}
                     </div>
-                    <div 
+                    <div
                         className="text-md font-[550] mt-2 text-gray-600 font-welcome ">
-                            {authMode == "logIn" ? "sign in to continue oraganizing" : "Sign up and start organizing your ideas"}
+                        {authMode == "logIn" ? "sign in to continue oraganizing" : "Sign up and start organizing your ideas"}
                     </div>
 
 
                     {
                         authMode === "signUp" && <>
-                            <div 
+                            <div
                                 className="text-xl ml-1 font-[600] mt-6 text-[#080B0A] font-roboto">
-                                    Enter email
+                                Enter email
                             </div>
-                            <input 
-                                type="text" 
-                                placeholder="email@domain.com" 
-                                onChange={(e) => setEmailUser(e.target.value)} 
-                                value={emailUser} 
-                                className={inputStyle} 
+                            <input
+                                type="text"
+                                placeholder="email@domain.com"
+                                onChange={(e) => setEmailUser(e.target.value)}
+                                value={emailUser}
+                                className={inputStyle}
                             />
                         </>
                     }
 
 
-                    <div className={`text-xl ml-1 font-[600] ${authMode === "signUp" ? "mt-6" : "mt-10"}  text-[#080B0A] font-roboto`}>Enter username</div>
-                    <input type="text" placeholder="oliver.graystone" onChange={(e) => setUserName(e.target.value)} value={userName} className={inputStyle} />
+                    <div 
+                        className={`text-xl ml-1 font-[600] ${authMode === "signUp" ? "mt-6" : "mt-10"}  text-[#080B0A] font-roboto`}>
+                            Enter username
+                    </div>
+                    <input 
+                        type="text" 
+                        placeholder="oliver.graystone" 
+                        onChange={(e) => setUserName(e.target.value)} value={userName} 
+                        className={inputStyle} 
+                    />
 
 
-                    <div className="text-xl ml-1 font-[600] mt-6 text-[#080B0A] font-roboto">Enter your secure password</div>
-                    <input type="password" placeholder={authMode === "signUp" ? "rajmaChawal123" : "secret passkey"} onChange={(e) => setPassword(e.target.value)} value={password} className={inputStyle} />
+                    <div
+                        className="text-xl ml-1 font-[600] mt-6 text-[#080B0A] font-roboto">
+                        Enter your secure password
+                    </div>
+                    <input
+                        type="password"
+                        placeholder={authMode === "signUp" ? "rajmaChawal123" : "secret passkey"} onChange={(e) => setPassword(e.target.value)}
+                        value={password}
+                        className={inputStyle}
+                        title="Password must be 8+ characters with a mix of upper & lowercase letters, numbers, and a symbol."
+                    />
 
                     {
                         authMode === 'signUp' && <div>
@@ -183,19 +258,22 @@ const Auth = ({ user, setUser }: AuthProps) => {
 
                     <div className="flex justify-between  items-center text-lg mt-7 px-2">
                         <label className="text-[#080B0A] cursor-pointer ">
-                            <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="accent-[#94a3b8] mr-4 scale-160" /> Remember me
+                            <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="accent-[#94a3b8] mr-4 scale-160 cursor-pointer" /> Remember me
                         </label>
-                        {authMode === "logIn" && <div className=" text-[#030303] font-[510] cursor-pointer text-md xl:text-lg font-roboto">Forgot password?</div>}
+                    </div>
+
+                    <div
+                        className="text-lg text-red-500 font-roboto text-center m-1">
+                            {errorMessage}
                     </div>
 
 
-
-                    <ButtonEl 
-                        onClickHandler={() => handleClick()} 
-                        buttonType={"authin"} 
-                        placeholder={authMode === "signUp" ? "Sign up" : "Sign in"} 
+                    <ButtonEl
+                        onClickHandler={() => handleClick()}
+                        buttonType={"authin"}
+                        placeholder={authMode === "signUp" ? "Sign up" : "Sign in"}
                         particularStyle={`mt-6 rounded-sm font-inter ${(inIsPending || upIsPending) ? " animate-pulse " : " "}`}
-                     />
+                    />
 
                     <div className="flex w-full items-center mt-2">
                         <hr className="w-[46%] border-t-2 border-gray-300 " />
@@ -204,19 +282,21 @@ const Auth = ({ user, setUser }: AuthProps) => {
                     </div>
 
 
-                    <ButtonEl 
-                        onClickHandler={() => handleGuestLogIn()} 
-                        buttonType={"authin"} 
-                        placeholder="Continue as Guest" 
-                        particularStyle="mt-2 rounded-sm text-inter" 
+                    <ButtonEl
+                        onClickHandler={() => handleGuestLogIn()}
+                        buttonType={"authin"}
+                        placeholder="Continue as Guest"
+                        particularStyle="mt-2 rounded-sm text-inter"
                     />
 
 
-                    <div 
+                    <div
                         className="mt-10 text-center text-gray-600 font-inter font-[410] text-lg">{authMode === "logIn" ? "New user ? Sign up now" : "Already have an account ? "}
                         <a>
-                            <b className="cursor-pointer" onClick={() => setAuthMode((prev) => prev === "signUp" ? "logIn" : "signUp")}>
-                                {authMode === "signUp" ? " Log In" : " Sign up"} 
+                            <b className="cursor-pointer" 
+                                onClick={chnageAuthMode}
+                            >
+                                {authMode === "signUp" ? " Log In" : " Sign up"}
                             </b>
                         </a>
                     </div>

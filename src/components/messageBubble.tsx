@@ -150,7 +150,7 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
                 className={`${role === "assistant" ? " xl:w-[80%] lg:w-[85%] w-[95%]" : " xl:max-w-[80%] lg:max-w-[85%] max-w-[80%]"} xl:text-xl text-xl  ${role === "user" ? " bg-slate-100 text-slate-600 " : " text-slate-700 "}  rounded-3xl md:p-4 p-3 text-slate-600 font-inter`}>
                 <article >
 
-                    <div className="float-right">
+                    <div className="md:float-right">
                         {role === "assistant" && cardData !== null && <div className=" m-8 flex justify-center items-center">
                             <CardElement
                                 key={cardData.id}

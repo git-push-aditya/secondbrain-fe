@@ -235,15 +235,28 @@ const ShareBrain = ({ closeCard, setPopUpLive }: cardComponent) => {
         }
     }
 
-    return <motion.div initial={{ y: 8, scale: 0.99 }} animate={{ y: 0, scale: 1 }} transition={{ duration: 0.2 }} className={` max-h-[500px] w-[70%] xl:w-[40%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB pb-10`} >
-        <div className="flex justify-between items-center mx-8 md:mx-10 xl:mx-12 mt-8">
-            <div className="font-[650]  text-3xl text-modalHead font-inter ">Share your Second Brain</div>
-            <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2" />} />
+    return <motion.div 
+        initial={{ y: 8, scale: 0.99 }} 
+        animate={{ y: 0, scale: 1 }} 
+        transition={{ duration: 0.2 }} 
+        className={` max-h-[500px] w-[70%] xl:w-[40%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB pb-10`} 
+        >
+        <div 
+            className="flex justify-between items-center mx-8 md:mx-10 xl:mx-12 mt-8">
+            <div 
+                className="font-[650]  text-3xl text-modalHead font-inter ">Share your Second Brain</div>
+                <ButtonEl 
+                    buttonType="" 
+                    onClickHandler={closeCard} 
+                    startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2" />} 
+                />
         </div>
-        <div className="  mt-6 xl:mt-5 md:mt-6  xl:text-xl text-justify  text-xl mx-12  font-[450] text-gray-500">
-            Share your entire collection of posts, blogs, tweets, and videos with others. They'll be able to import your content into their own Second Brain.
+        <div 
+            className="  mt-6 xl:mt-5 md:mt-6  xl:text-xl text-justify  text-xl mx-12  font-[450] text-gray-500">
+                Share your entire collection of posts, blogs, tweets, and videos with others. They'll be able to import your content into their own Second Brain.
         </div>
-        <div className="mt-2 xl:text-xl md:text-md mx-12 text-center font-[400] text-gray-600">
+        <div 
+            className="mt-2 xl:text-xl md:text-md mx-12 text-center font-[400] text-gray-600">
             You can stop sharing your secondbrain at any time.
         </div>
         {

@@ -264,11 +264,11 @@ const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked
         className={`${shared ? " w-[100%] " : " w-[96%] "} h-[80px] flex items-center mb-4 mx-auto transition-hover cursor-default duration-300  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md pl-3 ${shared ? " hover:scale-101 transition-hover duration-150 ease-in-out hover:sahdow-lg" : " "}  ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 " : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"}`}
 
     >
-        <div className="flex  items-center w-[5%] justify-center">
+        <div className="flex  items-center w-[5%] justify-center lg:scale-100 scale-80 m-2">
             {typeIcon[cardType]}
         </div>
-        <div className=" md:w-[70%] w-[80%]  h-full px-2 py-2">
-            <div className={`w-[100%] flex gap-10 items-center ${note !== "" ? "h-[60%] " : "h-full"}`}>
+        <div className=" w-[80%]  h-full px-2 py-2 ">
+            <div className={`w-[100%] flex lg:gap-10 gap-6 items-center ${note !== "" ? "h-[60%] " : "h-full"}`}>
                 <div className="max-w-[50%] font-cardTitleHeading h-[100%] flex items-center text-2xl text-cardTitle font-[500] ">
                     <span className="truncate w-full">{title}</span>
                 </div>
@@ -283,7 +283,7 @@ const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked
                 {note}
             </div>
         </div>
-        <div className=" cursor-default w-[10%] lg:text-md text-sm text-center text-clamp-2 font-[500] text-slate-500">
+        <div className=" cursor-default w-[10%] lg:text-md xl:block hidden text-sm text-center text-clamp-2 font-[500] text-slate-500">
             Added on {createdAt}
         </div>
         <AnimatePresence mode="wait">
@@ -305,14 +305,14 @@ const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: -20, opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className={`flex md:w-[15%] w-[5%] ${!shared ? " justify-around" : " justify-center gap-12"} items-center h-full`}
+                    className={`flex lg:w-[15%]  ${!shared ? " lg:justify-around justify-end  " : " justify-center gap-12"} items-center h-full md:gap-2`}
                 >
                     <ShareIcon
-                        layout={"list"} style="size-8 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out  " onClickHandler={() => shareClicked(link)} />
+                        layout={"list"} style="lg:size-8   size-6 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out mr-10 lg:mr-0  " onClickHandler={() => shareClicked(link)} />
                     {!shared && <DeleteIcon
-                        layout={"list"} onClickHandler={() => setDeleteClicked((prev) => !prev)} style={`size-8.5 hidden md:block transition-translate duration-300 ease-in-out hover:-translate-y-0.5 ${deletClicked ? " text-red-600 " : " "}`} />}
+                        layout={"list"} onClickHandler={() => setDeleteClicked((prev) => !prev)} style={`size-8.5 hidden md:block transition-translate duration-300 lg:scale-90 xl:scale-100 ease-in-out hover:-translate-y-0.5 ${deletClicked ? " text-red-600 " : " "}`} />}
                     <RedirectIcon
-                        layout={"list"} style="size-8 hover:-translate-y-0.5 hidden md:block transition-translate duration-300 ease-in-out" link={link} />
+                        layout={"list"} style="size-8 lg:scale-90 xl:scale-100 hover:-translate-y-0.5 hidden md:block transition-translate duration-300 ease-in-out" link={link} />
                 </motion.div>
             }
         </AnimatePresence>
