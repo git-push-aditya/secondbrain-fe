@@ -4,10 +4,12 @@ import { ChatLoader, CopyText } from "../icons/commonIcons";
 import { ChatbotIcon } from "../icons/particularIcons";
 import { useUserProfile } from "../recoil/user";
 import type { cardContent } from "./Chatbot";
-import { CardElement, type cardType } from "./card";
+import { type cardType } from "./card";
+import CardElement from "./card"
 import { usePopUpAtom, usePopUpMessage } from "../recoil/clientStates";
+import React from "react";
 
-export const MessageBubble = ({ role, message, responding, cardData, streamed = false, callBack }: { role: "assistant" | "user", cardData: cardContent | null, message: string, responding: boolean, streamed: boolean, callBack: () => void }) => {
+const MessageBubble = ({ role, message, responding, cardData, streamed = false, callBack }: { role: "assistant" | "user", cardData: cardContent | null, message: string, responding: boolean, streamed: boolean, callBack: () => void }) => {
     const [display, setDisplay] = useState<ReactNode[]>([]);
     const timerRef = useRef<number | null>(null);
     const [user] = useUserProfile();
@@ -21,25 +23,28 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
     }
 
     const renderWithBold = (text: string) => {
-        const parts = text.split(/(^###\s.*$|\*\*[^*]+\*\*|---|\n)/gm).filter(Boolean);
+        // keep delimiters, but don't drop empty strings
+        const parts = text.split(/(###\s.*$|\*\*[^*]+\*\*|---|\n)/gm);
 
         return (
             <div className="text-justify">
                 {parts.map((part, idx) => {
-                    if (!part) return null;
+                    if (!part) return null; // skip only true null/undefined, not empty strings
 
                     if (part === "---") {
-                        return <hr key={idx} />
+                        return <hr key={idx} />;
                     }
 
-                    if (part.trim() === "" && part.includes(" ")) {
-                        return " "; 
+                    if (part === "\n") {
+                        return <br key={idx} />;
                     }
 
                     if (part.startsWith("###")) {
-                        const headingText = part.replace(/^###\s?/, "").replace(/^#\s?/, "").replace(/^\*\*\s?/, "").replace(/\s?\*\*\s?/, "");
+                        const headingText = part
+                            .replace(/^###\s?/, "")
+                            .trim();
                         return (
-                            <h1 key={idx} className="font-extrabold font-roboto text-3xl ">
+                            <h1 key={idx} className="font-extrabold font-roboto text-3xl">
                                 {headingText}
                             </h1>
                         );
@@ -50,10 +55,7 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
                         return <b key={idx}>{boldText}</b>;
                     }
 
-                    if (part === "\n") {
-                        return <br key={idx} />;
-                    }
-
+                    // default case: just render span
                     return <span key={idx}>{part}</span>;
                 })}
             </div>
@@ -109,7 +111,7 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
 
             i++;
 
-            if (i < tokens.length) { 
+            if (i < tokens.length) {
                 timerRef.current = window.setTimeout(tick, 60);
             } else {
                 callBack();
@@ -119,7 +121,7 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
         if (timerRef.current) {
             clearTimeout(timerRef.current);
         }
- 
+
         timerRef.current = window.setTimeout(tick, 60);
 
         return () => {
@@ -170,17 +172,17 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
                     </div>
                     <p>
                         {
-                            role === "assistant" && message === "" && responding && 
-                                <ChatLoader 
-                                    style="flex justify-start" 
-                                    dim="70" 
-                                />
+                            role === "assistant" && message === "" && responding &&
+                            <ChatLoader
+                                style="flex justify-start"
+                                dim="70"
+                            />
                         }
                         {
-                            role === "assistant" && (streamed ? <div 
+                            role === "assistant" && (streamed ? <div
                                 className="text-justify">
-                                    {display}
-                                </div> : renderWithBold(message)
+                                {display}
+                            </div> : renderWithBold(message)
                             )
                         }
                     </p>
@@ -209,4 +211,7 @@ export const MessageBubble = ({ role, message, responding, cardData, streamed = 
             </motion.div>}
         </div>
     </div>
-}   
+}
+
+
+export default React.memo(MessageBubble);

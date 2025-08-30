@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Dasboard, DropdownIcon, DropUpIcon, PlusIcon, ShareIcon } from "../icons/commonIcons";
 import { CollectionIcon, ChatbotIcon, CommunityIcon, InstagramIcon, LogoIcon, RedditIcon, TwitterIcon, WebIcon, YoutubeIcon } from "../icons/particularIcons";
-import { ButtonEl } from "./button";
+import ButtonEl from "./button";
 import { useLogOutQuery } from "../api/auth/mutate";
 import { useNavigate } from "react-router-dom";
 import { useSideBarAtom, useTabAtom } from "../recoil/clientStates";
@@ -161,7 +161,8 @@ const SideBar = ({ setModalNeededBy, setUser }: sideBarTypes) => {
             <div >
                 <ButtonEl
                     onClickHandler={() => setCollectionClicked((prev) => !prev)}
-                    particularStyle={` hover:bg-gray-200  ${collectionClicked ? "bg-gray-300 " : " "}`} buttonType="dropDown"
+                    particularStyle={` hover:bg-gray-200  ${collectionClicked ? "bg-gray-300 " : " "} font-medium `} 
+                    buttonType="dropDown"
                     placeholder="Collections "
                     endIcon={!collectionClicked ? <DropdownIcon dim="40" /> : <DropUpIcon dim="40" />}
                 />

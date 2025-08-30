@@ -8,6 +8,7 @@ import { redditScriptLoader } from "../scriptLoader";
 import { useUserProfile } from "../recoil/user";
 import { useVoteContent } from "../api/user/mutate";
 import { getProfilePicPath } from "../utils/profilePhoto";
+import React from "react";
 
 interface communityCard {
     createdAt: string;
@@ -36,7 +37,7 @@ interface layoutType extends communityCard {
     usersPrevVote : vote;
 }
 
-export const CommunityCard = ({ createdAt, title, link, layout, communityId, id, note, cardType, posterName, isOwner, upVoteCount, downVoteCount, usersVote,profilePic }: communityCard) => {
+const CommunityCard = ({ createdAt, title, link, layout, communityId, id, note, cardType, posterName, isOwner, upVoteCount, downVoteCount, usersVote,profilePic }: communityCard) => {
 
     const [popUpMessage, setPopUpMessage] = usePopUpMessage();
     const [profilePhoto, setProfilePhoto] = useState<string>("");
@@ -111,7 +112,7 @@ export const CommunityCard = ({ createdAt, title, link, layout, communityId, id,
 
 const GridStyle = ({ createdAt, title, link, communityId, id, note, cardType, shareClicked, posterName, isOwner, profilePhoto, voteCount, upVoteDownVote, usersPrevVote }: layoutType) => {
 
-    const defaultStyle: string = `  w-85 overflow-x-hidden  ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 " : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 h-115  bg-cardBackground border-2  rounded-3xl shadow-md scrollbar-hidden ${isOwner ? " border-slate-400" : " border-slate-300 "} group/card `;
+    const defaultStyle: string = `  w-85 overflow-x-hidden  ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 " : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 h-115  bg-cardBackground border-2  rounded-3xl shadow-md scrollbar-hidden ${isOwner ? " border-slate-400" : " border-slate-300 "} group/card overflow-y-auto`;
 
     const [newLink, setNewLink] = useState<string>(link);
     const extractVideoId = (videoUrl : string) => {
@@ -145,7 +146,7 @@ const GridStyle = ({ createdAt, title, link, communityId, id, note, cardType, sh
         animate={{ y: 0, opacity: 1 }}
         exit={{ x: -10, opacity: 0 }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
-        className="scrollbar-hidden"
+        className="scrollbar-hidden relative flex flex-col "
     > <div className={defaultStyle} >
             <div className="h-[15%] mt-2 flex justify-between py-2 mx-4 items-center relative z-1 ">
                 <div className="flex items-center gap-2 text-cardTitleHeading text-xl font-[500]">
@@ -220,11 +221,18 @@ const GridStyle = ({ createdAt, title, link, communityId, id, note, cardType, sh
                 </div>}
 
 
-                <div className="px-3 my-2 cursor-default text-lg font-[500] text-slate-500">Added on {createdAt}</div>
-            </div> 
+
+            </div>
+            
         </div>
+        <div 
+            className="absolute mx-auto bg-cardBackground h-10 px-2 py-2 mb-2 ml-6  bottom-0  cursor-default text-[1.24rem] font-[500] text-slate-500">
+                Added on {createdAt}
+        </div>         
     </motion.div>
 }
+
+
 
 
 const ListStyle = ({ createdAt, title, link, note, cardType, shareClicked, posterName, isOwner, profilePhoto, upVoteDownVote, usersPrevVote }: layoutType) => {
@@ -237,12 +245,15 @@ const ListStyle = ({ createdAt, title, link, note, cardType, shareClicked, poste
         transition={{ duration: 0.4, ease: "easeInOut" }}
         className={`w-[90%] h-[80px] flex items-center mb-4 mx-auto transition-hover cursor-default duration-300  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md pl-3  ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 " : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} ${isOwner ? " border-slate-400" : " border-slate-300 "} `}
     >
-        <div className="flex  items-center w-[7%] justify-center">
-            <img src={profilePhoto} className={"rounded-3xl h-15 w-15 cursor-pointer"} />
+        <div className="flex  h-full items-center w-[16%] md:w-[7%] justify-center">
+            <img src={profilePhoto} className={"rounded-3xl size-13  cursor-pointer"} />
         </div>
-        <div className=" w-[70%] h-full pl-1 py-2">
+        <div className=" md:w-[70%] w-[80%] h-full pl-1 py-2 ">
             <div className={`w-[100%] flex gap-10 items-center ${note !== "" ? "h-[60%] " : "h-full"}`}>
-                <div className="truncate text-2xl font-[500]" title={`by ${isOwner ? "you" : posterName.trim()} — ${title}`}>
+                <div 
+                    className="truncate text-2xl font-[500]" 
+                    title={`by ${isOwner ? "you" : posterName.trim()} — ${title}`}
+                >
                     {`by ${isOwner ? "you" : posterName.trim()} — ${title}`}
                 </div>
             </div>
@@ -251,12 +262,13 @@ const ListStyle = ({ createdAt, title, link, note, cardType, shareClicked, poste
                 {note}
             </div>
         </div>
-        <div className=" cursor-default w-[10%] text-md text-center text-clamp-2 font-[500] text-slate-500">
+        <div 
+            className=" cursor-default w-[10%] xl:text-md text-[0.8rem] hidden lg:block text-center text-clamp-2 font-[500] text-slate-500">
             Added on {createdAt}
         </div>
         <div className="flex justify-between items-center gap-4 mx-3">
             <ShareIcon layout={"list"} style="size-7 hover:-translate-y-0.5 transition-translate duration-300 ease-in-out" onClickHandler={() => shareClicked(link)} />
-            <div className="flex justify-between mr-3">
+            <div className="md:flex md:justify-between mr-3 hidden ">
                 <div onClick={() => upVoteDownVote('upVote')}>
                    <UpArrow
                         dim="10"
@@ -272,3 +284,6 @@ const ListStyle = ({ createdAt, title, link, note, cardType, shareClicked, poste
         </div>
     </motion.div>
 }
+
+
+export default React.memo(CommunityCard);

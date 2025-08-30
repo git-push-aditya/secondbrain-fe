@@ -1,16 +1,17 @@
 import { useState, useEffect, Fragment, useRef, useLayoutEffect } from "react";
-import { ButtonEl } from "./button"
-import { CardElement } from "./card";
+import ButtonEl from "./button"
+import CardElement from "./card";
 import { DeleteIcon, GridIcon, ListIcon, Loader, PlusIcon, ShareIcon, BlockIcon } from "../icons/commonIcons";
 import type { ChildProps } from "../pages/dashboard";
 import { useCardCountAtom, useCurrentCollection, useCurrentCommunity, usePopUpAtom, usePopUpMessage, useTabAtom } from "../recoil/clientStates";
 import { useFetchQueryCollection, useFetchQueryCommunity, useGetListQuery } from "../api/user/query";
 import { useDeletecardQuery, useDeleteCollectionQuery, useGetCommunityMembers, useRemoveShareQuery, useShareCommunityLogin } from "../api/user/mutate";
 import { useDeleteID } from "../recoil/deleteId";
-import { CommunityCard } from "./communityCard";
-import { CardsLoaderSkeleton } from "../icons/skeleton";
+import CommunityCard from "./communityCard";
+import CardsLoaderSkeleton from "../icons/skeleton";
 import { CommunityIcon } from "../icons/particularIcons";
-import { RenderMembers } from "./membersList";
+import RenderMembers from "./membersList";
+import React from "react";
 
 const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -376,4 +377,4 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
 }
 
 
-export default MainBlock;
+export default React.memo(MainBlock);

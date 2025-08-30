@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactElement } from "react";
 import { InstagramIcon, RedditIcon, TwitterIcon, WebIcon, WebPageDisplay, YoutubeIcon } from "../icons/particularIcons";
 import { DeleteIcon, RedirectIcon, ShareIcon } from "../icons/commonIcons";
 import Tag from "./tags";
-import { ButtonEl } from "./button";
+import ButtonEl from "./button";
 import { AnimatePresence, motion } from "framer-motion";
 import { minEndingIndex } from "../utils/minEndingIndex"
 import { usePopUpAtom, usePopUpMessage } from "../recoil/clientStates";
@@ -42,7 +42,7 @@ interface layoutCard extends cardProp {
     shareClicked: (link: string) => void;
 }
 
-export const CardElement = React.memo(({ title, collectionId, shared, cardType, layout, id, note, tags, createdAt, link }: cardProp) => {
+const CardElement = React.memo(({ title, collectionId, shared, cardType, layout, id, note, tags, createdAt, link }: cardProp) => {
 
     const [deleteId, setDeleteId] = useDeleteID();
     const [popUpMessage, setPopUpMessage] = usePopUpMessage();
@@ -318,3 +318,6 @@ const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked
         </AnimatePresence>
     </motion.div>
 }
+
+
+export default React.memo(CardElement);

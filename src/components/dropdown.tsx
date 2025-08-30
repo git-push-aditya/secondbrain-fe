@@ -1,5 +1,5 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
-import { ButtonEl } from "./button";
+import ButtonEl from "./button";
 import { DropdownIcon, DropUpIcon } from "../icons/commonIcons";
 
 const Dropdown = ({ list, title, selected, setState }: { list: string[], selected: string, title: string, setState: Dispatch<SetStateAction<string>> }) => {

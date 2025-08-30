@@ -1,10 +1,10 @@
 import { useLocation } from "react-router-dom"
-import { CardElement } from "../components/card"
+import CardElement from "../components/card"
 import { GridIcon, ListIcon } from "../icons/commonIcons"
 import { LogoIcon } from "../icons/particularIcons"
 import { useFEctchData, useSharedMetaData } from "../api/shared/query"
 import { Fragment } from "react/jsx-runtime"
-import { ButtonEl } from "../components/button" 
+import ButtonEl from "../components/button" 
 
 export const SharedCollection = ({layout,setLayout}:{layout: "grid" | "list",setLayout: React.Dispatch<React.SetStateAction<"grid" | "list">>}) => {
     const location =  useLocation();

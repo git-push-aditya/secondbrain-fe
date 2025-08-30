@@ -1,3 +1,4 @@
+import React from "react";
 import { user, useUserProfile } from "../recoil/user";
 import { getProfilePicPath } from "../utils/profilePhoto"
 
@@ -34,7 +35,7 @@ const Member = ({ userName, profilePic, isFounder, id }: memberType) => {
 
 
 
-export const RenderMembers = ({ membersList }: { membersList: memberType[] }) => {
+const RenderMembers = ({ membersList }: { membersList: memberType[] }) => {
     return <div className="border-2 border-black rounded-lg max-h-[300px] scrollbarList overflow-y-auto overflow-x-hidden">
         {
             membersList.map((member: memberType, idx: number) => ( 
@@ -51,3 +52,4 @@ export const RenderMembers = ({ membersList }: { membersList: memberType[] }) =>
     </div>
 }
 
+export default React.memo(RenderMembers);

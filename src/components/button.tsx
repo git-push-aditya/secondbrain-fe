@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import React from "react";
 
 interface buttonProps {
     tooltip ?: string;
@@ -29,7 +30,7 @@ const specificStyle: { [key: string]: string } = {
 
 const defaultStyle = "   flex items-center  gap-3 cursor-pointer group  ease-out transition-hover duration-300 ";
 
-export const ButtonEl = ({tooltip, placeholder, onClickHandler, disabled = false, particularStyle, buttonType, startIcon, endIcon }: buttonProps) => {
+const ButtonEl = ({tooltip, placeholder, onClickHandler, disabled = false, particularStyle, buttonType, startIcon, endIcon }: buttonProps) => {
     return <div title={tooltip} ><button onClick={onClickHandler} disabled={disabled} className={`${defaultStyle}  ${specificStyle[buttonType]}  ${particularStyle}`}>
         {startIcon}
         <span className="truncate">
@@ -38,4 +39,5 @@ export const ButtonEl = ({tooltip, placeholder, onClickHandler, disabled = false
     </button></div>
 }
 
+export default React.memo(ButtonEl);
 

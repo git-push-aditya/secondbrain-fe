@@ -4,7 +4,7 @@ import { useChatHistory } from "../recoil/chatStates";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChatBot } from "../api/user/mutate";
 import type { message } from "../recoil/chatStates";
-import { MessageBubble } from "./messageBubble";
+import MessageBubble from "./messageBubble";
 
 const ttl = 2 * 24 * 60 * 60 * 1000;         //ttl for chat of 2 days
 
@@ -202,14 +202,14 @@ export const ChatBot = () => {
                                     handleMessage();
                                 }
                             }}
-                            className="text-token-text-primary resize-none placegolder:ps-px scrollbar-hidden outline-none px-5 h-[60%] xl:text-2xl lg:text-xl text-lg font-[550] w-[85%]" placeholder="Whats on your mind..."
+                            className="text-token-text-primary resize-none placegolder:ps-px scrollbar-hidden outline-none px-5 h-[60%] xl:text-2xl lg:text-xl text-[1.35rem] font-[550] w-[85%]" placeholder="Whats on your mind..."
                             ref={inputRef} />
                         <ChatbotEnter
                             dim="20"
-                            style={`p-2 hover:bg-gray-100 lg:size-19 size-16 cursor-pointer rounded-[3rem] transition-all duration-300 ${!isPending ? " block " : " hidden "}`}
+                            style={`p-2 mr-5 hover:bg-gray-100 lg:size-19 size-16 cursor-pointer rounded-[3rem] transition-all duration-300 ${!isPending ? " block " : " hidden "}`}
                             onClickHandler={handleMessage} />
                         <BlockIcon
-                            style={`bg-gray-500/90 -p-1 hover:bg-gray-600/90 size-19 cursor-default rounded-[3rem] transition-all duration-300 
+                            style={` text-gray-500/90 mr-5 hover:text-gray-600/95 lg:size-17 animate-pulse size-14 cursor-default  rounded-[5rem]  transition-all duration-300 
                             ${isPending ? " block " : " hidden "}`} />
                     </motion.div>
                 </AnimatePresence>

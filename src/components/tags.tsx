@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import React from "react";
 
 interface tagProps {
     name: string;
@@ -20,5 +21,5 @@ const Tag = ({ name, id, endIcon, onClickHandler, style }: tagProps) => {
     </div>
 }
 
-export default Tag;
+export default React.memo(Tag);
 

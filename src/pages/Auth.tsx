@@ -1,5 +1,5 @@
 import { useEffect, useState, type SetStateAction } from "react";
-import { ButtonEl } from "../components/button";
+import ButtonEl from "../components/button";
 import type { AuthUser } from "../App";
 import { useAuthInQuery, useAuthUpQuery, useCheckMe } from '../api/auth/mutate';
 import { useNavigate } from "react-router-dom";
