@@ -15,27 +15,27 @@ interface authUpTypes extends authInTypes{
 
 
 const logIn = ({userName,password,rememberMe}:authInTypes) => {
-    return axios.post('http://localhost:2233/auth/signin',
+    return axios.post(`${import.meta.env.VITE_BASE_URL}/auth/signin`  ,
         { userName, password, rememberMe},
         {withCredentials: true}
     )
 }
 
 const signUp = ({email, userName, password, rememberMe,profilePic}: authUpTypes) => {
-  return axios.post('http://localhost:2233/auth/signup',
+  return axios.post(`${import.meta.env.VITE_BASE_URL}/auth/signup`,
     {userName,email,rememberMe,password, profilePic},
     {withCredentials:true}
   )
 }
 
 const meRequest = () => {
-  return axios.get('http://localhost:2233/me',{
+  return axios.get(`${import.meta.env.VITE_BASE_URL}/me`,{
     withCredentials:true
   })
 }
 
 const logout = () => { 
-  return axios.post('http://localhost:2233/auth/logout',{},{
+  return axios.post(`${import.meta.env.VITE_BASE_URL}/auth/logout`,{},{
     withCredentials: true
   });
 }

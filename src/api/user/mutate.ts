@@ -49,11 +49,11 @@ interface voteContentType {
 
 const addContent = (data: addContentType) => {
     if (data.communityId === -1) {
-        return axios.post('http://localhost:2233/user/addcontent', data, {
+        return axios.post(`${import.meta.env.VITE_BASE_URL}/user/addcontent`, data, {
             withCredentials: true
         }).then(res => res.data)
     } else {
-        return axios.post('http://localhost:2233/user/addcommunitycontent', data, {
+        return axios.post(`${import.meta.env.VITE_BASE_URL}/user/addcommunitycontent`, data, {
             withCredentials: true
         }).then(res => res.data)
     }
@@ -61,20 +61,20 @@ const addContent = (data: addContentType) => {
 
 
 const addCollection = (data: addCollectionType) => {
-    return axios.post('http://localhost:2233/user/createcollection', data, {
+    return axios.post(`${import.meta.env.VITE_BASE_URL}/user/createcollection`, data, {
         withCredentials: true
     })
 }
 
 const sharebrain = async (data: shareBraintype) => {
-    const res = await axios.patch('http://localhost:2233/user/generatelink', data, {
+    const res = await axios.patch(`${import.meta.env.VITE_BASE_URL}/user/generatelink`, data, {
         withCredentials: true
     });
     return res.data;
 }
 
 const deleteCard = ({ contentId }: { contentId: number }) => {
-    return axios.post('http://localhost:2233/user/deletecontent', {
+    return axios.post(`${import.meta.env.VITE_BASE_URL}/user/deletecontent`, {
         contentId: contentId
     }, {
         withCredentials: true
@@ -82,7 +82,7 @@ const deleteCard = ({ contentId }: { contentId: number }) => {
 }
 
 const deleteCollection = ({ collectionId }: { collectionId: number }) => {
-    return axios.post('http://localhost:2233/user/deletecollection', {
+    return axios.post(`${import.meta.env.VITE_BASE_URL}/user/deletecollection`, {
         collectionId: collectionId
     }, {
         withCredentials: true
@@ -90,7 +90,7 @@ const deleteCollection = ({ collectionId }: { collectionId: number }) => {
 }
 
 const removerShare = ({ collectionId }: { collectionId: number }) => {
-    return axios.post('http://localhost:2233/user/removeshare', {
+    return axios.post(`${import.meta.env.VITE_BASE_URL}/user/removeshare`, {
         collectionId: collectionId
     }, {
         withCredentials: true
@@ -100,7 +100,7 @@ const removerShare = ({ collectionId }: { collectionId: number }) => {
 
 const createCommunityFn = (body: createCommunity) => {
     const { name, descp, password, membersCanPost, emailLead } = body;
-    return axios.post('http://localhost:2233/user/createcommunity', {
+    return axios.post(`${import.meta.env.VITE_BASE_URL}/user/createcommunity`, {
         name, descp, password, membersCanPost, emailLead
     }, {
         headers: {
@@ -114,7 +114,7 @@ const createCommunityFn = (body: createCommunity) => {
 const joinCommunityFn = (body: { communityId: string }) => {
     const { communityId } = body;
 
-    return axios.post('http://localhost:2233/user/joincommunity', {
+    return axios.post(`${import.meta.env.VITE_BASE_URL}/user/joincommunity`, {
         communityId
     }, {
         withCredentials: true
@@ -125,7 +125,7 @@ const joinCommunityFn = (body: { communityId: string }) => {
 const shareCommunityCred = async (body: basicCommunity) => {
     const { communityId } = body;
 
-    const res = await axios.post('http://localhost:2233/user/sharelogin', {
+    const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/sharelogin`, {
         communityId
     }, {
         withCredentials: true
@@ -137,7 +137,7 @@ const shareCommunityCred = async (body: basicCommunity) => {
 const voteContent = (body: voteContentType) => {
     const { communityId, contentId, vote } = body;
 
-    return axios.post('http://localhost:2233/user/vote', {
+    return axios.post(`${import.meta.env.VITE_BASE_URL}/user/vote`, {
         communityId, contentId, vote
     }, {
         withCredentials: true
@@ -145,7 +145,7 @@ const voteContent = (body: voteContentType) => {
 }
 
 const getCommunityMembers = async (communityId: number) => {
-    return axios.post('http://localhost:2233/user/getmembers', {
+    return axios.post(`${import.meta.env.VITE_BASE_URL}/user/getmembers`, {
         communityId
     }, {
         withCredentials: true
@@ -155,7 +155,7 @@ const getCommunityMembers = async (communityId: number) => {
 
 const getChatbot = async (lastSevenMessages: message[]) => {
     const refinedMesseges = lastSevenMessages.map((prev) => ({role : prev.role, content : prev.content, toStream : prev.toStream}))
-    return axios.post('http://localhost:2233/user/chatbot', {
+    return axios.post(`${import.meta.env.VITE_BASE_URL}/user/chatbot`, {
         lastSevenMessages : refinedMesseges
     }, {
         withCredentials: true

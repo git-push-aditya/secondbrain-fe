@@ -2,14 +2,14 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from 'axios';
 
 const getLists = () => {
-    return axios.get('http://localhost:2233/user/communitycollectionlist', {
+    return axios.get(`${import.meta.env.VITE_BASE_URL}/user/communitycollectionlist`, {
         withCredentials: true
     })
 }
 
 
 const fetchContentCollection = async (pageParam: number, collectionId: number) => {
-    const res = await axios.get(`http://localhost:2233/user/fetchcontents?collectionId=${collectionId}&page=${pageParam}&limit=${12}`, {
+    const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/fetchcontents?collectionId=${collectionId}&page=${pageParam}&limit=${12}`, {
         withCredentials: true
     });
     return res.data;
@@ -17,7 +17,7 @@ const fetchContentCollection = async (pageParam: number, collectionId: number) =
 
 
 const fetchContentCommunity = async (pageParam: number, communityId: number) => {
-    const res = await axios.get(`http://localhost:2233/user/getcommunitycontent?communityId=${communityId}&page=${pageParam}&limit=${12}`, {
+    const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/getcommunitycontent?communityId=${communityId}&page=${pageParam}&limit=${12}`, {
         withCredentials: true
     });
     return res.data;

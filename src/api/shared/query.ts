@@ -11,13 +11,13 @@ interface fetchedData extends sharedMetaData {
 }
 
 const sharedbrain = ({ hash }: sharedMetaData) => {
-    return axios.get(`http://localhost:2233/user/sharedbrain?id=${hash}`, {
+    return axios.get(`${import.meta.env.VITE_BASE_URL}/user/sharedbrain?id=${hash}`, {
         withCredentials: false
     }).then(res => res.data)
 }
 
 const fetchContent = ({ hash, pageParam, limit }: fetchedData) => {
-    return axios.get(`http://localhost:2233/user/paginatedshareddata?hash=${hash}&page=${pageParam}&limit=${limit}`, {
+    return axios.get(`${import.meta.env.VITE_BASE_URL}/user/paginatedshareddata?hash=${hash}&page=${pageParam}&limit=${limit}`, {
         withCredentials: false
     })
 }
