@@ -76,7 +76,6 @@ function App() {
 					</Routes>
 				</BrowserRouter>
 			</AnimatePresence>
-			<ReactQueryDevtools initialIsOpen={false} position="bottom" /> 
 		</QueryClientProvider>  
 	)
 }
