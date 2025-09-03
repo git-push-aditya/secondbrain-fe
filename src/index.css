@@ -2,11 +2,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap'); 
 @font-face {
   font-family: Source-Sans-3;
-  src : url('/src/assets/fonts/SourceSans3-SemiBold.ttf')
+  src : url('/fonts/SourceSans3-SemiBold.ttf') format("truetype")
 }
 @font-face {
   font-family: Bricolage-Grotesque ;
-  src : url('src/assets/fonts/BricolageGrotesque_48pt-Bold.ttf')
+  src : url('/fonts/BricolageGrotesque_48pt-Bold.ttf') format("truetype")
 } 
 
 
@@ -28,7 +28,15 @@
     --font-head: Bitter, "sans-serif";
     --font-subHead :"LibreBaskerville", serif; 
 
-    --font-welcome : "Bricolage-Grotesque", Inter;
+    --font-welcome : "Bricolage-Grotesque", Inter;my projevt was using this font:
+@font-face {
+  font-family: Bricolage-Grotesque ;
+  src : url('src/assets/fonts/BricolageGrotesque_48pt-Bold.ttf')
+} 
+as :
+--font-welcome : "Bricolage-Grotesque", Inter;
+
+but when deployed on vercel , it is showing system ui and obviously the font is nt applied; i used vercel ; in dev mode it is showing;i have put the file of the font int src/assets/font
 
 
 
