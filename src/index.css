@@ -28,17 +28,7 @@
     --font-head: Bitter, "sans-serif";
     --font-subHead :"LibreBaskerville", serif; 
 
-    --font-welcome : "Bricolage-Grotesque", Inter;my projevt was using this font:
-@font-face {
-  font-family: Bricolage-Grotesque ;
-  src : url('src/assets/fonts/BricolageGrotesque_48pt-Bold.ttf')
-} 
-as :
---font-welcome : "Bricolage-Grotesque", Inter;
-
-but when deployed on vercel , it is showing system ui and obviously the font is nt applied; i used vercel ; in dev mode it is showing;i have put the file of the font int src/assets/font
-
-
+    --font-welcome : "Bricolage-Grotesque", Inter;
 
     --boxShadow-even: 0 0 6px rgba(0, 0, 0, 0.2);
 
@@ -116,12 +106,12 @@ but when deployed on vercel , it is showing system ui and obviously the font is 
 @layer utilities {
   .scrollbarSB-x {
     overflow-x: auto;
-    overflow-y: hidden; /* prevent vertical scroll */
-    white-space: nowrap; /* make children stay in a single line */
+    overflow-y: hidden;
+    white-space: nowrap;
   }
 
   .scrollbarSB-x::-webkit-scrollbar {
-    height: 10px;   /* horizontal scrollbar thickness */
+    height: 10px;   
   }
 
   .scrollbarSB-x::-webkit-scrollbar-track {
