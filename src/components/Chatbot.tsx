@@ -55,39 +55,39 @@ export const ChatBot = () => {
         };
     }, []);
 
-    //In dev enviornment for desingin purposes i am deactivation this storing chat to two days
-
-    // useEffect(() => {
-    //     const rawPastChats = localStorage.getItem("pastChats");
-    //     if (!rawPastChats) {
-    //         setChatHistory(null);  
-    //         return;
-    //     }
-
-    //     try {
-    //         const parsed = JSON.parse(rawPastChats);
-    //         if (parsed.expiry && parsed.expiry > Date.now()) {
-    //             setChatHistory(parsed.value);
-    //         } else { 
-    //             localStorage.removeItem("pastChats");
-    //             setChatHistory(null);
-    //         }
-    //     } catch (err) {
-    //         console.error("Failed to parse pastChats:", err);
-    //         setChatHistory(null);
-    //     }
-    // }, []);
 
 
-    // useEffect(() => {
-    //     const now = new Date;
-    //     const pastChats = {
-    //         value: chatHistory,
-    //         expiry: now.getTime() + ttl,
-    //     }
+    useEffect(() => {
+        const rawPastChats = localStorage.getItem("pastChats");
+        if (!rawPastChats) {
+            setChatHistory(null);  
+            return;
+        }
 
-    //     localStorage.setItem("pastChats", JSON.stringify(pastChats))
-    // }, [chatHistory])
+        try {
+            const parsed = JSON.parse(rawPastChats);
+            if (parsed.expiry && parsed.expiry > Date.now()) {
+                setChatHistory(parsed.value);
+            } else { 
+                localStorage.removeItem("pastChats");
+                setChatHistory(null);
+            }
+        } catch (err) {
+            console.error("Failed to parse pastChats:", err);
+            setChatHistory(null);
+        }
+    }, []);
+
+
+    useEffect(() => {
+        const now = new Date;
+        const pastChats = {
+            value: chatHistory,
+            expiry: now.getTime() + ttl,
+        }
+
+        localStorage.setItem("pastChats", JSON.stringify(pastChats))
+    }, [chatHistory])
 
 
     const handleMessage = async () => {
