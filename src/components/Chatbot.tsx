@@ -6,7 +6,7 @@ import { useChatBot } from "../api/user/mutate";
 import type { message } from "../recoil/chatStates";
 import MessageBubble from "./messageBubble";
 
-const ttl = 2 * 24 * 60 * 60 * 1000;         //ttl for chat of 2 days
+const ttl = 2 * 24 * 60 * 60 * 1000;
 
 export interface cardContent {
     title: string;
