@@ -6,9 +6,7 @@ import { AnimatePresence } from "framer-motion";
 import { PopUp } from "./components/popUp";
 import Auth from "./pages/Auth";
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import {RecoilRoot } from 'recoil';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; 
 import { useCardCountAtom, usePopUpAtom, useTabAtom } from "./recoil/clientStates";
 import { useUserProfile } from "./recoil/user";
 
