@@ -65,6 +65,10 @@ export const useCheckMe = () => {
     queryKey: ['fetchMe'],
     queryFn: meRequest,
     enabled: true,
+    /* A 401 here is the answer ("not logged in"), not a fault worth retrying —
+       the default 3 retries with backoff delayed every visit, and stalled the
+       auth page for ~10s whenever the backend was unreachable. */
+    retry: false,
   }); 
 }
 

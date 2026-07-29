@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactElement, type SetStateAction } from "react";
+import axios from "axios";
 import type { AuthUser } from "../App";
 import { useAuthInQuery, useAuthUpQuery, useCheckMe } from '../api/auth/mutate';
 import { useNavigate } from "react-router-dom";
@@ -6,6 +7,7 @@ import Dither from "../components/Dither";
 import DitherBranches from "../components/DitherBranches";
 import { CardStack } from "../components/ui/card-stack";
 import { getProfilePicPath } from "../utils/profilePhoto";
+import { authErrorMessage } from "../utils/authError";
 import { THEMES, hexRgb, type profilePicId } from "../utils/theme";
 
 export type { profilePicId };   // re-exported: api/auth/mutate.ts imports it from here
@@ -133,9 +135,9 @@ const Auth = ({ user, setUser }: AuthProps) => {
                     });
                     setErrorMessage("");
                     setUserError(false);   
-                }, onError: () => {
+                }, onError: (err) => {
                     setUserError(true);
-                    setErrorMessage("That didn’t match our records. Please try again.");
+                    setErrorMessage(authErrorMessage(err, "That didn’t match our records. Please try again."));
                     return;
                 }
             }
@@ -178,10 +180,13 @@ const Auth = ({ user, setUser }: AuthProps) => {
                 setUser({ userName: data.data.payload.userName, profilePic: getProfilePicPath(data.data.payload.profilePic), email: data.data.payload.email });
                 setErrorMessage("");
                 setUserError(false);
-            }, onError: () => {
+            }, onError: (err) => {
                 setUserError(true);
-                setErrorMessage("Either username or email already in use.");
-                setStep("details");
+                setErrorMessage(authErrorMessage(err, "Either username or email already in use."));
+                /* Only bounce back to the details step when the details are the
+                   problem — on a network failure the avatar pick is still valid and
+                   they can just retry. */
+                if (axios.isAxiosError(err) && err.response) setStep("details");
             }
         }
         );
