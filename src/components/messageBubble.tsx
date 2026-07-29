@@ -1,23 +1,21 @@
 import { motion } from "framer-motion";
 import { useState, type ReactNode, useRef, useEffect } from "react";
-import { ChatLoader, CopyText } from "../icons/commonIcons";
-import { ChatbotIcon } from "../icons/particularIcons";
-import { useUserProfile } from "../recoil/user";
+import { CopyText } from "../icons/commonIcons";
+import ThinkingState from "./thinkingState";
 import type { cardContent } from "./Chatbot";
 import { type cardType } from "./card";
-import CardElement from "./card"
+import SourceCard from "./sourceCard";
 import { usePopUpAtom, usePopUpMessage } from "../recoil/clientStates";
 import React from "react";
 
 const MessageBubble = ({ role, message, responding, cardData, streamed = false, callBack }: { role: "assistant" | "user", cardData: cardContent | null, message: string, responding: boolean, streamed: boolean, callBack: () => void }) => {
     const [display, setDisplay] = useState<ReactNode[]>([]);
     const timerRef = useRef<number | null>(null);
-    const [user] = useUserProfile();
     const [popUpMessage, setPopUpMessage] = usePopUpMessage();
     const [popUpLive, setPopUpLive] = usePopUpAtom();
 
     const copyResponse = () => {
-        setPopUpMessage("Response coppied to clipboard!!");
+        setPopUpMessage("Response copied to clipboard!!");
         navigator.clipboard.writeText(message);
         setPopUpLive?.((prev) => !prev);
     }
@@ -133,83 +131,65 @@ const MessageBubble = ({ role, message, responding, cardData, streamed = false, 
     }, [message, streamed, role]);
 
 
-    return <div className="mt-2 cursor-default">
-        <div className={`h-full flex ${role === "assistant" ? " justify-start " : " justify-end "} gap-2`}>
-            {
-                role === "assistant" && <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="w-[5%] flex justify-center items-center">
-                    <ChatbotIcon dim="40" style=" xl:size-12 md:size-10 size-8" />
-                </motion.div>
-            }
+    return <div className="group/message relative mb-2 flex w-full flex-col">
+        <div className={`flex w-full ${role === "assistant" ? "justify-start" : "justify-end"}`}>
             <motion.div
                 initial={{ y: 5, opacity: 0 }}
                 animate={{ y: 0, x: 0, opacity: 1 }}
                 exit={{ x: -10, opacity: 0 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
-                className={`${role === "assistant" ? " xl:w-[80%] lg:w-[85%] w-[95%]" : " xl:max-w-[80%] lg:max-w-[85%] max-w-[80%]"} xl:text-xl text-xl  ${role === "user" ? " bg-slate-100 text-slate-600 " : " text-slate-700 "}  rounded-3xl md:p-4 p-3 text-slate-600 font-inter`}>
-                <article >
+                className={`cursor-default font-inter text-[0.95rem] leading-[1.7] ${role === "user"
+                    ? "max-w-[90%] rounded-3xl rounded-br-lg border border-[var(--rule)] bg-[var(--wash)] px-4 py-3 text-[#141418]"
+                    : "w-full max-w-none text-[#27272A]"}`}>
+                {/* With a citation the answer becomes two columns — prose left,
+                    source rail right. Stacks under 768px, where a 9rem rail beside
+                    text would leave neither enough room. */}
+                <article className={cardData !== null && role === "assistant"
+                    ? "flex flex-col gap-4 md:flex-row md:items-start md:gap-6"
+                    : undefined}>
 
-                    <div className="md:float-right">
-                        {role === "assistant" && cardData !== null && <div className=" m-8 flex justify-center items-center">
-                            <CardElement
-                                key={cardData.id}
-                                title={cardData.title}
-                                cardType={cardData.type as cardType}
-                                createdAt={cardData.createdAt}
-                                layout="grid"
-                                link={cardData.hyperlink}
+                    <div className="min-w-0 flex-1">
+                        {/* Stays mounted past `responding` so it can settle into
+                            "Thought for Ns"; renders nothing for restored history. */}
+                        {role === "assistant" && <ThinkingState working={responding} />}
+
+                        <p>
+                            {
+                                role === "assistant" && (streamed ? <div
+                                    className="text-justify">
+                                    {display}
+                                </div> : renderWithBold(message)
+                                )
+                            }
+                        </p>
+                    </div>
+
+                    {role === "assistant" && cardData !== null &&
+                        <div className="w-full shrink-0 md:sticky md:top-4 md:w-36">
+                            <SourceCard
                                 id={cardData.id}
-                                shared={true}
-                                note={cardData.note ?? undefined}
-                                collectionId={0}
-                                tags={cardData.tags}
+                                title={cardData.title}
+                                link={cardData.hyperlink}
+                                type={cardData.type as cardType}
                             />
                         </div>
-                        }
-                    </div>
-                    <p>
-                        {
-                            role === "assistant" && message === "" && responding &&
-                            <ChatLoader
-                                style="flex justify-start"
-                                dim="70"
-                            />
-                        }
-                        {
-                            role === "assistant" && (streamed ? <div
-                                className="text-justify">
-                                {display}
-                            </div> : renderWithBold(message)
-                            )
-                        }
-                    </p>
-
+                    }
                 </article>
 
                 {role === "user" && message}
-
-                {
-                    role === "assistant" && !responding && <div
-                        className="relative bottom-0 -left-4 cursor-pointer  lg:m-4 m-2">
-                        <CopyText
-                            dim="45"
-                            onClickHandler={copyResponse}
-                            style={` hover:bg-slate-100 lg:p-2 p-1 size-8 md:size-9  lg:size-11 rounded-lg transition-hover duration-200`}
-                        />
-                    </div>
-                }
             </motion.div>
-            {role === "user" && <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="md:w-[5%] w:[8%] flex justify-center items-center">
-                <img src={user?.profilePic} className="xl:size-12 scale-x-[-1] md:size-10 size-9 lg:rounded-[5rem] rounded-[2rem]" />
-            </motion.div>}
         </div>
+
+        {/* action bar rides in on hover, per the reference */}
+        {role === "assistant" && !responding &&
+            <div className="-ml-2 mt-1 flex h-8 items-center gap-0.5 opacity-0 transition-opacity group-focus-within/message:opacity-100 group-hover/message:opacity-100">
+                <CopyText
+                    dim="16"
+                    onClickHandler={copyResponse}
+                    style="size-8 cursor-pointer rounded-full p-2 text-[#6B6B6B] transition-colors hover:bg-[var(--wash)] hover:text-[var(--accent)] [&_path]:stroke-current"
+                />
+            </div>
+        }
     </div>
 }
 

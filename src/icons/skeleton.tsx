@@ -1,65 +1,37 @@
-import React from "react";
+import React, { type CSSProperties } from "react";
 
-const CardSkeleton = () => {
-  return (
-    <svg
-    role="img"
-    width="330"
-    height="440"
-    viewBox="0 0 330 440"
-    preserveAspectRatio="none"
-    >
+/* Placeholder cards while a page loads. Matches the real card's geometry — 15rem
+   wide, dithered header, dashed body — so the grid doesn't reflow when the data
+   lands. The old version was a 330x440 SVG shimmer on its own breakpoint grid:
+   more than twice the current card's size, in columns that no longer matched, at
+   a 2s sweep that read as stalled.
+   The dither is tinted grey rather than a source colour: a placeholder shouldn't
+   claim to be a YouTube or Reddit card before the data says so. */
+const Bar = ({ w, h = "h-2.5" }: { w: string; h?: string }) =>
+    <div className={`skeleton-bar ${h} ${w} rounded-[2px]`} />;
 
-      <title id="loading-aria">Loading...</title>
-      <rect
-        x="0"
-        y="0"
-        width="100%"
-        height="100%"
-        clipPath="url(#clip-path)"
-        fill="url(#fill)" 
-      />
-      <defs> 
-        <clipPath id="clip-path">
-        <rect x="0" y="0" width="330" height="440" rx="20" ry="20" />
-        </clipPath>
-        <linearGradient id="fill">
-          <stop offset="0.599964" stopColor="#f3f3f3" stopOpacity="1">
-            <animate
-              attributeName="offset"
-              values="-2; -2; 1"
-              keyTimes="0; 0.25; 1"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-          </stop>
-          <stop offset="1.59996" stopColor="#ecebeb" stopOpacity="1">
-            <animate
-              attributeName="offset"
-              values="-1; -1; 2"
-              keyTimes="0; 0.25; 1"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-          </stop>
-          <stop offset="2.59996" stopColor="#f3f3f3" stopOpacity="1">
-            <animate
-              attributeName="offset"
-              values="0; 0; 3"
-              keyTimes="0; 0.25; 1"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-          </stop>
-        </linearGradient>
-      </defs>
-    </svg>
-  );
-};
+const CardSkeleton = ({ i }: { i: number }) => (
+    <div className="w-[15rem] border border-[var(--rule)] bg-[#FBFBF9] p-1.5">
+        <div className="dither-strip dither-load h-12"
+            style={{ "--accent": "#D6D6D2", "--dx": `${-(i % 7) * 43}px`, "--dy": `${-(i % 5) * 37}px` } as CSSProperties} />
 
+        <div className="mt-1.5 h-[12rem] border border-dashed border-[var(--rule)] px-3 pt-3">
+            <div className="flex items-center gap-2">
+                <Bar w="w-4" h="h-4" />
+                <Bar w="w-24" />
+            </div>
+            <div className="skeleton-bar mt-3 h-[6.5rem] w-full rounded-md" />
+            <div className="mt-2.5 flex items-center gap-2">
+                <Bar w="w-20" h="h-2" />
+            </div>
+        </div>
+    </div>
+);
 
-const CardsLoaderSkeleton = () => {
-    return <div className=" grid 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 xl:gap-6  lg:gap-4 gap-2 gap-y-6"><CardSkeleton /><CardSkeleton /><CardSkeleton /><CardSkeleton /><CardSkeleton /><CardSkeleton /><CardSkeleton /><CardSkeleton /></div>
-}
+const CardsLoaderSkeleton = () => (
+    <div className="card-grid w-full" role="status" aria-label="Loading cards">
+        {Array.from({ length: 8 }, (_, i) => <CardSkeleton key={i} i={i} />)}
+    </div>
+);
 
-export default  React.memo(CardsLoaderSkeleton);
+export default React.memo(CardsLoaderSkeleton);

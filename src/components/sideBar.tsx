@@ -1,44 +1,94 @@
-import { useEffect, useState } from "react";
-import { Dasboard, DropdownIcon, DropUpIcon, PlusIcon, ShareIcon } from "../icons/commonIcons";
-import { CollectionIcon, ChatbotIcon, CommunityIcon, InstagramIcon, LogoIcon, RedditIcon, TwitterIcon, WebIcon, YoutubeIcon } from "../icons/particularIcons";
-import ButtonEl from "./button";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Dasboard, PlusIcon } from "../icons/commonIcons";
+import {CollectionIcon, CommunityIcon} from "../icons/particularIcons";
 import { useLogOutQuery } from "../api/auth/mutate";
 import { useNavigate } from "react-router-dom";
-import { useSideBarAtom, useTabAtom } from "../recoil/clientStates";
+import { useSearchQuery, useSideBarAtom, useTabAtom } from "../recoil/clientStates";
 import { useGetListQuery } from "../api/user/query";
 import React from "react";
 import type { AuthUser } from "../App";
 import type { ModalType } from "../pages/dashboard";
-import { user, useUserProfile } from "../recoil/user";
-
-const headingStyle: string = " lg:text-[1.8rem] text-[1.7rem] 2xl:text-[1.9rem] font-[600]  font-head text-secondBrainHeading";
+import { useUserProfile } from "../recoil/user";
 
 interface sideBarTypes {
     setModalNeededBy: React.Dispatch<React.SetStateAction<ModalType>>;
     setUser: React.Dispatch<React.SetStateAction<AuthUser | null>>;
+    /** 56px icon rail instead of the full panel */
+    collapsed?: boolean;
+    onToggle: () => void;
 }
 
+type Item = { key: string; label: string; icon: ReactNode; onClick: () => void; active?: boolean };
+type Group = { label: string; items: Item[] };
 
+/* The source icons ship wrapped in <a href="youtube.com">, so a bare click on
+   one used to leave the app instead of filtering. pointer-events-none hands the
+   click back to the row. */
+const Glyph = ({ children }: { children: ReactNode }) =>
+    <span className="pointer-events-none grid size-4 shrink-0 place-items-center text-[#71717A]">{children}</span>;
 
-const SideBar = ({ setModalNeededBy, setUser }: sideBarTypes) => {
+/* `light` inverts it for the dark chrome bar — the default near-black tile is for
+   the white sidebar, and on the navy dither it sank into the darker patches. */
+export const LatticeMark = ({ size, light = false }: { size: number; light?: boolean }) => (
+    <span className={`grid shrink-0 place-items-center rounded-[7px] ${light ? "bg-white" : "bg-[#18181B]"}`}
+        style={{ width: size, height: size }}>
+        <svg viewBox="0 0 16 16" width={size * 0.6} height={size * 0.6} fill={light ? "#18181B" : "#fff"} aria-hidden>
+            {/* four bars, tall-short-tall — the lattice */}
+            <rect x="1.5" y="4.5" width="1.6" height="7" rx="0.8" />
+            <rect x="5" y="2" width="1.6" height="12" rx="0.8" />
+            <rect x="8.5" y="5.5" width="1.6" height="5" rx="0.8" />
+            <rect x="12" y="3.25" width="1.6" height="9.5" rx="0.8" />
+        </svg>
+    </span>
+);
+
+const StatsIcon = () => (
+    <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden>
+        <path d="M2.5 13.5h11M4.5 13.5V9m3.5 4.5V4.5m3.5 9V7" />
+    </svg>
+);
+
+// Local, in the StatsIcon idiom above. The nav row always renders a <Glyph>, so
+// leaving DeepDive iconless would pull its label out of line with its siblings.
+const DeepDiveIcon = () => (
+    <svg viewBox="0 0 16 16" className="size-4" fill="currentColor" aria-hidden>
+        <path d="M8 1.4l1.6 4.8L14.4 8l-4.8 1.8L8 14.6l-1.6-4.8L1.6 8l4.8-1.8z" />
+    </svg>
+);
+
+const groupLabel = "px-3 pt-4 pb-1.5 text-[0.62rem] font-[500] uppercase tracking-[0.09em] text-[#A1A1AA]";
+const rowBase = "flex w-full cursor-pointer items-center gap-2.5 rounded-md border px-2.5 py-[0.42rem] text-left text-[0.82rem] transition-colors";
+const rowOn = "border-[#E7E7E9] bg-[#F4F4F5] text-[#18181B] font-[550]";
+const rowOff = "border-transparent text-[#3F3F46] font-[450] hover:bg-[#FAFAFA]";
+const pill = "flex w-full cursor-pointer items-center gap-2.5 rounded-md border border-[#E7E7E9] px-2.5 py-[0.42rem] text-left text-[0.82rem] font-[450] text-[#52525B] transition-colors hover:bg-[#FAFAFA]";
+
+const SideBar = ({ setModalNeededBy, setUser, collapsed, onToggle }: sideBarTypes) => {
 
     const navigate = useNavigate();
-    const [logOutButton, setLogoutHidden] = useState<boolean>(false)
-
-    const [collectionClicked, setCollectionClicked] = useState<boolean>(false);
-    const [communityClicked, setcommunityClicked] = useState<boolean>(false);
+    const [logOutOpen, setLogOutOpen] = useState<boolean>(false);
 
     const [tab, setTab] = useTabAtom();
-
     const [user] = useUserProfile();
-
     const [sidebar, setSideBar] = useSideBarAtom();
+    const [query, setQuery] = useSearchQuery();
+    const search = useRef<HTMLInputElement>(null);
 
-    const { isSuccess: listSuccess, isError, data: lists, refetch: listFetch } = useGetListQuery();
+    const { isSuccess: listSuccess, data: lists, refetch: listFetch } = useGetListQuery();
 
     useEffect(() => {
         listFetch();
     }, [])
+
+    // ⌘F / ⌘K jumps to search — expands the rail first when there's no input yet
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if (!(e.metaKey || e.ctrlKey) || (e.key !== "f" && e.key !== "k")) return;
+            e.preventDefault();
+            search.current ? search.current.focus() : onToggle();
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [onToggle]);
 
     const handleTabChnage = (tab: string) => {
         setTab(tab);
@@ -47,17 +97,10 @@ const SideBar = ({ setModalNeededBy, setUser }: sideBarTypes) => {
         }
     }
 
-
     const { mutateAsync } = useLogOutQuery();
     const handleAsyncLogout = async () => {
         try {
-            await mutateAsync(undefined,
-                {
-                    onSuccess: () => {
-                        setUser?.(null);
-                    }
-                }
-            );
+            await mutateAsync(undefined, { onSuccess: () => { setUser?.(null); } });
         } catch (e) {
             console.error(e)
         }
@@ -70,179 +113,132 @@ const SideBar = ({ setModalNeededBy, setUser }: sideBarTypes) => {
         }
     }, [user])
 
+    const collections: { id: number, name: string }[] = listSuccess && Array.isArray(lists?.data?.payload?.collectionList)
+        ? lists.data.payload.collectionList.filter((c: { name: string }) => c.name !== "dashboard")
+        : [];
 
-    const logOutButtonStyle = "fixed -translate-y-13 text-2xl w-50 text-center ml-16 border-white font-roboto lg:hover:scale-105 hover:scale-90 md:hover:scale-96 transition-all duration-300 ease-in-out cursor-pointer bg-slate-300 rounded-3xl h-10 flex items-center justify-center border-3"
+    const communities: { id: number, name: string }[] = listSuccess && Array.isArray(lists?.data?.payload?.allCommunities)
+        ? lists.data.payload.allCommunities
+        : [];
 
+    const nav = (key: string, label: string, icon: ReactNode): Item =>
+        ({ key, label, icon, active: tab === key, onClick: () => handleTabChnage(key) });
 
+    const groups: Group[] = [
+        {
+            label: "workspace", items: [
+                // "Episodes" is every saved card; the source filter lives in its header now
+                { ...nav("dashboard", "Episodes", <Dasboard dim="16" style="[&_path]:stroke-current" />), active: tab.startsWith("dashboard") },
+                nav("stats", "Stats", <StatsIcon />),
+                nav("chatbot", "DeepDive", <DeepDiveIcon />),
+            ]
+        },
+        {
+            label: "collections", items: collections.map(c =>
+                nav(`collection-${c.id}`, c.name, <CollectionIcon dim="15" style="fill-current" />))
+        },
+        {
+            label: "community", items: communities.map(c =>
+                nav(`community-${c.id}`, c.name, <CommunityIcon dim="16" style="stroke-current" />))
+        },
+    ];
 
-    return <div className="border-r-2 border-slate-300 bg-sidebarBg h-[90.9%] overflow-y-scroll overflow-x-hidden scrollbarSB relative z-10 scroll-smooth">
-        <div className="flex justify-start gap-2 cursor-pointer items-center  px-2 left-0 top-0 sticky z-10 bg-sidebarBg">
-            <LogoIcon dim="90" style="lg:scale-88 scale-85 2xl:scale-100" />
-            <div>
-                <div className={headingStyle}>Second</div>
-                <div className={headingStyle}>Brain App</div>
+    const account = (
+        <div className="shrink-0 border-t border-[#F0F0F0] p-2.5">
+            {logOutOpen && !collapsed &&
+                <button onClick={handleAsyncLogout} className={`${pill} mb-2 justify-center border-[#FCA5A5] text-[#B91C1C] hover:bg-[#FEF2F2]`}>
+                    log out
+                </button>
+            }
+            <button onClick={() => collapsed ? onToggle() : setLogOutOpen(prev => !prev)} title={user?.userName}
+                className={`flex w-full cursor-pointer items-center gap-2.5 rounded-md p-1 text-left transition-colors hover:bg-[#FAFAFA] ${collapsed ? "justify-center" : ""}`}>
+                <img src={user?.profilePic} className="size-7 shrink-0 rounded-[7px] ring-1 ring-[#E7E7E9]" />
+                {!collapsed &&
+                    <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[0.8rem] font-[550] text-[#18181B]">{user?.userName}</span>
+                        <span className="block truncate text-[0.65rem] text-[#A1A1AA]">{user?.email}</span>
+                    </span>
+                }
+            </button>
+        </div>
+    );
+
+    /* ---- 56px rail ---- */
+    if (collapsed) return <div className="flex h-full w-14 flex-col border-r border-[#EAEAEA] bg-white">
+        <div className="grid shrink-0 place-items-center pt-3 pb-1">
+            <button onClick={onToggle} title="Lattice — expand" className="cursor-pointer"><LatticeMark size={28} /></button>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto py-2 scrollbar-hidden">
+            {groups.map(g => (
+                <div key={g.label} className="flex flex-col items-center gap-1 border-t border-[#F0F0F0] py-2 first:border-0">
+                    {g.items.map(i => (
+                        <button key={i.key} onClick={i.onClick} title={i.label} aria-current={i.active || undefined}
+                            className={`grid size-8 cursor-pointer place-items-center rounded-md border transition-colors ${i.active ? rowOn : rowOff}`}>
+                            <Glyph>{i.icon}</Glyph>
+                        </button>
+                    ))}
+                </div>
+            ))}
+        </div>
+
+        {account}
+    </div>
+
+    /* ---- 248px panel ---- */
+    return <div className="flex h-full w-[248px] flex-col border-r border-[#EAEAEA] bg-white">
+
+        {/* ---- search ---- */}
+        <div className="shrink-0 px-2.5 pt-3 pb-2.5">
+            <div className="flex items-center gap-2 rounded-lg border border-[#E7E7E9] px-2.5 py-[0.42rem] transition-colors focus-within:border-[#93A4F4] focus-within:ring-2 focus-within:ring-[#1D4ED8]/12">
+                <svg viewBox="0 0 24 24" className="size-3.5 shrink-0 text-[#A1A1AA]" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                    <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" strokeLinecap="round" />
+                </svg>
+                <input ref={search} value={query} onChange={e => setQuery(e.target.value)} placeholder="Search"
+                    onKeyDown={e => { if (e.key === "Escape") { setQuery(""); e.currentTarget.blur(); } }}
+                    className="min-w-0 flex-1 bg-transparent text-[0.82rem] text-[#18181B] outline-none placeholder:text-[#A1A1AA]" />
+                {query
+                    ? <button onClick={() => setQuery("")} className="cursor-pointer text-[0.7rem] text-[#A1A1AA] hover:text-[#52525B]">esc</button>
+                    : <kbd className="shrink-0 font-sans text-[0.66rem] text-[#C4C4C8]">⌘F</kbd>
+                }
             </div>
         </div>
-        <div className="mt-2">
-            {tab != "chatbot" && <> <ButtonEl onClickHandler={() => setModalNeededBy("addContent")}
-                buttonType="optionalButton"
-                placeholder="Add Content"
-                particularStyle=" lg:hidden block  mb-0 bg-primaryButtonBlue/60 text-white hover:bg-primaryButtonBlue/40 font-[500] text-[1.4rem]"
-                startIcon={<PlusIcon style="size-8.5 ml-2 mr-3 " />}
-            />
-                {
-                    !tab.startsWith('community') ? <ButtonEl
-                        onClickHandler={() => setModalNeededBy("shareBrain")}
-                        particularStyle="  gap-0 lg:hidden font-bold block text-[1.4rem] bg-secondaryButtonBlue  mt-0"
-                        buttonType="optionalButton"
-                        placeholder="Share Brain"
-                        startIcon={<ShareIcon style="size-7 ml-3 mr-4 my-0" />}
-                    /> : null
-                }</>}
 
-        </div>
+        {/* ---- nav ---- */}
+        <nav className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto pb-4 scrollbar-hidden">
+            {groups.map(g => (
+                <div key={g.label} className="border-t border-[#F0F0F0] px-2.5 pb-2 first:border-0">
+                    <p className={groupLabel}>{g.label}</p>
 
-        <ButtonEl
-            onClickHandler={() => handleTabChnage('chatbot')}
-            startIcon={<ChatbotIcon dim='40' style="ml-2 lg:scale-100 scale-95" />}
-            particularStyle=" font-cardTitleHeading mx-auto mt-2 lg:mt-5.5 pt-1 hover:bg-slate-300  h-15 lg:text-3xl text-[1.50rem]  w-full pl-4 gap-5 lg:gap-4"
-            buttonType=""
-            placeholder="DeepDive">
-        </ButtonEl>
+                    {g.items.map(i => (
+                        <button key={i.key} onClick={i.onClick} aria-current={i.active || undefined}
+                            className={`${rowBase} ${i.active ? rowOn : rowOff}`}>
+                            <Glyph>{i.icon}</Glyph>
+                            <span className="truncate">{i.label}</span>
+                        </button>
+                    ))}
 
-        <div >
-            <div>
-                <ButtonEl
-                    onClickHandler={() => handleTabChnage('dashboard')}
-                    startIcon={<Dasboard dim="35" style=" mx-2 " />}
-                    particularStyle="  h-8 gap-3"
-                    buttonType="sidebar"
-                    placeholder="Dashboard"
-                />
-
-
-                <ButtonEl
-                    onClickHandler={() => handleTabChnage('dashboard-YOUTUBE')}
-                    startIcon={<YoutubeIcon dim="40" style=" mx-2 " />}
-                    particularStyle="  h-8 gap-3"
-                    buttonType="sidebar"
-                    placeholder="YouTube"
-                />
-                <ButtonEl
-                    onClickHandler={() => handleTabChnage('dashboard-TWITTER')}
-                    startIcon={<TwitterIcon dim="35" />}
-                    particularStyle="  gap-7 pl-6 h-10 "
-                    buttonType="sidebar"
-                    placeholder="X"
-                />
-                <ButtonEl
-                    onClickHandler={() => handleTabChnage('dashboard-REDDIT')}
-                    startIcon={<RedditIcon dim="40" />}
-                    particularStyle=" text-2xl gap-5 pl-6 h-10  "
-                    buttonType="sidebar"
-                    placeholder="Reddit"
-                />
-                <ButtonEl
-                    onClickHandler={() => handleTabChnage('dashboard-INSTAGRAM')}
-                    startIcon={<InstagramIcon dim="40" />}
-                    particularStyle=" pl-6 text-2xl h-10 py-3 "
-                    buttonType="sidebar"
-                    placeholder="Instagram"
-                />
-                <ButtonEl
-                    onClickHandler={() => handleTabChnage('dashboard-WEB')}
-                    startIcon={<WebIcon diml="40" dimb="40" />}
-                    particularStyle="  pl-7 text-2xl h-10 "
-                    buttonType="sidebar"
-                    placeholder="Webpage"
-                />
-            </div>
-
-            <div >
-                <ButtonEl
-                    onClickHandler={() => setCollectionClicked((prev) => !prev)}
-                    particularStyle={` hover:bg-gray-200  ${collectionClicked ? "bg-gray-300 " : " "} font-medium `} 
-                    buttonType="dropDown"
-                    placeholder="Collections "
-                    endIcon={!collectionClicked ? <DropdownIcon dim="40" /> : <DropUpIcon dim="40" />}
-                />
-                <div
-                    className={`transition-transform delay-[20ms]  duration-190 origin-top   ${collectionClicked ? 'scale-y-100' : 'scale-y-0'} transition-opacity ${collectionClicked ? " opacity-100 " : " opacity-0 "}  `}>
-                    {
-                        collectionClicked && (
-                            <>
-                                <ButtonEl
-                                    onClickHandler={() => setModalNeededBy("addCollection")} placeholder="Add Collection"
-                                    particularStyle=" pl-7"
-                                    buttonType="sidebar"
-                                    startIcon={<PlusIcon dim={"40"} />}
-                                />
-                                {
-                                    listSuccess &&
-                                    Array.isArray(lists?.data?.payload?.collectionList) &&
-                                    lists.data.payload.collectionList
-                                        .filter(
-                                            (collection: { id: number; name: string }) =>
-                                                collection.name !== "dashboard"
-                                        )
-                                        .map((collection: { id: number; name: string }) => (
-                                            <ButtonEl
-                                                onClickHandler={() => handleTabChnage("collection-" + collection.id.toString())
-                                                }
-                                                placeholder={collection.name}
-                                                particularStyle=" pl-7 truncate "
-                                                buttonType="sidebar"
-                                                startIcon={<CollectionIcon dim={"40"} />}
-                                            />
-                                        ))
-                                }
-
-                            </>
-                        )
+                    {g.label === "collections" &&
+                        <button onClick={() => setModalNeededBy("addCollection")} className={`${pill} mt-1`}>
+                            <span className="grid size-4 shrink-0 place-items-center"><PlusIcon dim="13" /></span>
+                            Add new collection
+                        </button>
                     }
+                    {g.label === "community" && <div className="mt-1 flex flex-col gap-1">
+                        <button onClick={() => setModalNeededBy("addCommunity")} className={pill}>
+                            <span className="grid size-4 shrink-0 place-items-center"><PlusIcon dim="13" /></span>
+                            Start a community
+                        </button>
+                        <button onClick={() => setModalNeededBy("joinCommunity")} className={pill}>
+                            <span className="grid size-4 shrink-0 place-items-center"><PlusIcon dim="13" /></span>
+                            Join a community
+                        </button>
+                    </div>}
                 </div>
-            </div>
-            <div className="mb-4">
-                <ButtonEl onClickHandler={() => setcommunityClicked((prev) => !prev)} particularStyle={` hover:bg-gray-200  ${communityClicked ? "bg-gray-300 " : " "}`} buttonType="dropDown" placeholder="community " endIcon={!communityClicked ? <DropdownIcon dim="40" /> : <DropUpIcon dim="40" />} />
-                <div className={`transition-transform origin-top delay-30 duration-150 transform ${communityClicked ? "scale-y-100" : "scale-y-0"}`}>
-                    {
-                        communityClicked && (
-                            <>
-                                <ButtonEl onClickHandler={() => setModalNeededBy("addCommunity")} placeholder="start a Community" particularStyle=" pl-7" buttonType="sidebar" startIcon={<PlusIcon dim={"40"} />} />
-                                <ButtonEl onClickHandler={() => setModalNeededBy("joinCommunity")} placeholder="join a Community" particularStyle=" pl-7" buttonType="sidebar" startIcon={<PlusIcon dim={"40"} />} />
+            ))}
+        </nav>
 
-                                {
-                                    listSuccess && Array.isArray(lists?.data?.payload?.allCommunities) && lists.data.payload.allCommunities.map((collection: { id: number, name: string }) => (<ButtonEl onClickHandler={() => handleTabChnage("community-" + collection.id.toString())} placeholder={collection.name} particularStyle=" pl-7 truncate " buttonType="sidebar" startIcon={<CommunityIcon dim={"40"} />} />))
-                                }
-                            </>)
-                    }
-                </div>
-            </div>
-
-        </div>
-        <div className="fixed bottom-0 h-[9.3%] 2xl:w-[18%] xl:w-[20%] w-[290px] z-20 bg-sidebarBg  border-r-2 border-slate-300 " >
-            <div
-                className={` ${logOutButtonStyle} xl:scale-96 2xl:scale:scale-100 lg:scale:94 md:scale-92 scale-85 flex justify-center lg:-translate-x-4 md:-translate-x-6 -translate-x-6  ${logOutButton ? " block" : " hidden"} font-[520]`}
-                onClick={() => handleAsyncLogout()}
-            >
-                log out
-            </div>
-
-            <div
-                onClick={() => setLogoutHidden((prev) => !prev)}
-                className="flex p-2 rounded-[2.5rem] justify-center cursor-pointer mx-6 mr-9 items-center hover:bg-slate-300 transition-hover duration-300  max-h-[90%] gap-4 lg:gap-2"
-                title={user?.userName}
-            >
-                <img src={user?.profilePic}
-                    className="rounded-[4rem] xl:size-14 size-12"
-                />
-                <div
-                    className=" xl:text-3xl  text-[1.6rem] lg:font-[600]  font-[700] font-cardTitleHeading truncate mr-2   w-full text-center " >
-                    {user?.userName}
-                </div>
-            </div>
-        </div>
-
+        {account}
     </div>
 }
 

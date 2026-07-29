@@ -59,7 +59,7 @@ function App() {
 		<QueryClientProvider client={queryClient}>
 			<AnimatePresence>
 				<BrowserRouter>
-					{popUpLive && <PopUp placeholder="Link coppied to clipboard!!" />}
+					{popUpLive && <PopUp />}
 					<Routes>
 
 						<Route path="/" element={<Auth user={user} setUser={setUser} />} />

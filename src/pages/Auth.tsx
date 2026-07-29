@@ -6,8 +6,9 @@ import Dither from "../components/Dither";
 import DitherBranches from "../components/DitherBranches";
 import { CardStack } from "../components/ui/card-stack";
 import { getProfilePicPath } from "../utils/profilePhoto";
+import { THEMES, hexRgb, type profilePicId } from "../utils/theme";
 
-export type profilePicId = 'b1' | 'b2' | 'b3' | 'g1' | 'g2' | 'g3';
+export type { profilePicId };   // re-exported: api/auth/mutate.ts imports it from here
 
 interface AuthProps {
     user: AuthUser | null;
@@ -93,6 +94,9 @@ const Auth = ({ user, setUser }: AuthProps) => {
     const [profilePic, setProfilePic] = useState<profilePicId | "">("");
     const [step, setStep] = useState<"details" | "avatar">("details");
     const deck = useRef<{ prev: () => void; next: () => void } | null>(null);
+
+    // the carousel sets profilePic as you scroll, so the panel retints live
+    const theme = THEMES[profilePic || "b1"];
 
     const navigate = useNavigate();
 
@@ -223,11 +227,11 @@ const Auth = ({ user, setUser }: AuthProps) => {
     };
 
 
-    return <div className="min-h-screen w-full bg-[#F1F2F5] font-jakarta p-2 sm:p-3 lg:p-4">
-        <div className="min-h-[calc(100dvh-1rem)] sm:min-h-[calc(100dvh-1.5rem)] lg:min-h-[calc(100dvh-2rem)] w-full bg-white rounded-2xl sm:rounded-[1.75rem] shadow-[0_1px_3px_rgba(16,24,40,0.06)] flex overflow-hidden">
+    return <div className="min-h-screen w-full bg-[#F1F2F5] font-jakarta">
+        <div className="min-h-dvh w-full bg-white flex overflow-hidden">
 
             {/* ---- form column ---- */}
-            <div className="flex flex-col w-full lg:w-1/2 px-5 sm:px-10 lg:px-14 py-6 sm:py-8 overflow-auto cursor-default">
+            <div className="paper-rails flex flex-col w-full lg:w-1/2 px-5 sm:px-10 lg:px-14 py-6 sm:py-8 overflow-auto cursor-default">
                 <div className="flex-1 flex flex-col justify-center py-6 sm:py-10">
                     <div className="w-full max-w-[340px] mx-auto">
                         {step === "details" ? <>
@@ -374,11 +378,12 @@ const Auth = ({ user, setUser }: AuthProps) => {
             </div>
 
             {/* ---- showcase column ---- */}
-            <div className="cursor-avatar relative hidden lg:flex flex-col w-1/2 m-3 ml-0 rounded-[1.4rem] bg-[#4338E5] overflow-hidden">
+            <div style={{ backgroundColor: theme.bg }}
+                className="cursor-avatar relative hidden lg:flex flex-col w-1/2 m-3 ml-0 rounded-[1.4rem] overflow-hidden">
                 <div className="absolute inset-0">
                     <Dither
-                        bgColor={[0.263, 0.22, 0.898]}
-                        waveColor={[0.62, 0.58, 1]}
+                        bgColor={hexRgb(theme.bg)}
+                        waveColor={hexRgb(theme.wave)}
                         waveSpeed={0.04}
                         waveFrequency={3}
                         waveAmplitude={0.3}
