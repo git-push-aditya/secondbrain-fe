@@ -232,13 +232,18 @@ const Auth = ({ user, setUser }: AuthProps) => {
     };
 
 
-    return <div className="min-h-screen w-full bg-[#F1F2F5] font-jakarta">
-        <div className="min-h-dvh w-full bg-white flex overflow-hidden">
+    /* h-screen first, then h-dvh: browsers without dvh keep the vh value, newer
+       ones override it and stop the mobile toolbar clipping the panel. */
+    return <div className="h-screen h-dvh w-full bg-[#F1F2F5] font-jakarta">
+        <div className="flex h-full w-full overflow-hidden bg-white">
 
             {/* ---- form column ---- */}
-            <div className="paper-rails flex flex-col w-full lg:w-1/2 px-5 sm:px-10 lg:px-14 py-6 sm:py-8 overflow-auto cursor-default">
-                <div className="flex-1 flex flex-col justify-center py-6 sm:py-10">
-                    <div className="w-full max-w-[340px] mx-auto">
+            {/* Fluid, not a fixed half: the form takes what it needs and the panel
+                absorbs the rest, so this holds from a phone up to an ultrawide
+                without a breakpoint per size. min-w-0 lets it actually shrink. */}
+            <div className="paper-rails scrollbar-hidden flex min-w-0 flex-1 flex-col overflow-y-auto cursor-default px-[clamp(1rem,5vw,3.5rem)] py-[clamp(1rem,3vh,2rem)] lg:max-w-[clamp(28rem,42%,40rem)]">
+                <div className="flex flex-1 flex-col justify-center">
+                    <div className="mx-auto w-full max-w-[clamp(17rem,88%,23rem)]">
                         {step === "details" ? <>
                         <h1 className="text-center text-[1.65rem] sm:text-[1.9rem] leading-tight font-[600] tracking-[-0.02em] text-[#1A1A21]">
                             {authMode === "logIn" ? "Welcome Back" : "Create Account"}
@@ -384,7 +389,7 @@ const Auth = ({ user, setUser }: AuthProps) => {
 
             {/* ---- showcase column ---- */}
             <div style={{ backgroundColor: theme.bg }}
-                className="cursor-avatar relative hidden lg:flex flex-col w-1/2 m-3 ml-0 rounded-[1.4rem] overflow-hidden">
+                className="cursor-avatar relative hidden flex-1 flex-col overflow-hidden lg:flex">
                 <div className="absolute inset-0">
                     <Dither
                         bgColor={hexRgb(theme.bg)}
