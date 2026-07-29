@@ -25,3 +25,7 @@ dist-ssr
 backendRelated.txt
 
 .env
+# agent skills installed via `npx skills add` — third-party, not part of the app
+.agents/
+.claude/
+skills-lock.json

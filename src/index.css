@@ -89,8 +89,196 @@
   animation: dashflow 1.1s linear infinite;
 }
 
+/* DeepDive thinking trace. Referenced from inline `animation:` in
+   thinkingState.tsx, so these must be real global keyframes — Tailwind only
+   emits its own (spin, pulse, ...) when the matching animate-* class is used,
+   which is why the spinner has its own trace-spin rather than borrowing spin. */
+@keyframes shimmer-text {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes trace-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Liquid metal button. ShaderMount appends its own <canvas>, which has to be
+   stretched and clipped to the pill — the upstream component injected this into
+   document.head at runtime; it belongs here instead. */
+.shader-container-exploded canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  border-radius: 100px !important;
+}
+
+@keyframes ripple-animation {
+  0%   { transform: translate(-50%, -50%) scale(0); opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+}
+
+/* Loading state for a dither surface: the same grain, drifting fast so the wait
+   reads as brisk. Reuses the button's drift keyframes — the pseudos just need the
+   oversize inset first, or the translate would pull their edges into view. */
+.dither-strip.dither-load::before,
+.dither-strip.dither-load::after { inset: -60%; }
+.dither-strip.dither-load::before { animation: dither-drift-a 1.4s linear infinite; }
+.dither-strip.dither-load::after { animation: dither-drift-b 1s linear infinite; }
+
+/* Skeleton bar. animate-pulse is 2s, which reads as stalled; this is 0.9s. */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
+.skeleton-bar {
+  background: #EBEBE8;
+  animation: skeleton-pulse 0.9s ease-in-out infinite;
+}
+
+/* Card grid: pack in as many columns as the panel can actually hold.
+   The breakpoint-based column counts this replaces were keyed to the *viewport*,
+   but this grid sits inside a panel narrowed by the sidebar rail and the page
+   padding, so it was always a step or two behind the real available width — at
+   ~1200px it was still showing two columns with room for five.
+   auto-fill measures the container instead, so the count is always right and
+   there are no breakpoints to keep in sync. */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+  justify-items: center;
+}
+
+/* Chrome bar title. A real class rather than [text-shadow:...] — arbitrary
+   properties are unreliable in this Tailwind setup (the gradient ones silently
+   never generate), and this shadow is what keeps the title readable where the
+   dither crest runs pale behind it. */
+.chrome-title {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.38), 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+/* Dithered button. Two grain layers drift across a tinted fill at different rates
+   and angles, so the surface moves without a WebGL canvas — the dashboard already
+   runs one Dither context and a button is the wrong place to spend another.
+   --btn sets the tint (falls back to --accent); --grain scales how present the
+   pattern is, which is the whole primary/secondary distinction.
+   The inset shadows are a top sheen plus a bottom well: they darken the lower
+   half so white type keeps its contrast wherever the grain happens to be pale. */
+.dither-btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: var(--btn, var(--accent));
+  box-shadow:
+    /* --rim lets the theme colour survive on an otherwise black button */
+    inset 0 0 0 1px var(--rim, rgba(255, 255, 255, 0.22)),
+    inset 0 14px 20px -14px rgba(255, 255, 255, 0.4),
+    inset 0 -18px 24px -12px rgba(0, 0, 0, 0.5);
+}
+
+.dither-btn::before,
+.dither-btn::after {
+  content: "";
+  position: absolute;
+  /* oversized so the drift never pulls an edge of the layer into view */
+  inset: -70%;
+  z-index: -1;
+  background-image: repeating-conic-gradient(rgba(255, 255, 255, 0.55) 0% 25%, transparent 0% 50%);
+}
+
+.dither-btn::before {
+  background-size: 5px 5px;
+  opacity: calc(var(--grain, 0.8) * 0.55);
+  --m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='200'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='3' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0 1 1 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='320' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-mask-image: var(--m);
+  mask-image: var(--m);
+  animation: dither-drift-a 16s linear infinite;
+}
+
+.dither-btn::after {
+  background-size: 3px 3px;
+  opacity: calc(var(--grain, 0.8) * 0.3);
+  --m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='200'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.11' numOctaves='2' seed='13' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0 0 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='320' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-mask-image: var(--m);
+  mask-image: var(--m);
+  animation: dither-drift-b 11s linear infinite;
+}
+
+/* hover just speeds the same drift up — the surface stirs rather than restyling */
+.dither-btn:hover::before { animation-duration: 5s; }
+.dither-btn:hover::after { animation-duration: 3.4s; }
+.dither-btn:active { filter: brightness(1.08); }
+
+@keyframes dither-drift-a {
+  to { transform: translate3d(-68px, -46px, 0); }
+}
+
+@keyframes dither-drift-b {
+  to { transform: translate3d(48px, -62px, 0); }
+}
+
+/* Blur band over the dither at the top of the dashboard, fading out downward so
+   it reads as a soft transition rather than a seam across the page.
+   ponytail: a real class, not `[mask-image:linear-gradient(...)]` — arbitrary
+   properties with gradient values silently fail to generate in this Tailwind
+   setup, so the mask never lands and you get a hard-edged blur strip. */
+.top-blur {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  --fade: linear-gradient(to bottom, #000 0%, #000 40%, transparent 100%);
+  -webkit-mask-image: var(--fade);
+  mask-image: var(--fade);
+}
+
+/* Solid core under the scroll-to-latest arrow so the glyph never sits on a pale
+   patch of grain. Same reason as above: this was written as an arbitrary
+   [background:radial-gradient(...)] and was being dropped silently. */
+.puck-core {
+  background: radial-gradient(circle at 50% 50%,
+    rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.6) 42%, transparent 72%);
+}
+
+/* Brushed-silver rim for the composer, matching the liquid metal button's ring.
+   Two backgrounds: the paper fill clipped to padding-box, the metal clipped to
+   border-box, so the gradient only shows in the 1.5px border.
+   ponytail: a conic-gradient, not a third ShaderMount — the dashboard already
+   runs the Dither canvas plus the button's, and a full-width rim would need its
+   own canvas. Upgrade to a real shader if the static highlights read as flat. */
+.silver-rim {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(#F7F7F5, #F7F7F5) padding-box,
+    /* Linear, not conic: on a wide short pill a conic gradient stretches each
+       angular stop into one long flat band down the sides. Banding across the
+       width is what reads as brushed metal. */
+    linear-gradient(100deg,
+      #A8A8A8 0%, #FFFFFF 9%, #8F8F8F 19%, #EFEFEF 30%,
+      #9C9C9C 42%, #FFFFFF 55%, #8A8A8A 67%, #E8E8E8 78%,
+      #9A9A9A 88%, #D4D4D4 100%) border-box;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .floaty, .dashflow { animation: none; }
+  .paper-rails::before { animation: none; }
+  .dither-btn::before, .dither-btn::after { animation: none; }
+  .dither-load::before, .dither-load::after, .skeleton-bar { animation: none; }
+  /* the trace still needs to appear, so land it at its end state, not none */
+  [style*="shimmer-text"], [style*="trace-spin"] { animation: none !important; }
+  [style*="fade-up"], [style*="fade-in"] { animation-duration: 1ms !important; }
 }
 
 /* 64px copy of sb_avatar.png — browsers ignore cursor images larger than ~128px */
@@ -102,7 +290,6 @@
 .glass-card {
   background: rgba(255, 255, 255, 0.35);
   backdrop-filter: blur(7px);
-  -webkit-backdrop-filter: blur(7px);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow:
@@ -112,6 +299,23 @@
     inset 0 0 16px 8px rgba(255, 255, 255, 0.8);
   position: relative;
   overflow: hidden;
+}
+
+/* Pill variant for the floating navs: the reference's lighter, less milky glass
+   (0.21 white / 6px blur reads as glass on paper, where 0.35 just goes cloudy).
+   overflow is released so the selected symbol's dither halo isn't clipped — the
+   two highlight pseudos below fade to transparent at their ends, so they don't
+   show past the rounded corners. */
+.glass-card.glass-pill {
+  border-radius: 9999px;
+  overflow: visible;
+  background: rgba(255, 255, 255, 0.21);
+  backdrop-filter: blur(6px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 12px 6px rgba(255, 255, 255, 0.6);
 }
 
 .glass-card::before {
@@ -144,8 +348,107 @@
   );
 }
 
+/* Ordered-dither stand-in for the WebGL shader, used on the paper card headers.
+   ponytail: CSS, not a canvas — one <Dither> per card would mean dozens of live
+   WebGL contexts on a full page, and browsers cap those around 16.
+   Two checkerboards at different scales, each masked by thresholded SVG
+   turbulence, so coverage clusters into organic blobs instead of reading as a
+   flat halftone grid. --dx/--dy shift the noise field so neighbouring cards
+   don't repeat; --accent supplies the colour. */
+.dither-strip {
+  background-color: var(--accent);
+  position: relative;
+  overflow: hidden;
+}
+
+.dither-strip::before,
+.dither-strip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-conic-gradient(#FBFBF9 0% 25%, transparent 0% 50%);
+  mask-position: var(--dx, 0px) var(--dy, 0px);
+  -webkit-mask-position: var(--dx, 0px) var(--dy, 0px);
+  /* noise ∩ falloff: without intersect the two masks add and the falloff is a
+     no-op — still legible, just denser. */
+  mask-composite: intersect;
+}
+
+/* coarse grain: ~50% coverage blobs */
+.dither-strip::before {
+  background-size: 8px 8px;
+  --m:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='200'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.022' numOctaves='3' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0 1 1 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='320' height='200' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(120% 150% at 50% 118%, transparent 22%, #000 60%);
+  -webkit-mask-image: var(--m);
+  mask-image: var(--m);
+}
+
+/* Small-target variant. The grain above is sized for a ~112px card header; on a
+   36px puck you land inside a single blob and it reads as random noise. Shrinking
+   mask-size scales the whole noise field down, so a small circle still shows
+   several blobs, and the finer checkerboards keep it from looking chunky. */
+.dither-strip.dither-fine::before,
+.dither-strip.dither-fine::after {
+  mask-size: 96px 60px;
+  -webkit-mask-size: 96px 60px;
+}
+
+.dither-strip.dither-fine::before { background-size: 4px 4px; }
+.dither-strip.dither-fine::after  { background-size: 2px 2px; }
+
+/* fine grain: sparser, breaks up the edges of the coarse blobs */
+.dither-strip::after {
+  background-size: 4px 4px;
+  --m:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='200'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.045' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0 0 0 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='320' height='200' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(120% 150% at 50% 118%, transparent 12%, #000 55%);
+  -webkit-mask-image: var(--m);
+  mask-image: var(--m);
+}
+
+/* Faint dotted margins down the left and right of a paper column, fading out
+   before the text starts — the reference's "side dither".
+   ponytail: a CSS dot grid, not another <Dither> canvas. This runs on every
+   page at once and a third WebGL context per tab isn't worth a texture nobody
+   looks straight at. Drift is a transform (composited, no repaint) over a whole
+   number of grid cells, so the loop never seams. Colour follows --accent. */
+.paper-rails {
+  position: relative;
+  isolation: isolate;
+}
+
+.paper-rails::before {
+  content: "";
+  position: absolute;
+  inset: -6rem 0;
+  z-index: -1;
+  pointer-events: none;
+  color: var(--accent, #3B82F6);
+  background-image: radial-gradient(currentColor 1px, transparent 1.4px);
+  background-size: 13px 13px;
+  opacity: 0.22;             /* the resting value if the breathe is switched off */
+  --rails:
+    linear-gradient(to right, #000 0, transparent 22%, transparent 78%, #000 100%),
+    linear-gradient(to bottom, #000 0 45%, transparent 90%);
+  -webkit-mask-image: var(--rails);
+  mask-image: var(--rails);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  animation: rail-drift 80s linear infinite, rail-breathe 15s ease-in-out infinite;
+}
+
+@keyframes rail-drift {
+  to { transform: translateY(-104px); }   /* 8 × 13px grid */
+}
+
+@keyframes rail-breathe {
+  0%, 100% { opacity: 0.16; }
+  50%      { opacity: 0.30; }
+}
+
 .scrollbar-hidden {
-    scrollbar-width: none;  
+    scrollbar-width: none;
     -ms-overflow-style: none;   
   } 
   .scrollbar-hidden::-webkit-scrollbar {

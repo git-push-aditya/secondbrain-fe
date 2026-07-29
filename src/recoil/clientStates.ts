@@ -17,12 +17,17 @@ const sideBarAtom = atom<boolean>({
 
 const popUpMessage = atom<string>({
     key: "message",
-    default: "Link coppied to clipboard!!"
+    default: "Link copied to clipboard!!"
 })
 
 const cardsCount = atom<number>({
     key: "card-count",
     default: 0
+})
+
+const searchQuery = atom<string>({
+    key: "searchQuery",
+    default: ""
 })
 
 const currentCollection = atom<{ name: string, id: number }>({
@@ -48,3 +53,5 @@ export const useCurrentCommunity = () => useRecoilState(currentCommmunity);
 export const useCurrentCollection = () => useRecoilState(currentCollection);
 
 export const useSideBarAtom = () => useRecoilState(sideBarAtom);
+
+export const useSearchQuery = () => useRecoilState(searchQuery);

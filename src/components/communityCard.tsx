@@ -60,7 +60,7 @@ const CommunityCard = ({ createdAt, title, link, layout, communityId, id, note, 
 
     const [popUpLive, setPopUpLive] = usePopUpAtom();
     const shareClicked = (link: string) => {
-        setPopUpMessage("Link coppied to clipboard!!");
+        setPopUpMessage("Link copied to clipboard!!");
         navigator.clipboard.writeText(link);
         setPopUpLive?.((prev) => !prev);
     }

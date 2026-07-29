@@ -1,89 +1,146 @@
 import { useLocation } from "react-router-dom"
 import CardElement from "../components/card"
-import { GridIcon, ListIcon } from "../icons/commonIcons"
-import { LogoIcon } from "../icons/particularIcons"
 import { useFEctchData, useSharedMetaData } from "../api/shared/query"
 import { Fragment } from "react/jsx-runtime"
-import ButtonEl from "../components/button" 
+import ButtonEl from "../components/button"
+import Dither from "../components/Dither"
+import PaperCard from "../components/paperCard"
+import { hexRgb, themeFor } from "../utils/theme"
+import { useUserProfile } from "../recoil/user"
 
-export const SharedCollection = ({layout,setLayout}:{layout: "grid" | "list",setLayout: React.Dispatch<React.SetStateAction<"grid" | "list">>}) => {
-    const location =  useLocation();
+export const SharedCollection = ({ layout, setLayout }: { layout: "grid" | "list", setLayout: React.Dispatch<React.SetStateAction<"grid" | "list">> }) => {
+    const location = useLocation();
     const hash = new URLSearchParams(location.search).get('id') || "";
-     
-    const layoutStyle = "hover:bg-[#F5F5F6] rounded-lg p-2 transition:hover duration-200 ease-in-out  cursor-pointer size-11 lg:size-13";
 
-    const {data : metadata, isLoading : metadataLoading, isSuccess} = useSharedMetaData({hash});
+    // whoever is signed in brings their avatar's theme along; visitors get the default blue
+    const [user] = useUserProfile();
+    const theme = themeFor(user?.profilePic);
 
-    const {data: sharedData, isLoading: sharedDataLoading, hasNextPage, isFetchingNextPage, fetchNextPage} = useFEctchData({hash});
+    const { data: metadata, isLoading: metadataLoading, isSuccess } = useSharedMetaData({ hash });
 
-    return <div className="h-screen w-full bg-mainComponentBg overflow-y-auto scrollbarMC flex flex-col items-center pt-5">
-        <div className="w-[90%] md:w-[75%] h-[15%] flex gap-4 lg:gap-8 items-center ">
-            <div>
-                <LogoIcon dim="30" style="size-20 md:size-25 xl:size-30" />
-            </div>
-            <div className="overflow-x-hidden">
-                <div className="xl:text-5xl md:text-3xl text-xl  font-dashboardHeading font-extrabold cursor-default line-colaps-2 text-4xl py-3 font-bold text-gradient  ">
-                    {
-                        isSuccess && <span> {metadata.payload.userName}'s shared brain</span>
-                    }
-                    
-                </div>
-                <div className="md:text-2xl cursor-default text-slate-800 text-lg font-[550] text-subHead mt-0 md:mt-2 lg:mt-1">
-                    {
-                        isSuccess && <span> Collection: {metadata?.payload.collectionName}</span>
-                    }       
-                </div>
-            </div>
-            
+    const { data: sharedData, isLoading: sharedDataLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useFEctchData({ hash });
+
+    const cardCount = sharedData?.pages.reduce((n, g) => n + (g?.data?.payload?.content?.length ?? 0), 0) ?? 0;
+
+    // ponytail: only `bg` reaches the paper side of the page — `wave` is a pale
+    // tint on the light themes but a mid grey on the black ones, so it would go
+    // unreadable behind text. It stays in the shader, where it's the crest colour.
+    const vars = { "--accent": theme.bg, "--wash": theme.bg + "14" } as React.CSSProperties;
+
+    const eyebrow = "font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[var(--accent)]";
+
+    return <div style={vars} className="relative min-h-screen w-full bg-[#FBFBF9] font-jakarta">
+
+        {/* One dithered canvas pinned behind the whole page — the opaque paper
+            column masks the middle, leaving it visible as rails down both edges. */}
+        <div className="fixed inset-0">
+            <Dither
+                bgColor={hexRgb(theme.bg)}
+                waveColor={hexRgb(theme.wave)}
+                waveSpeed={0.03}
+                waveFrequency={3}
+                waveAmplitude={0.3}
+                colorNum={4}
+                pixelSize={2}
+                enableMouseInteraction={false}
+                mouseRadius={0.4}
+            />
         </div>
-        
-        <div className="w-[95%] md:w-[80%] h-[85%] 2xl:h-[80%] ">
-            <div className="flex justify-between items-center mx-15 md:mx-12 ">
-                <div className="text-gray-700 animate-pulse duration-[5000ms] duration-[2000ms] ml-2 line-clamp-3 text-sm md:text-xl font-[480] cursor-default">
-                    secondbrain helps you capture and share insights from the web — your second brain, curated for the world.
+
+        <div className="paper-rails mx-auto min-h-screen w-full max-w-[1180px] border-x border-[var(--accent)] bg-[#FBFBF9]">
+
+            {/* ---- chrome bar ---- */}
+            <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b border-[var(--accent)] bg-[#FBFBF9]/95 px-4 backdrop-blur sm:px-8">
+                <span className={eyebrow}>[ shared brain ]</span>
+
+                <div className="flex items-center gap-1">
+                    {(["grid", "list"] as const).map(l => (
+                        <button key={l} onClick={() => setLayout(l)}
+                            aria-pressed={layout === l}
+                            className={`cursor-pointer px-2.5 py-1.5 font-mono text-[0.68rem] uppercase tracking-[0.16em] transition-colors ${layout === l
+                                ? "bg-[var(--accent)] text-white"
+                                : "text-[var(--accent)] hover:bg-[var(--wash)]"}`}>
+                            {layout === l ? "[x] " : "[ ] "}{l}
+                        </button>
+                    ))}
                 </div>
-                <div className="flex items-center justify-around  w-26 gap-2 mr-2 rounded-lg"> 
-                    <GridIcon dim="52" onClickHandler={() => setLayout?.("grid")} style={layoutStyle}/> 
-                    <ListIcon dim="52" onClickHandler={() => setLayout?.("list")} style={layoutStyle} />
-                </div>
+            </header>
+
+            {/* ---- masthead ---- */}
+            <section className="px-4 pt-12 pb-10 sm:px-10 lg:px-16">
+                <p className={eyebrow}>[ shared collection ]</p>
+
+                <h1 className="mt-5 text-[2rem] leading-[1.06] font-[700] tracking-[-0.03em] text-[#141418] sm:text-[2.6rem] lg:text-[3.1rem]">
+                    {metadataLoading
+                        ? <span className="inline-block h-[1em] w-[min(60vw,22rem)] animate-pulse bg-[var(--wash)] align-middle" />
+                        : isSuccess && <>{metadata.payload.userName}'s shared brain</>}
+                </h1>
+
+                {isSuccess &&
+                    <p className="mt-4 font-mono text-[0.78rem] tracking-[0.02em] text-[#52525B]">
+                        collection <span className="bg-[var(--wash)] px-1.5 py-0.5 text-[var(--accent)]">{metadata.payload.collectionName}</span>
+                    </p>
+                }
+
+                <p className="mt-7 max-w-[620px] text-[0.95rem] leading-[1.75] text-[#3F3F46]">
+                    secondbrain helps you capture and share insights from the web —{" "}
+                    <span className="bg-[var(--wash)] px-1">your second brain, curated for the world.</span>
+                </p>
+            </section>
+
+            {/* ---- perforated divider, echoing the reference's torn paper edge ---- */}
+            <div className="mx-4 flex items-center gap-4 border-t border-dashed border-[var(--accent)] pt-4 sm:mx-10 lg:mx-16">
+                <span className={eyebrow}>
+                    [ {sharedDataLoading ? "loading" : `${cardCount} saved`} ]
+                </span>
             </div>
-            <div className=" mt-6 flex justify-center ">
-                <div className={` ${layout === "grid" ? " grid sharedBp2xl:grid-cols-4 sharedBp2x:gap-10 sharedBplg:grid-cols-3  md:grid-cols-2 grid-cols-1  lg:gap-4 gap-2 gap-y-4 " : " w-full px-10 " }`}> 
-                    {
-                        sharedData?.pages.map((group,i) => (
-                            <Fragment key={i}>
-                                {   
-                                    group?.data?.payload?.content?.map((cardData :any, idx : number) => (       <CardElement 
-                                        title={cardData.content.title}
-                                        key={cardData.content.id}
-                                        collectionId={group.data.payload.collectionId}
-                                        id={cardData.content.id}
-                                        note={cardData.content.note}
-                                        createdAt={cardData.content.createdAt}
-                                        tags={cardData.content.tags}
-                                        cardType={cardData.content.type} 
-                                        layout={layout}
-                                        link={cardData.content.hyperlink} 
-                                        shared={true}
-                                        />
-                                    ))
-                                }
-                            </Fragment>
-                        ))
-                    }
-                </div> 
-            </div>
-            <div className="mt-14 flex justify-center">
-                <ButtonEl 
-                    onClickHandler={() => fetchNextPage()} 
-                    disabled={!hasNextPage} 
-                    placeholder="Load more..." 
-                    particularStyle={`${hasNextPage ? " hover:scale-105 " : " border-slate-300 bg-slate-100 text-slate-400 "} `} 
-                    buttonType={"loadMore"} 
+
+            {/* ---- cards ---- */}
+            <section className="px-4 pt-8 sm:px-10 lg:px-16">
+                {!sharedDataLoading && cardCount === 0
+                    ? <p className="py-20 text-center font-mono text-[0.75rem] uppercase tracking-[0.2em] text-[#A1A1AA]">[ nothing shared here yet ]</p>
+                    : <div className="flex justify-center">
+                        <div className={layout === "grid"
+                            ? "card-grid w-full"
+                            : "w-full"}>
+                            {sharedData?.pages.map((group, i) => (
+                                <Fragment key={i}>
+                                    {group?.data?.payload?.content?.map((cardData: any) => {
+                                        const card = <CardElement
+                                            title={cardData.content.title}
+                                            collectionId={group.data.payload.collectionId}
+                                            id={cardData.content.id}
+                                            note={cardData.content.note}
+                                            createdAt={cardData.content.createdAt}
+                                            tags={cardData.content.tags}
+                                            cardType={cardData.content.type}
+                                            layout={layout}
+                                            link={cardData.content.hyperlink}
+                                            shared={true}
+                                        />;
+
+                                        return layout === "grid"
+                                            ? <PaperCard key={cardData.content.id} i={cardData.content.id} type={cardData.content.type}>{card}</PaperCard>
+                                            : <Fragment key={cardData.content.id}>{card}</Fragment>;
+                                    })}
+                                </Fragment>
+                            ))}
+                        </div>
+                    </div>
+                }
+            </section>
+
+            <div className="flex justify-center px-4 pt-14 pb-20">
+                <ButtonEl
+                    onClickHandler={() => fetchNextPage()}
+                    disabled={!hasNextPage}
+                    buttonType=""
+                    placeholder={isFetchingNextPage ? "[ loading... ]" : hasNextPage ? "[ load more ]" : "[ end of collection ]"}
+                    particularStyle={`border border-[var(--accent)] px-6 py-3 font-mono text-[0.7rem] uppercase tracking-[0.18em] transition-colors ${hasNextPage
+                        ? "text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white"
+                        : "cursor-default border-dashed text-[#A1A1AA] opacity-70"}`}
                 />
             </div>
-            <div className="h-15"></div>
         </div>
-
     </div>
 }

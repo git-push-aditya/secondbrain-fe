@@ -1,7 +1,6 @@
-import { CopyIcon, CrossIcon, LeftIcon, Loader } from "../icons/commonIcons";
-import ButtonEl from "./button";
-import { motion, AnimatePresence } from "framer-motion";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { CopyIcon, CrossIcon, Loader } from "../icons/commonIcons";
+import { motion } from "framer-motion";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import Tag from "./tags";
 import { useAddContentQuery, useCreateCollection, useCreateCommunity, useJoinCommunity, useShareBrain } from "../api/user/mutate";
 import { useQueryClient } from "@tanstack/react-query";
@@ -26,8 +25,10 @@ export type GetListResponse = {
     };
 };
 
+type Cause = "addContent" | "shareBrain" | "addCollection" | "addCommunity" | "joinCommunity" | "close";
+
 interface props {
-    cause: "addContent" | "shareBrain" | "logout" | "addCollection" | "addCommunity" | "joinCommunity" | "close";
+    cause: Cause;
     closeModal: () => void;
     collectionName?: string;
 }
@@ -35,23 +36,70 @@ interface props {
 interface cardComponent {
     setPopUpLive?: SetterOrUpdater<boolean>;
     closeCard: () => void;
-    cause?: "addContent" | "shareBrain" | "logout" | "addCollection" | "addCommunity" | "joinCommunity" | "close";
+    cause?: Cause;
 }
 
+/* One paper vocabulary for every dialog: hairline accent border, dithered cap,
+   mono eyebrow, Bitter italic title, square fields. */
+const field = "w-full border border-[var(--rule)] bg-white px-3 py-2 text-[0.86rem] text-[#18181B] outline-none transition-colors placeholder:text-[#A1A1AA] hover:border-[#C7C7CB] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/15";
+const primary = "w-full cursor-pointer border border-[var(--accent)] bg-[var(--accent)] px-4 py-2.5 text-center font-mono text-[0.7rem] uppercase tracking-[0.18em] text-white transition-colors hover:bg-[#1E3A8A] disabled:opacity-60";
+const ghost = "cursor-pointer border border-[var(--rule)] px-3 py-1.5 font-mono text-[0.66rem] uppercase tracking-[0.16em] text-[#52525B] transition-colors hover:bg-[var(--wash)] hover:text-[var(--accent)]";
+const eyebrowCls = "font-mono text-[0.62rem] uppercase tracking-[0.2em] text-[var(--accent)]";
+const note = "text-[0.84rem] leading-[1.5] text-[#52525B]";
+const invalid = "border-l-2 border-[#B91C1C] bg-[#FEF2F2] px-3 py-2 text-[0.78rem] text-[#B91C1C]";
+
+const Shell = ({ eyebrow, title, sub, onClose, width, children }: {
+    eyebrow: string; title: string; sub?: ReactNode; onClose: () => void; width: string; children: ReactNode;
+}) => (
+    <motion.div
+        initial={{ y: 8, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 8, opacity: 0 }}
+        transition={{ duration: 0.15 }}
+        onClick={e => e.stopPropagation()}
+        className={`max-h-[88vh] w-[92%] cursor-default overflow-y-auto border border-[var(--accent)] bg-[#FBFBF9] scrollbar-hidden ${width}`}>
+
+        <div className="dither-strip h-9" />
+
+        <div className="px-6 pt-5 pb-6 sm:px-8">
+            <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                    <p className={eyebrowCls}>[ {eyebrow} ]</p>
+                    <h2 className="mt-2 font-head text-[1.4rem] leading-tight italic text-[#141418]">{title}</h2>
+                </div>
+                <button onClick={onClose} aria-label="close"
+                    className="shrink-0 cursor-pointer p-1.5 text-[#71717A] transition-colors hover:bg-[var(--wash)] hover:text-[var(--accent)]">
+                    <CrossIcon dim="16" />
+                </button>
+            </div>
+
+            {sub && <p className={`mt-3 ${note}`}>{sub}</p>}
+
+            <div className="mt-5 flex flex-col gap-3">{children}</div>
+        </div>
+    </motion.div>
+);
 
 const Modal = ({ cause, closeModal }: props) => {
 
     const [popUpLive, setPopUpLive] = usePopUpAtom();
 
+    // esc closes, and so does a click on the backdrop itself
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeModal(); };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [closeModal]);
+
     return <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.3, ease: 'circIn' }}
-        className="h-screen w-screen  backdrop-blur-xs bg-[rgba(0,0,0,0.5)] fixed z-300 top-0 left-0 flex justify-center items-center" >
+        transition={{ duration: 0.2, ease: 'circIn' }}
+        onClick={closeModal}
+        className="fixed top-0 left-0 z-300 flex h-screen w-screen items-center justify-center bg-[#0A1B33]/45 font-jakarta backdrop-blur-sm" >
         {cause == "addContent" && <AddContent closeCard={closeModal} />}
         {cause == "shareBrain" && <ShareBrain setPopUpLive={setPopUpLive} cause={cause} closeCard={closeModal} />}
-        {cause == "logout" && <Logout closeCard={closeModal} />}
         {cause == "addCommunity" && <StartCommunity closeCard={closeModal} />}
         {cause == "addCollection" && <AddCollection closeCard={closeModal} />}
         {cause == "joinCommunity" && <JoinCommunity closeCard={closeModal} />}
@@ -67,7 +115,7 @@ const AddContent = ({ closeCard }: cardComponent) => {
     const listData = queryClient.getQueryData<AxiosResponse<GetListResponse>>(['getList']);
     const collectionList = listData?.data?.payload?.collectionList || [];
 
-    const [tab, setTab] = useTabAtom()
+    const [tab] = useTabAtom()
 
 
     let collectionId, communityId;
@@ -78,7 +126,7 @@ const AddContent = ({ closeCard }: cardComponent) => {
 
     const [hyperLink, setHyperLink] = useState<string>('');
     const [title, setTitle] = useState<string>('');
-    const [note, setNote] = useState<string>('');
+    const [noteText, setNote] = useState<string>('');
 
 
     const tagsKeyDownHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -102,7 +150,8 @@ const AddContent = ({ closeCard }: cardComponent) => {
                 name={tag}
                 id={tag}
                 onClickHandler={() => deleteTag(tag)}
-                endIcon={<CrossIcon dim="15" />}
+                endIcon={<CrossIcon dim="10" style="ml-1.5" />}
+                style="text-[0.68rem] px-2 py-[0.2rem]"
             />
         ));
     }, [tagsList]);
@@ -110,11 +159,10 @@ const AddContent = ({ closeCard }: cardComponent) => {
     const { mutateAsync, isPending } = useAddContentQuery();
 
     const addContentHandler = async () => {
-        console.log(tab)
         if (hyperLink.trim() === "" || title.trim() === "") return;
 
         //collection id /\ community id
-        if (tab.startsWith('dashboard')) {
+        if (tab.startsWith('dashboard') || tab === 'stats') {
             collectionId = collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1;
             communityId = -1;
         } else if (tab.startsWith('collection')) {
@@ -159,74 +207,63 @@ const AddContent = ({ closeCard }: cardComponent) => {
         }
 
 
-        mutateAsync({ title: title.trim(), hyperlink: hyperLink.trim(), note: note.trim(), type: linkType, collectionId, communityId, existingTags: existingTags, newTags: newTags });
+        mutateAsync({ title: title.trim(), hyperlink: hyperLink.trim(), note: noteText.trim(), type: linkType, collectionId, communityId, existingTags: existingTags, newTags: newTags });
         closeCard();
     }
 
-    return <motion.div
-        initial={{ y: 8, scale: 0.99 }}
-        animate={{ y: 0, scale: 1 }}
-        exit={{ y: 8, opacity: 0 }}
-        transition={{ duration: 0.1 }}
-        className={` max-h-[800px]  w-[88%] xl:w-[48%] md:w-[60%] rounded-3xl bg-modalCard  cursor-default scrollbarSB  pb-8`} >
-        <div
-            className="flex justify-between items-center mx-8 md:mx-10 xl:mx-12 mt-10">
-            <div
-                className="font-[650] text-[2rem] lg:text-4xl text-modalHead font-inter ">
-                Save a New Link
-            </div>
-            <ButtonEl
-                buttonType=""
-                onClickHandler={closeCard}
-                startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2 scale-90 lg:scale-100" />}
-            />
-        </div>
-        <div
-            className="mt-3 text-center text-[1.1rem] lg:text-xl mx-12  font-[450] text-gray-500">
-            Paste a link you want to save or share with your Second Brain.
-        </div>
-        <div
-            className="text-center mt-2">
+    return <Shell
+        eyebrow="new link"
+        title="Save a new link"
+        sub="Paste a link you want to save or share with your Second Brain."
+        onClose={closeCard}
+        width="max-w-[520px]">
 
+        <input
+            type="text"
+            placeholder="Paste link here"
+            className={field}
+            value={hyperLink}
+            onChange={(e) => setHyperLink(e.target.value)}
+        />
+
+        <input
+            type="text"
+            placeholder="Enter title"
+            className={field}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+        />
+
+        <textarea
+            placeholder="Note..."
+            rows={3}
+            className={`${field} resize-y`}
+            value={noteText}
+            onChange={(e) => setNote(e.target.value)}
+        />
+
+        {!tab.startsWith('community') && <>
             <input
                 type="text"
-                placeholder="Paste link here"
-                className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none"
-                value={hyperLink}
-                onChange={(e) => setHyperLink(e.target.value)}
+                placeholder="Enter tags, hit return for each"
+                className={field}
+                value={currentTag}
+                onChange={(e) => setCurrentTag(e.target.value)}
+                onKeyDown={(e) => tagsKeyDownHandler(e)}
             />
 
-            <input
-                type="text"
-                placeholder="Enter title"
-                className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-            />
-
-            <textarea
-                placeholder="Note..."
-                className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none overflow-y-auto scrollbarSB"
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-            />
-
-            {!tab.startsWith('community') && <>         <input type="text" placeholder="Enter tags for this post" className="w-[90%] mt-2 cursor-pointer py-1 pl-4 md:py-2 text-xl font-cardTitleHeading border-2 border-gray-500 rounded-md hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none" value={currentTag} onChange={(e) => setCurrentTag(e.target.value)} onKeyDown={(e) => tagsKeyDownHandler(e)} />
-
-                <div className="mt-2 flex flex-wrap mx-12 gap-2 w-[90%] overflow-y-auto scrollbarSB max-h-[48px]">
+            {tagsList.length > 0 &&
+                <div className="flex max-h-[64px] flex-wrap gap-1.5 overflow-y-auto scrollbar-hidden">
                     {renderedTags}
-                </div></>
+                </div>
             }
-            <ButtonEl
-                buttonType="primary"
-                onClickHandler={() => addContentHandler()}
-                particularStyle={`w-[90%] font-inter lg:mt-4 h-16 scale-y-85 lg:scale-y-100 mx-auto font-[550] font-inter ${isPending ? "animate-pulse" : ""} `}
-                placeholder="Add Link"
-            />
+        </>}
 
-
-        </div>
-    </motion.div>
+        <button onClick={addContentHandler} disabled={isPending}
+            className={`${primary} mt-1 ${isPending ? "animate-pulse" : ""}`}>
+            [ add link ]
+        </button>
+    </Shell>
 }
 
 const ShareBrain = ({ closeCard, setPopUpLive }: cardComponent) => {
@@ -244,7 +281,7 @@ const ShareBrain = ({ closeCard, setPopUpLive }: cardComponent) => {
     useEffect(() => {
         if (!isListSuccess) return;
 
-        if (tab.startsWith('dashboard')) {
+        if (tab.startsWith('dashboard') || tab === 'stats') {
             setCurrentCollectionId(collectionList.find((coll) => coll.name === 'dashboard')?.id ?? -1);
         } else {
             const tabId = parseInt(tab.split('-')[1]);
@@ -262,76 +299,40 @@ const ShareBrain = ({ closeCard, setPopUpLive }: cardComponent) => {
     const handleShareBrain = async () => {
         try {
             await mutateAsync({ collectionId: currentCollectionId });
-            console.log("generated link");
         } catch (e) {
             console.error("Issue with creating a sharacble link", error);
         }
     }
 
-    return <motion.div
-        initial={{ y: 8, scale: 0.99 }}
-        animate={{ y: 0, scale: 1 }}
-        transition={{ duration: 0.2 }}
-        className={` max-h-[500px] w-[90%] xl:w-[40%] lg:w-[60%] md:w-[70%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB pb-10`}
-    >
-        <div
-            className="flex justify-between items-center mx-8 md:mx-10 xl:mx-12 mt-8">
-            <div
-                className="font-[650] text-[1.6rem] lg:text-3xl text-modalHead font-inter ">
-                Share your Second Brain
+    return <Shell
+        eyebrow="share"
+        title="Share your Second Brain"
+        sub="Share your entire collection of posts, blogs, tweets and videos with others. They'll be able to import your content into their own Second Brain."
+        onClose={closeCard}
+        width="max-w-[520px]">
+
+        <p className="font-mono text-[0.72rem] text-[#71717A]">You can stop sharing at any time.</p>
+
+        {isPending
+            ? <div className={`${primary} flex items-center justify-center`}>
+                <Loader dimh="16" dimw="44" style="text-white" />
             </div>
-            <ButtonEl
-                buttonType=""
-                onClickHandler={closeCard}
-                startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2 scale-90 lg:scale-100" />}
-            />
-        </div>
-        <div
-            className=" mt-3 lg:mt-6 xl:mt-5 md:mt-6  xl:text-xl text-justify  text-lg mx-8 lg:mx-12  font-[450] text-gray-500">
-            Share your entire collection of posts, blogs, tweets, and videos with others. They'll be able to import your content into their own Second Brain.
-        </div>
-        <div
-            className="mt-2 xl:text-xl md:text-md mx-8 lg:mx-12 text-center font-[400] text-gray-600">
-            You can stop sharing your secondbrain at any time.
-        </div>
-        {
-            isPending ? <div
-                className="w-[80%] xl:w-[88%] mt-6 h-16 mx-auto  bg-primaryButtonBlue rounded-xl h-14 flex justify-center items-center hover:bg-hover1">
-                <Loader
-                    dimh="30" dimw="60"
-                    style="" />
-            </div> :
-                !isSuccess ? <ButtonEl
-                    buttonType="primary"
-                    onClickHandler={() => handleShareBrain()}
-                    particularStyle={`w-[85%] xl:w-[88%] gap-5 mt-3 scale-y-90 lg:mt-6 h-16 mx-auto lg:font-[550] font-[600] font-inter text-[1.3rem] lg:text-[1.8rem] pr-2`}
-                    placeholder="Generate sharable link"
-                    startIcon={<CopyIcon
-                        dim="40"
-                        style="color-white size-7 ml-2 lg:size-8" />}
-                /> : <div
-                    className=" flex xl:max-w-[88%] max-w-[90%] bg-gray-200 justify-between items-center mx-auto h-18 mt-3 rounded-[3.5rem] border-2 border-gray-800 p-1 scale-y-90 lg:scale-y-100">
-                    <div
-                        className="max-w-[80%] line-clamp-1 pl-3 lg:text-[1.48rem] text-[1.3rem] font-cardTitleHeading">
+            : !isSuccess
+                ? <button onClick={handleShareBrain} className={`${primary} flex items-center justify-center gap-3`}>
+                    <CopyIcon dim="16" style="size-4" />
+                    [ generate sharable link ]
+                </button>
+                : <div className={`flex items-center gap-2 border border-[var(--rule)] bg-white p-1.5`}>
+                    <span className="min-w-0 flex-1 truncate pl-1.5 font-mono text-[0.74rem] text-[#3F3F46]">
                         {data?.payload?.generatedLink ?? "server issue, no link generated"}
-                    </div>
-                    <div
-                        className="cursor-pointer justify-center flex items-center h-full rounded-[3.5rem] bg-[#8F96C0] hover:bg-[#AAB1DA] lg:w-[20%]  w-[50%] xl:w-[50%] xl:text-[1.3rem] 2xl:w-[20%] shadow-2xl text-[1.2rem] lg:text-[1.43rem] font-[600] lg:font-[480] transition-hover duration-150"
-                        onClick={() => copyLink()}>
-                        Copy link
-                    </div>
+                    </span>
+                    <button onClick={copyLink}
+                        className="shrink-0 cursor-pointer bg-[var(--accent)] px-3 py-1.5 font-mono text-[0.66rem] uppercase tracking-[0.16em] text-white transition-colors hover:bg-[#1E3A8A]">
+                        copy
+                    </button>
                 </div>
         }
-    </motion.div>
-}
-
-
-const Logout = ({ closeCard }: cardComponent) => {
-
-    return <div className="h-[50%] w-[60%] bg-modalCard py-4">
-        <button onClick={() => closeCard()}>closeModal</button>
-        <h1 className="text-center">Logout</h1>
-    </div>
+    </Shell>
 }
 
 
@@ -345,48 +346,31 @@ const AddCollection = ({ closeCard }: cardComponent) => {
         try {
             mutateAsync({ collectionName, collectionDesc });
         } catch (e) {
-            console.log('errro occured', error)
+            console.error('errro occured', error)
         } finally {
             closeCard();
         }
     }
 
-    return <motion.div
-        initial={{ y: 8, scale: 0.99 }}
-        animate={{ y: 0, scale: 1 }}
-        transition={{ duration: 0.3 }}
-        className={` max-h-[60%] w-[85%] xl:w-[38%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-auto scrollbarSB pb-7`} >
-        <div className="flex justify-between items-center mx-8 nd:mx-10 xl:mx-12 mt-8">
-            <div
-                className="font-[650]  text-3xl text-modalHead font-inter ">
-                Start a new collection
-            </div>
-            <ButtonEl
-                buttonType=""
-                onClickHandler={closeCard}
-                startIcon={<CrossIcon dim="50"
-                    style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2 scale-90 lg:scale-100" />}
-            />
-        </div>
-        <div className="mt-4  xl:mt-6 text-md  lg:mx-12 mx-8  font-[450] text-gray-500 text-center">
-            Organize related links under one collection. Perfect for keeping your research or ideas grouped together.
-        </div>
-        <div className="text-center mt-3">
-            <input type="text" placeholder="Name your collection" className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-[1.1rem] lg:text-xl font-cardTitleHeading border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-700 focus:outline-none" value={collectionName} onChange={(e) => setCollectionName(e.target.value)} />
-            <textarea placeholder="A brief description shown when this collection is shared." className="w-[90%] mt-4 cursor-pointer py-1 pl-4 md:py-2 text-[o.92rem] lg:text-xl font-cardTitleHeading scrollbarSB border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-700 focus:outline-none" value={collectionDesc} onChange={(e) => setCollectionDesc(e.target.value)} />
-        </div>
-        <ButtonEl
-            buttonType="primary"
-            onClickHandler={() => handleAddCollection()}
-            particularStyle="w-[90%]  font-inter mt-2 scale-y-90 lg:scale-y-100 mx-auto text-[1.5rem] lg:text-3xl font-[550] font-inter "
-            placeholder="Create new collection" />
-        {
-            isPending && <div
-                className="animate-pulse text-lg text-center mt-1 font[600]">
-                Creating collection {collectionName}
-            </div>
-        }
-    </motion.div>
+    return <Shell
+        eyebrow="new collection"
+        title="Start a new collection"
+        sub="Organize related links under one collection. Perfect for keeping your research or ideas grouped together."
+        onClose={closeCard}
+        width="max-w-[460px]">
+
+        <input type="text" placeholder="Name your collection" className={field}
+            value={collectionName} onChange={(e) => setCollectionName(e.target.value)} />
+
+        <textarea placeholder="A brief description shown when this collection is shared." rows={3}
+            className={`${field} resize-y`}
+            value={collectionDesc} onChange={(e) => setCollectionDesc(e.target.value)} />
+
+        <button onClick={handleAddCollection} disabled={isPending}
+            className={`${primary} mt-1 ${isPending ? "animate-pulse" : ""}`}>
+            {isPending ? `[ creating ${collectionName} ]` : "[ create collection ]"}
+        </button>
+    </Shell>
 }
 
 const StartCommunity = ({ closeCard }: cardComponent) => {
@@ -415,120 +399,81 @@ const StartCommunity = ({ closeCard }: cardComponent) => {
         try {
             await mutateAsync({ name: communityName.trim(), descp: communityDesc.trim(), password: password.trim(), emailLead: emailLead.trim(), membersCanPost: allowPost });
             if (!isPending && !error) {
-                console.log("successfully community created");
                 console.log(data)
             }
         } catch (e) {
-            console.log(error);
-            alert("some server issue in createing community")
+            console.error(error);
         }
         closeCard();
     }
 
-    const checkboxDivStyle = "flex items-center mt-2 lg:pl-16 pl-8 lg:text-2xl text-lg font-cardTitleHeading font-[400] text-slate-700 "
-    const checkboxInputStyle = "size-6 mr-4 cursor-pointer accent-[#6056AA] hover:scale-120 hover:inset-ring-2 hover:inset-ring-[#6056AA]/30 border-slate-600   transition-hover duration-200 ease-in-out";
-    const inputStyle = "w-[85%] mt-4 cursor-pointer py-1 pl-4 md:py-2 lg:text-2xl text-lg font-cardTitleHeading border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-700 focus:outline-none";
+    return <Shell
+        eyebrow={startClicked ? "new community" : "access"}
+        title="Start your community"
+        sub={startClicked ? "Passionate about something? Build a space where others can explore it with you." : undefined}
+        onClose={closeCard}
+        width="max-w-[520px]">
 
-    return <motion.div
-        initial={{ y: 8, scale: 0.99 }}
-        animate={{ y: 0, scale: 1 }}
-        transition={{ duration: 0.2 }}
-        className={`max-h-[80%] w-[85%] xl:w-[45%] md:w-[60%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB overflow-x-hidden pb-8`}
-    >
-        <div className="flex justify-between items-center mx-8 nd:mx-10 xl:mx-16 mt-8">
-            <div className="font-[650]  text-3xl text-modalHead font-inter">Start your Community!!</div>
-            <ButtonEl buttonType="" onClickHandler={closeCard} startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2" />} />
-        </div>
         {startClicked ? <motion.div key="sliding-box1"
-            initial={{ x: 0, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ x: -300, opacity: 0 }}
-            transition={{ duration: 0.4, ease: "easeInOut" }}>
-            <div
-                className="mt-5 lg:text-[1.3rem] text-[1rem] lg:mx-16 mx-7 lg:text-center text-justified tracking-[0.05rem]  font-[550] text-gray-500">
-                Passionate about something? Build a space where others can explore it with you.
-            </div>
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="flex flex-col gap-3">
 
-            <div
-                className="text-center lg:mt-4 mt-2">
-                <input
-                    type="text"
-                    onChange={(e) => setcommunityName(e.target.value)} value={communityName}
-                    placeholder="Name your community"
-                    className={inputStyle + ""}
-                />
+            <input type="text" placeholder="Name your community" className={field}
+                onChange={(e) => setcommunityName(e.target.value)} value={communityName} />
 
-                <textarea
-                    placeholder="Describe you community.."
-                    value={communityDesc}
-                    onChange={(e) => setcommunityDesc(e.target.value)}
-                    className={inputStyle}
-                />
-            </div>
+            <textarea placeholder="Describe your community..." rows={3} className={`${field} resize-y`}
+                value={communityDesc} onChange={(e) => setcommunityDesc(e.target.value)} />
 
-            <div className={checkboxDivStyle + " mt-4"}>
-                <label className="flex items-center cursor-pointer">
-                    <input type="checkbox" checked={allowPost} onChange={() => { setAllowPost((prev) => !prev) }} className={checkboxInputStyle} ></input>Allow members to post
-                </label>
-            </div>
+            <label className="flex cursor-pointer items-center gap-2.5 text-[0.84rem] text-[#3F3F46]">
+                <input type="checkbox" checked={allowPost} onChange={() => setAllowPost((prev) => !prev)}
+                    className="size-4 cursor-pointer accent-[var(--accent)]" />
+                Allow members to post
+            </label>
 
-            {inValidInput && <div
-                className="text-center text-red-600 font-[500] text-[0.9rem] mt-2 mx-5">
-                Invalid input-Community name and description field are necessary field
-            </div>
-            }
-            <ButtonEl
-                buttonType="primary"
-                onClickHandler={onStart}
-                particularStyle="w-[85%] gap-5 font-inter mt-6 lg:h-16 h-10 mx-auto font-[650] font-inter text-[1.4rem]"
-                placeholder="Start your Community"
-            />
-        </motion.div> : <motion.div key="sliding-box2"
-            initial={{ x: 250, y: 0, opacity: 0 }}
-            animate={{ x: 0, y: 0, opacity: 1 }}
-            exit={{ x: 200, opacity: 0 }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
-        >
+            {inValidInput && <p className={invalid}>Community name and description are both required.</p>}
 
-            <ButtonEl
-                onClickHandler={() => setStartClicked(true)}
-                startIcon={<LeftIcon dim="20" style="size-5" />}
-                buttonType={"back"}
-                placeholder="Back"
-                particularStyle=" lg:ml-16 ml-8 my-2 text-[1.2rem] "
-            />
+            <button onClick={onStart} className={`${primary} mt-1`}>[ continue ]</button>
+        </motion.div>
 
-            <div className="text-center">
-                <input type="text" onChange={(e) => setemailLead(e.target.value)} placeholder="Enter Email-id(lead)" className={inputStyle + ""} />
-                <input type="text" onChange={(e) => setpassword(e.target.value)} placeholder="Enter password for access" className={inputStyle + ""} />
-            </div>
+            : <motion.div key="sliding-box2"
+                initial={{ x: 60, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 60, opacity: 0 }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
+                className="flex flex-col gap-3">
 
-            <div
-                className="lg:text-lg text-sm text-justify my-3 text-red-600 lg:mx-17 mx-10">
-                <u>Note:</u>
-                <ul className="list-disc pl-7">
-                    <li>This password is used by new members to join the community.                            </li>
-                    <li>It can be changed later if needed.                            </li>
-                    <li>Do not use anything personal, as the password is shared.                            </li>
-                    <li>Group settings can be managed lead</li>
-                </ul>
-            </div>
+                <button onClick={() => setStartClicked(true)} className={`${ghost} self-start`}>[ back ]</button>
 
-            <ButtonEl
-                buttonType="primary"
-                onClickHandler={handleCreateCommunity}
-                particularStyle="w-[85%] gap-5 font-inter mt-6 h-8 lg:h-16 mx-auto font-[650] font-inter text-[1.7rem] "
-                placeholder="Final Submission"
-            />
+                <input type="text" placeholder="Enter email-id (lead)" className={field}
+                    value={emailLead} onChange={(e) => setemailLead(e.target.value)} />
+                <input type="text" placeholder="Enter password for access" className={field}
+                    value={password} onChange={(e) => setpassword(e.target.value)} />
 
-        </motion.div>}
-    </motion.div>
+                <div className="border-l-2 border-[var(--accent)] bg-[var(--wash)] px-3 py-2.5">
+                    <p className={eyebrowCls}>[ note ]</p>
+                    <ul className="mt-2 list-disc pl-4 text-[0.78rem] leading-[1.45] text-[#52525B]">
+                        <li>New members use this password to join.</li>
+                        <li>It can be changed later if needed.</li>
+                        <li>Don't use anything personal — the password gets shared.</li>
+                        <li>Group settings are managed by the lead.</li>
+                    </ul>
+                </div>
+
+                <button onClick={handleCreateCommunity} disabled={isPending}
+                    className={`${primary} ${isPending ? "animate-pulse" : ""}`}>
+                    [ create community ]
+                </button>
+            </motion.div>}
+    </Shell>
 }
 
 
 const JoinCommunity = ({ closeCard }: cardComponent) => {
 
-    const { mutateAsync, error } = useJoinCommunity();
+    const { mutateAsync, error, isPending } = useJoinCommunity();
     const [communityId, setCommunityId] = useState<string>('');
     const [inValidInput, setInvalidInput] = useState<boolean>(false);
 
@@ -541,65 +486,36 @@ const JoinCommunity = ({ closeCard }: cardComponent) => {
                 await mutateAsync({ communityId: communityIdTrimmed });
                 closeCard();
             } catch (e) {
-                console.log("Error happened \n\n");
-                console.log(error)
+                console.error(error)
             }
         }
     }
 
+    return <Shell
+        eyebrow="join"
+        title="Join a community"
+        sub="Discover and share the best content with like-minded people."
+        onClose={closeCard}
+        width="max-w-[440px]">
 
-    const inputStyle = "w-[85%] mt-2 lg:mt-4 cursor-pointer py-1 pl-4 md:py-2 lg:text-2xl text-xl font-cardTitleHeading border-2 border-gray-500 rounded-xl hover:border-[#7569B3] focus:border-[#6056AA] focus:shadow-sm transition-focus delay-50 duration-150 text-gray-600 focus:outline-none";
+        <input
+            type="text"
+            placeholder="Paste community link..."
+            value={communityId}
+            onChange={(e) => setCommunityId(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") handleJoinCommunity(); }}
+            className={field}
+        />
 
+        {inValidInput && <p className={invalid}>A community link is required.</p>}
 
-    return <motion.div
-        initial={{ y: 8, scale: 0.99 }}
-        animate={{ y: 0, scale: 1 }}
-        transition={{ duration: 0.2 }}
-        className={`max-h-[75%] w-[85%] xl:w-[40%] md:w-[50%]  rounded-3xl bg-modalCard  cursor-default overflow-y-hidden scrollbarSB pb-8`} >
-        <div className="flex justify-between items-center mx-8 nd:mx-10 xl:mx-15 mt-8">
-
-            <div
-                className="font-[650] text-[1.7rem]  lg:text-3xl text-modalHead font-inter ">
-                Join a Community!!
-            </div>
-
-            <ButtonEl
-                buttonType=""
-                onClickHandler={closeCard}
-                particularStyle="scale-85  lg:scale-100"
-                startIcon={<CrossIcon dim="50" style="text-gray hover:bg-gray-300/60 transition-hover duration-150 ease-in-out rounded-xl p-2 " />}
-            />
-
-        </div>
-        <div
-            className="mt-2 lg:mt-5 text-center text-[1.1rem] lg:text-xl mx-12  font-[450] text-gray-500">
-            Discover and share the best content with like-minded people.
-        </div>
-        <div
-            className="text-center mt-3">
-            <input
-                type="text"
-                placeholder="Paste community link..."
-                value={communityId}
-                onChange={(e) => setCommunityId(e.target.value)}
-                className={inputStyle + " h-14"}
-            />
-        </div>
-
-        {inValidInput && <div
-            className="text-center text-red-600 font-[500] mx-2 mt-2 text-[0.8rem] md:text-0.9 lg:text-[1.2rem]">
-            Invalid input: Community link is required.
-        </div>
-        }
-
-        <ButtonEl
-            buttonType="primary"
-            onClickHandler={handleJoinCommunity}
-            particularStyle="w-[85%] gap-5 font-inter mt-3 lg:mt-6 h-8 scale-y-90 lg:scale-y-100 mx-auto font-[600] font-inter text-[1.6rem]"
-            placeholder="Join Community" />
-    </motion.div>
+        <button onClick={handleJoinCommunity} disabled={isPending}
+            className={`${primary} mt-1 ${isPending ? "animate-pulse" : ""}`}>
+            [ join community ]
+        </button>
+    </Shell>
 }
 
 
 
-export default React.memo(Modal); 
+export default React.memo(Modal);
