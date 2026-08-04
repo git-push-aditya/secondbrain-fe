@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { usePopUpAtom, usePopUpMessage } from "../recoil/clientStates";
 import type { cardType } from "./card";
 import { DownArrow, ShareIcon, UpArrow } from "../icons/commonIcons";
-import { minEndingIndex } from "../utils/minEndingIndex";
 import { useEffect, useState } from "react";
 import { redditScriptLoader } from "../scriptLoader";
 import { useUserProfile } from "../recoil/user";
@@ -10,6 +9,8 @@ import { useVoteContent } from "../api/user/mutate";
 import { getProfilePicPath } from "../utils/profilePhoto";
 import { Avatar } from "./ui/avatar";
 import WebGlance from "./webGlance";
+import { LinkChip } from "./ui/linkChip";
+import { Button01 } from "./ui/nextjsshop-button";
 import React from "react";
 
 interface communityCard {
@@ -209,18 +210,11 @@ const GridStyle = ({ createdAt, title, link, communityId, id, note, cardType, sh
 
                 {
                     cardType === 'WEB' &&
-                    <div className="flex justify-center">
-                        {/* preview only — pointer-events-none so the click reaches the
-                            button and opens the glance instead of the framed page */}
-                        <button type="button" onClick={() => setGlancing(true)} aria-label={`Open ${title}`}
-                            className="group/web w-full cursor-pointer">
-                            <iframe className="pointer-events-none w-[99%] mx-auto h-50 mt-2 rounded-lg border border-transparent transition-colors group-hover/web:border-[#1D4ED8]"
-                                src={link} tabIndex={-1} loading="lazy" referrerPolicy="strict-origin-when-cross-origin"
-                                sandbox="allow-scripts allow-same-origin allow-forms" />
-                            <div className="text-center text-mon0 text-xl text-primaryButtonBlue mt-[-30px]">
-                                {link.substring(link.indexOf('www'), minEndingIndex(link)).split('https://')[1]}
-                            </div>
-                        </button>
+                    <div className="mt-2 w-full">
+                        <LinkChip link={link} />
+                        <div className="mt-2 flex justify-center">
+                            <Button01 label="open" size="sm" onClick={() => setGlancing(true)} />
+                        </div>
                     </div>
                 }
 

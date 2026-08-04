@@ -4,13 +4,13 @@ import { RedirectIcon } from "../icons/commonIcons";
 import Tag from "./tags";
 import ButtonEl from "./button";
 import { AnimatePresence, motion } from "framer-motion";
-import { minEndingIndex } from "../utils/minEndingIndex"
 import { usePopUpAtom, usePopUpMessage } from "../recoil/clientStates";
 import React from "react";
 import { useDeleteID } from "../recoil/deleteId";
 import { redditScriptLoader } from "../scriptLoader";
 import VideoLightbox from "./videoLightbox";
 import WebGlance from "./webGlance";
+import { LinkChip } from "./ui/linkChip";
 import { Button01 } from "./ui/nextjsshop-button";
 import { youtubeId, youtubeThumb } from "../utils/youtube";
 
@@ -272,22 +272,9 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
                                 pointer-events-none so clicks land on the button and
                                 open the glance instead of being swallowed by the
                                 embedded document. */}
-                            <div className="group/web w-full">
-                                <button type="button" onClick={() => setGlancing(true)} aria-label={`Open ${title}`}
-                                    className="block w-full cursor-pointer">
-                                    <iframe
-                                        className="pointer-events-none mx-auto mt-1.5 h-28 w-[98%] rounded-md border border-transparent transition-colors group-hover/web:border-[#1D4ED8]"
-                                        src={link}
-                                        loading="lazy"
-                                        tabIndex={-1}
-                                        referrerPolicy="strict-origin-when-cross-origin"
-                                        sandbox="allow-scripts allow-same-origin allow-forms"
-                                    />
-                                </button>
-                                {/* was a text link showing the bare host — an "open"
-                                    action says what it does, and the host is already
-                                    on the glance's chrome bar once it's up */}
-                                <div className="mt-1.5 flex justify-center">
+                            <div className="mt-1.5 w-full">
+                                <LinkChip link={link} />
+                                <div className="mt-2 flex justify-center">
                                     <Button01 label="open" size="sm" onClick={() => setGlancing(true)} />
                                 </div>
                             </div>
