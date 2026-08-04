@@ -353,16 +353,16 @@ const AddCollection = ({ closeCard }: cardComponent) => {
     }
 
     return <Shell
-        eyebrow="new collection"
-        title="Start a new collection"
-        sub="Organize related links under one collection. Perfect for keeping your research or ideas grouped together."
+        eyebrow="new workspace"
+        title="Start a new workspace"
+        sub="Organize related links under one workspace. Perfect for keeping your research or ideas grouped together."
         onClose={closeCard}
         width="max-w-[460px]">
 
-        <input type="text" placeholder="Name your collection" className={field}
+        <input type="text" placeholder="Name your workspace" className={field}
             value={collectionName} onChange={(e) => setCollectionName(e.target.value)} />
 
-        <textarea placeholder="A brief description shown when this collection is shared." rows={3}
+        <textarea placeholder="A brief description shown when this workspace is shared." rows={3}
             className={`${field} resize-y`}
             value={collectionDesc} onChange={(e) => setCollectionDesc(e.target.value)} />
 

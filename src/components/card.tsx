@@ -10,6 +10,8 @@ import React from "react";
 import { useDeleteID } from "../recoil/deleteId";
 import { redditScriptLoader } from "../scriptLoader";
 import VideoLightbox from "./videoLightbox";
+import WebGlance from "./webGlance";
+import { Button01 } from "./ui/nextjsshop-button";
 import { youtubeId, youtubeThumb } from "../utils/youtube";
 
 export type cardType = "YOUTUBE" | "WEB" | "TWITTER" | "REDDIT" | "INSTAGRAM";
@@ -152,6 +154,7 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
 
     const videoId = cardType === "YOUTUBE" ? youtubeId(link) : null;
     const [playing, setPlaying] = useState(false);
+    const [glancing, setGlancing] = useState(false);
 
     useEffect(() => {
         if (cardType === "TWITTER") {
@@ -265,20 +268,34 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
                     {
                         cardType === 'WEB' &&
                         <div className="flex justify-center">
-                            <a href={link} target="_blank">
-                                {<iframe
-                                    className="w-[98%] mx-auto h-28 mt-1.5 rounded-md  "
-                                    src={link}
-                                    loading="lazy"
-                                    referrerPolicy="strict-origin-when-cross-origin"
-                                    sandbox="allow-scripts allow-same-origin allow-forms"
-                                    allowFullScreen>
-                                </iframe>}
-                                <div className="text-center text-mono line-clamp-1 text-[0.72rem] text-primaryButtonBlue mt-[-18px]">
-                                    {link.substring(link.indexOf('www'), minEndingIndex(link)).split('https://')[1]}
+                            {/* The preview iframe is a thumbnail, not a usable page:
+                                pointer-events-none so clicks land on the button and
+                                open the glance instead of being swallowed by the
+                                embedded document. */}
+                            <div className="group/web w-full">
+                                <button type="button" onClick={() => setGlancing(true)} aria-label={`Open ${title}`}
+                                    className="block w-full cursor-pointer">
+                                    <iframe
+                                        className="pointer-events-none mx-auto mt-1.5 h-28 w-[98%] rounded-md border border-transparent transition-colors group-hover/web:border-[#1D4ED8]"
+                                        src={link}
+                                        loading="lazy"
+                                        tabIndex={-1}
+                                        referrerPolicy="strict-origin-when-cross-origin"
+                                        sandbox="allow-scripts allow-same-origin allow-forms"
+                                    />
+                                </button>
+                                {/* was a text link showing the bare host — an "open"
+                                    action says what it does, and the host is already
+                                    on the glance's chrome bar once it's up */}
+                                <div className="mt-1.5 flex justify-center">
+                                    <Button01 label="open" size="sm" onClick={() => setGlancing(true)} />
                                 </div>
-                            </a>
+                            </div>
                         </div>
+                    }
+
+                    {glancing &&
+                        <WebGlance link={link} title={title} onClose={() => setGlancing(false)} />
                     }
 
                     {note && <div
@@ -330,6 +347,8 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
 
 
 const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked, cardType, note, tags, createdAt, link, deleteCard }: layoutCard) => {
+    const [glancing, setGlancing] = useState(false);
+
     return <motion.div
         key={"listCard"}
         initial={{ y: 8, opacity: 0 }}
@@ -390,11 +409,18 @@ const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked
                     <CardMenu showDelete={!shared}
                         onShare={() => shareClicked(link)}
                         onDelete={() => setDeleteClicked((prev) => !prev)} />
-                    <RedirectIcon
-                        layout={"list"} style="size-8 lg:scale-90 xl:scale-100 hover:-translate-y-0.5 hidden md:block transition-translate duration-300 ease-in-out" link={link} />
+                    {/* WEB rows glance in place; the other types have no embeddable
+                        page worth framing, so they keep the redirect arrow. */}
+                    {cardType === 'WEB'
+                        ? <Button01 label="open" size="sm" className="hidden md:block" onClick={() => setGlancing(true)} />
+                        : <RedirectIcon
+                            layout={"list"} style="size-8 lg:scale-90 xl:scale-100 hover:-translate-y-0.5 hidden md:block transition-translate duration-300 ease-in-out" link={link} />
+                    }
                 </motion.div>
             }
         </AnimatePresence>
+
+        {glancing && <WebGlance link={link} title={title} onClose={() => setGlancing(false)} />}
     </motion.div>
 }
 

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Dither from "../components/Dither";
 import DitherBranches from "../components/DitherBranches";
 import { CardStack } from "../components/ui/card-stack";
+import { Button01 } from "../components/ui/nextjsshop-button";
 import { getProfilePicPath } from "../utils/profilePhoto";
 import { authErrorMessage } from "../utils/authError";
 import { THEMES, hexRgb, type profilePicId } from "../utils/theme";
@@ -288,13 +289,12 @@ const Auth = ({ user, setUser }: AuthProps) => {
                                 <div className="mt-3 text-center text-[0.8rem] font-[500] text-red-500">{errorMessage}</div>
                             }
 
-                            <button
+                            <Button01
+                                label={authMode === "logIn" ? "Log In" : "Sign Up"}
                                 onClick={() => handleClick()}
                                 disabled={inIsPending || upIsPending}
-                                className={`mt-4 h-11 w-full rounded-lg bg-[#4338E5] text-white text-[0.9rem] font-[600] cursor-pointer transition-colors duration-200 hover:bg-[#372DCC] ${(inIsPending || upIsPending) ? "animate-pulse" : ""}`}
-                            >
-                                {authMode === "logIn" ? "Log In" : "Sign Up"}
-                            </button>
+                                className={`mt-4 ${(inIsPending || upIsPending) ? "animate-pulse" : ""}`}
+                            />
 
                             <div className="flex items-center gap-3 mt-5">
                                 <hr className="flex-1 border-t border-gray-200" />
@@ -302,12 +302,12 @@ const Auth = ({ user, setUser }: AuthProps) => {
                                 <hr className="flex-1 border-t border-gray-200" />
                             </div>
 
-                            <button
+                            <Button01
+                                label="Continue as Guest"
+                                variant="secondary"
                                 onClick={() => handleGuestLogIn()}
-                                className="mt-4 h-11 w-full rounded-lg border border-gray-200 bg-[#FAFAFB] text-[#1A1A21] text-[0.85rem] font-[500] cursor-pointer transition-colors duration-200 hover:bg-gray-100"
-                            >
-                                Continue as Guest
-                            </button>
+                                className="mt-4"
+                            />
 
                             <p className="mt-5 text-center text-[0.8rem] font-[500] text-gray-600">
                                 {authMode === "logIn" ? "Don't Have An Account? " : "Already Have An Account? "}
@@ -363,20 +363,19 @@ const Auth = ({ user, setUser }: AuthProps) => {
                                 <div className="mt-3 text-center text-[0.8rem] font-[500] text-red-500">{errorMessage}</div>
                             }
 
-                            <button
+                            <Button01
+                                label="Create Account"
                                 onClick={() => submitSignUp()}
                                 disabled={upIsPending}
-                                className={`mt-4 h-11 w-full rounded-lg bg-[#4338E5] text-white text-[0.9rem] font-[600] cursor-pointer transition-colors duration-200 hover:bg-[#372DCC] ${upIsPending ? "animate-pulse" : ""}`}
-                            >
-                                Create Account
-                            </button>
+                                className={`mt-4 ${upIsPending ? "animate-pulse" : ""}`}
+                            />
 
-                            <button
+                            <Button01
+                                label="Back to details"
+                                variant="secondary"
                                 onClick={() => setStep("details")}
-                                className="mt-3 h-11 w-full rounded-lg border border-gray-200 bg-[#FAFAFB] text-[#1A1A21] text-[0.85rem] font-[500] cursor-pointer transition-colors duration-200 hover:bg-gray-100"
-                            >
-                                Back to details
-                            </button>
+                                className="mt-3"
+                            />
                         </div>}
                     </div>
                 </div>
