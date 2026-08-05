@@ -1,0 +1,132 @@
+/* Pixel-dither wipe button. Two layers slide in from the left on hover: a solid
+   bar whose leading edge is a grid of squares, plus a sparser scatter ahead of
+   it. Staggered per-square delays (--index) make the edge disintegrate instead
+   of being a clean line. Colours come from the vars, so variants are just vars. */
+
+.button01 {
+    --b01-dur: 0.42s;
+    --b01-ease: cubic-bezier(0.62, 0.05, 0.32, 1);
+    --b01-px: 0.5rem;
+
+    position: relative;
+    display: block;
+    width: var(--b01-w, 100%);
+    height: var(--b01-h, 2.75rem);
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background: var(--b01-bg);
+    color: var(--b01-fg);
+    box-shadow: inset 0 0 0 var(--b01-ring-w, 0px) var(--b01-ring, transparent);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.button01:disabled {
+    cursor: default;
+    opacity: 0.65;
+}
+
+.button01_bg {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    transform: translateX(-100%);
+    transition: transform var(--b01-dur) var(--b01-ease);
+}
+
+.button01_bg-mid {
+    flex: 1;
+    background: var(--b01-fill);
+}
+
+/* leading edge: 5x5 squares, the ragged boundary of the wipe */
+.button01_bg-right,
+.button01_bg-right-overlay {
+    display: grid;
+    grid-template-columns: repeat(5, var(--b01-px));
+    grid-auto-rows: 20%;
+    align-content: stretch;
+}
+
+/* scatter layer sits just beyond the edge, outside the bar */
+.button01_bg-right-overlay {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    height: 100%;
+    grid-template-columns: repeat(4, var(--b01-px));
+    grid-auto-rows: 25%;
+}
+
+.button01_bg-pixel {
+    background: var(--b01-fill);
+    opacity: 0;
+    transition: opacity calc(var(--b01-dur) * 0.55) linear;
+    transition-delay: calc(var(--index) * 45ms);
+}
+
+/* text: base label plus an inverted copy revealed by a clip-path wipe running
+   on the same duration/easing as the bar, so the two stay in step. */
+.button01_inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    height: 100%;
+    padding: 0 1rem;
+    font-size: var(--b01-size, 0.9rem);
+    font-weight: var(--b01-weight, 600);
+    letter-spacing: -0.005em;
+}
+
+.button01_inner::before {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--b01-fill-fg);
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path var(--b01-dur) var(--b01-ease);
+}
+
+.button01_text {
+    display: block;
+}
+
+.button01:hover:not(:disabled) .button01_bg,
+.button01:focus-visible:not(:disabled) .button01_bg {
+    transform: translateX(0);
+}
+
+.button01:hover:not(:disabled) .button01_bg-pixel,
+.button01:focus-visible:not(:disabled) .button01_bg-pixel {
+    opacity: 1;
+}
+
+.button01:hover:not(:disabled) .button01_inner::before,
+.button01:focus-visible:not(:disabled) .button01_inner::before {
+    clip-path: inset(0 0 0 0);
+}
+
+.button01:focus-visible {
+    outline: 2px solid var(--b01-fill);
+    outline-offset: 2px;
+}
+
+.button01:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+/* ponytail: the wipe is decoration — motion-sensitive users just get the
+   colour swap, no per-pixel animation to reason about. */
+@media (prefers-reduced-motion: reduce) {
+
+    .button01_bg,
+    .button01_bg-pixel,
+    .button01_inner::before {
+        transition-duration: 0.01ms;
+        transition-delay: 0ms;
+    }
+}

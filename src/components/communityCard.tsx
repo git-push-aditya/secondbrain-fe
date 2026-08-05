@@ -2,12 +2,15 @@ import { motion } from "framer-motion";
 import { usePopUpAtom, usePopUpMessage } from "../recoil/clientStates";
 import type { cardType } from "./card";
 import { DownArrow, ShareIcon, UpArrow } from "../icons/commonIcons";
-import { minEndingIndex } from "../utils/minEndingIndex";
 import { useEffect, useState } from "react";
 import { redditScriptLoader } from "../scriptLoader";
 import { useUserProfile } from "../recoil/user";
 import { useVoteContent } from "../api/user/mutate";
 import { getProfilePicPath } from "../utils/profilePhoto";
+import { Avatar } from "./ui/avatar";
+import WebGlance from "./webGlance";
+import { LinkChip } from "./ui/linkChip";
+import { Button01 } from "./ui/nextjsshop-button";
 import React from "react";
 
 interface communityCard {
@@ -115,6 +118,7 @@ const GridStyle = ({ createdAt, title, link, communityId, id, note, cardType, sh
     const defaultStyle: string = `  w-85 overflow-x-hidden  ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 " : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} font-source  transition-hover duration-300 h-115  bg-cardBackground border-2  rounded-3xl shadow-md scrollbar-hidden ${isOwner ? " border-slate-400" : " border-slate-300 "} group/card overflow-y-auto`;
 
     const [newLink, setNewLink] = useState<string>(link);
+    const [glancing, setGlancing] = useState(false);
     const extractVideoId = (videoUrl : string) => {
         const regex = /(?:youtube\.com\/.*v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/;
         const match = videoUrl.match(regex);
@@ -150,7 +154,7 @@ const GridStyle = ({ createdAt, title, link, communityId, id, note, cardType, sh
     > <div className={defaultStyle} >
             <div className="h-[15%] mt-2 flex justify-between py-2 mx-4 items-center relative z-1 ">
                 <div className="flex items-center gap-2 text-cardTitleHeading text-xl font-[500]">
-                    <img src={profilePhoto} className={"rounded-3xl h-12 w-12 cursor-pointer"} />
+                    <Avatar src={profilePhoto} alt={posterName} className="rounded-full size-12 cursor-pointer" />
                     <div>by {isOwner ? "you" : posterName}</div>
                 </div>
 
@@ -206,15 +210,15 @@ const GridStyle = ({ createdAt, title, link, communityId, id, note, cardType, sh
 
                 {
                     cardType === 'WEB' &&
-                    <div className="flex justify-center">
-                        <a href={link} target="_blank">
-                            {<iframe className="w-[99%] mx-auto h-50 mt-2 rounded-lg  " src={link} referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>}
-                            <div className="text-center text-mon0 text-xl text-primaryButtonBlue mt-[-30px]">
-                                {link.substring(link.indexOf('www'), minEndingIndex(link)).split('https://')[1]}
-                            </div>
-                        </a>
+                    <div className="mt-2 w-full">
+                        <LinkChip link={link} />
+                        <div className="mt-2 flex justify-center">
+                            <Button01 label="open" size="sm" onClick={() => setGlancing(true)} />
+                        </div>
                     </div>
                 }
+
+                {glancing && <WebGlance link={link} title={title} onClose={() => setGlancing(false)} />}
 
                 {note && <div className="px-2 mt-4 cursor-default font-sans font-[440] text-slate-500 text-xl text-justify ">
                     {note}
@@ -246,7 +250,7 @@ const ListStyle = ({ createdAt, title, link, note, cardType, shareClicked, poste
         className={`w-[90%] h-[80px] flex items-center mb-4 mx-auto transition-hover cursor-default duration-300  bg-cardBackground border-2 border-slate-300 rounded-3xl shadow-md pl-3  ${cardType == 'REDDIT' ? " hover:border-orange-600 " : cardType == "TWITTER" ? " hover:border-blue-800" : cardType == "YOUTUBE" ? " hover:border-red-700 " : cardType == "INSTAGRAM" ? " hover:border-[#bc1888] " : " hover:border-slate-500"} ${isOwner ? " border-slate-400" : " border-slate-300 "} `}
     >
         <div className="flex  h-full items-center w-[16%] md:w-[7%] justify-center">
-            <img src={profilePhoto} className={"rounded-3xl size-13  cursor-pointer"} />
+            <Avatar src={profilePhoto} alt={posterName} className="rounded-full size-13 cursor-pointer" />
         </div>
         <div className=" md:w-[70%] w-[80%] h-full pl-1 py-2 ">
             <div className={`w-[100%] flex gap-10 items-center ${note !== "" ? "h-[60%] " : "h-full"}`}>

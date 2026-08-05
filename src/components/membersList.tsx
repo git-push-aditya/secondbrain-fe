@@ -1,6 +1,7 @@
 import React from "react";
 import { user, useUserProfile } from "../recoil/user";
 import { getProfilePicPath } from "../utils/profilePhoto"
+import { Avatar } from "./ui/avatar"
 
 interface memberType {
     userName: string;
@@ -22,7 +23,7 @@ const Member = ({ userName, profilePic, isFounder, id }: memberType) => {
             title={`${userName} : ${isFounder ? "Founder" : "Member"}`}
             className="flex cursor-default items-center gap-2 px-2 h-[50px] w-60 bg-slate-100"
         >
-            <img src={src} className="rounded-[2rem] size-10" />
+            <Avatar src={src} alt={userName} className="rounded-full size-10" />
             <div className="text-2xl font-[500] truncate">{userName}</div>
             {isFounder ? (
                 <div className="rounded-[3rem] size-8 bg-blue-300 flex justify-center items-center text-lg font-400">

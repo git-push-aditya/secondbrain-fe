@@ -68,7 +68,7 @@ export const SharedCollection = ({ layout, setLayout }: { layout: "grid" | "list
 
             {/* ---- masthead ---- */}
             <section className="px-4 pt-12 pb-10 sm:px-10 lg:px-16">
-                <p className={eyebrow}>[ shared collection ]</p>
+                <p className={eyebrow}>[ shared workspace ]</p>
 
                 <h1 className="mt-5 text-[2rem] leading-[1.06] font-[700] tracking-[-0.03em] text-[#141418] sm:text-[2.6rem] lg:text-[3.1rem]">
                     {metadataLoading

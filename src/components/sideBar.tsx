@@ -9,6 +9,7 @@ import React from "react";
 import type { AuthUser } from "../App";
 import type { ModalType } from "../pages/dashboard";
 import { useUserProfile } from "../recoil/user";
+import { Avatar } from "./ui/avatar";
 
 interface sideBarTypes {
     setModalNeededBy: React.Dispatch<React.SetStateAction<ModalType>>;
@@ -126,7 +127,7 @@ const SideBar = ({ setModalNeededBy, setUser, collapsed, onToggle }: sideBarType
 
     const groups: Group[] = [
         {
-            label: "workspace", items: [
+            label: "browse", items: [
                 // "Episodes" is every saved card; the source filter lives in its header now
                 { ...nav("dashboard", "Episodes", <Dasboard dim="16" style="[&_path]:stroke-current" />), active: tab.startsWith("dashboard") },
                 nav("stats", "Stats", <StatsIcon />),
@@ -134,7 +135,7 @@ const SideBar = ({ setModalNeededBy, setUser, collapsed, onToggle }: sideBarType
             ]
         },
         {
-            label: "collections", items: collections.map(c =>
+            label: "workspaces", items: collections.map(c =>
                 nav(`collection-${c.id}`, c.name, <CollectionIcon dim="15" style="fill-current" />))
         },
         {
@@ -152,7 +153,7 @@ const SideBar = ({ setModalNeededBy, setUser, collapsed, onToggle }: sideBarType
             }
             <button onClick={() => collapsed ? onToggle() : setLogOutOpen(prev => !prev)} title={user?.userName}
                 className={`flex w-full cursor-pointer items-center gap-2.5 rounded-md p-1 text-left transition-colors hover:bg-[#FAFAFA] ${collapsed ? "justify-center" : ""}`}>
-                <img src={user?.profilePic} className="size-7 shrink-0 rounded-[7px] ring-1 ring-[#E7E7E9]" />
+                <Avatar src={user?.profilePic} alt={user?.userName} className="size-7 rounded-[7px] ring-1 ring-[#E7E7E9]" />
                 {!collapsed &&
                     <span className="min-w-0 flex-1">
                         <span className="block truncate text-[0.8rem] font-[550] text-[#18181B]">{user?.userName}</span>
@@ -218,10 +219,10 @@ const SideBar = ({ setModalNeededBy, setUser, collapsed, onToggle }: sideBarType
                         </button>
                     ))}
 
-                    {g.label === "collections" &&
+                    {g.label === "workspaces" &&
                         <button onClick={() => setModalNeededBy("addCollection")} className={`${pill} mt-1`}>
                             <span className="grid size-4 shrink-0 place-items-center"><PlusIcon dim="13" /></span>
-                            Add new collection
+                            Add new workspace
                         </button>
                     }
                     {g.label === "community" && <div className="mt-1 flex flex-col gap-1">

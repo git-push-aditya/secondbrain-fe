@@ -194,7 +194,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
             console.error(err);
         } finally {
             setRemovingShare(false);
-            setPopupMessage('Collection is no longer shared!!');
+            setPopupMessage('Workspace is no longer shared!!');
             setPopUp(true);
         }
     }
@@ -279,7 +279,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                         foot={delta === null ? `${thisWeek} this week` : `${delta >= 0 ? "+" : ""}${delta}% wk/wk`}
                         spark={<Spark counts={weekly.counts} />}
                     />
-                    <Tile label="Collections" value={collectionsCount} foot={`${sharedCount} shared`} />
+                    <Tile label="Workspaces" value={collectionsCount} foot={`${sharedCount} shared`} />
                     <Tile label="Communities" value={communitiesCount} foot="joined" />
                 </div>
             </section>
@@ -358,7 +358,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                     {!community ? <>
                         {!tab.startsWith("dashboard") &&
                             <button onClick={deleteCollection} disabled={deleting} className={danger}>
-                                {deleting ? <Loader style="h-3 w-8 text-current" dimh="12" dimw="34" /> : "[ delete collection ]"}
+                                {deleting ? <Loader style="h-3 w-8 text-current" dimh="12" dimw="34" /> : "[ delete workspace ]"}
                             </button>
                         }
                         <button onClick={handleRemoveShare} disabled={removingShare} className={danger}>
