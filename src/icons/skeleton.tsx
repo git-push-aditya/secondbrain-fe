@@ -30,7 +30,7 @@ const CardSkeleton = ({ i }: { i: number }) => (
 
 const CardsLoaderSkeleton = () => (
     <div className="card-grid w-full" role="status" aria-label="Loading cards">
-        {Array.from({ length: 8 }, (_, i) => <CardSkeleton key={i} i={i} />)}
+        {Array.from({ length: 12 }, (_, i) => <CardSkeleton key={i} i={i} />)}
     </div>
 );
 
