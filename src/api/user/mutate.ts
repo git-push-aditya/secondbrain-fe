@@ -174,9 +174,33 @@ export const useAddContentQuery = () => {
     const client = useQueryClient();
     return useMutation<any, Error, addContentType>({
         mutationFn: ({ collectionId, title, hyperlink, note, type, existingTags, newTags, communityId }) => addContent({ collectionId, title, hyperlink, note, type, existingTags, newTags, communityId }),
-        onSuccess: (_, variables) => {
+        onSuccess: (data, variables) => {
             if (variables.communityId === -1) {
-                client.invalidateQueries({ queryKey: ['fetchDataCollection', variables.collectionId] });
+                const newCard = data?.payload?.content;
+                if (!newCard) {
+                    client.invalidateQueries({ queryKey: ['fetchDataCollection', variables.collectionId] });
+                    return;
+                }
+
+                client.setQueryData(['fetchDataCollection', variables.collectionId], (old: any) => {
+                    if (!old) return old;
+                    const pages = [...old.pages];
+                    const firstPage = pages[0];
+                    pages[0] = {
+                        ...firstPage,
+                        payload: {
+                            ...firstPage.payload,
+                            content: [
+                                {
+                                    collectionId: variables.collectionId,
+                                    content: { ...newCard, tags: (newCard.tags || []).map((tag: any) => ({ tag })) }
+                                },
+                                ...firstPage.payload.content
+                            ]
+                        }
+                    };
+                    return { ...old, pages };
+                });
             } else {
                 client.invalidateQueries({ queryKey: ['fetchDataCommunity', variables.communityId] });
             }
