@@ -109,6 +109,7 @@ const Auth = ({ user, setUser }: AuthProps) => {
 
     const { mutateAsync: logIN, isPending: inIsPending } = useAuthInQuery();
     const { mutateAsync: signUP, isPending: upIsPending } = useAuthUpQuery();
+    const { mutateAsync: guestLogIN, isPending: guestIsPending } = useAuthInQuery();
 
 
     const handleClick = async () => {
@@ -212,17 +213,17 @@ const Auth = ({ user, setUser }: AuthProps) => {
 
 
     const handleGuestLogIn = () => {
-        logIN(
+        guestLogIN(
             {
-                userName: 'randomuser',
+                userName: 'guest',
                 password: 'Qwer1234+-*/',
                 rememberMe: true,
             }, {
             onSuccess: () => {
                 setUser({
-                    userName: 'randomuser',
+                    userName: 'guest',
                     profilePic: getProfilePicPath('b1'),
-                    email: 'dummy@doom.com'
+                    email: 'guest@dummy.com'
                 });
             },
             onError: (err) => {
@@ -306,7 +307,8 @@ const Auth = ({ user, setUser }: AuthProps) => {
                                 label="Continue as Guest"
                                 variant="secondary"
                                 onClick={() => handleGuestLogIn()}
-                                className="mt-4"
+                                disabled={guestIsPending}
+                                className={`mt-4 ${guestIsPending ? "animate-pulse" : ""}`}
                             />
 
                             <p className="mt-5 text-center text-[0.8rem] font-[500] text-gray-600">
