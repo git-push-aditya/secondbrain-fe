@@ -12,6 +12,8 @@ const QuickAdd = ({ collectionId, communityId }: { collectionId: number; communi
     const [, setMessage] = usePopUpMessage();
 
     const submit = async () => {
+        if (isPending) return;
+
         const meta = linkMeta(value);
         if (!meta) {
             setBad(true);
@@ -19,10 +21,13 @@ const QuickAdd = ({ collectionId, communityId }: { collectionId: number; communi
         }
         setBad(false);
 
+        const hyperlink = value.trim();
+        setValue("");
+
         try {
             await mutateAsync({
                 title: meta.title,
-                hyperlink: value.trim(),
+                hyperlink,
                 note: "",
                 type: meta.type,
                 collectionId,
@@ -30,11 +35,11 @@ const QuickAdd = ({ collectionId, communityId }: { collectionId: number; communi
                 existingTags: [],
                 newTags: [],
             });
-            setValue("");
             setMessage("Link saved to your brain!!");
             setPopUp(p => !p);
         } catch (err) {
             console.error(err);
+            setValue(hyperlink);
             setMessage("Couldn't save that link — try again.");
             setPopUp(p => !p);
         }
