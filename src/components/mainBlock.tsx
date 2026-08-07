@@ -203,6 +203,12 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
     const stats = tab === "stats";
     const episodes = tab.startsWith("dashboard");
 
+    //the collection/community atoms default to id:-1 until the tab-resolution effect above runs, which
+    //disables useFetchQueryCollection/useFetchQueryCommunity (enabled: id !== -1) - react-query's isLoading
+    //reads false for a disabled query (it's idle, not fetching), so without this the "no content" message
+    //flashed before the real id was even known, ahead of the skeleton it should follow
+    const activeIdResolved = community ? currentCommunity1.id !== -1 : currentCollection1.id !== -1;
+
     /* Numbers over one page of 12 aren't worth a page of their own, so the stats
        view pulls the rest — capped, since there's no aggregate endpoint.
        ponytail: 10 pages = 120 items, raise it the day someone notices. */
@@ -396,7 +402,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
 
             {/* ---- cards ---- */}
             <div className="mt-5">
-                {contentLoading || communityDataLoading
+                {!activeIdResolved || contentLoading || communityDataLoading
                     ? <CardsLoaderSkeleton />
                     : <div className="flex justify-center">
                         <div className={layout === "grid"
@@ -446,7 +452,7 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                     </div>
                 }
 
-                {!contentLoading && !communityDataLoading && shown === 0 &&
+                {activeIdResolved && !contentLoading && !communityDataLoading && shown === 0 &&
                     <div className="py-16 text-center">
                         <p className={`${mono} text-[#A1A1AA]`}>{q ? "[ no matches ]" : "[ nothing here yet ]"}</p>
                         {!community && !q &&
