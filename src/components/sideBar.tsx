@@ -5,6 +5,7 @@ import { useLogOutQuery } from "../api/auth/mutate";
 import { useNavigate } from "react-router-dom";
 import { useSearchQuery, useSideBarAtom, useTabAtom } from "../recoil/clientStates";
 import { useGetListQuery } from "../api/user/query";
+import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import type { AuthUser } from "../App";
 import type { ModalType } from "../pages/dashboard";
@@ -99,9 +100,18 @@ const SideBar = ({ setModalNeededBy, setUser, collapsed, onToggle }: sideBarType
     }
 
     const { mutateAsync } = useLogOutQuery();
+    const queryClient = useQueryClient();
     const handleAsyncLogout = async () => {
         try {
-            await mutateAsync(undefined, { onSuccess: () => { setUser?.(null); } });
+            await mutateAsync(undefined, {
+                onSuccess: () => {
+                    /* getList is seeded at login and held with staleTime:Infinity, so without
+                       this the next account to sign in on this tab would render the previous
+                       user's collections and communities until something forced a refetch */
+                    queryClient.clear();
+                    setUser?.(null);
+                }
+            });
         } catch (e) {
             console.error(e)
         }

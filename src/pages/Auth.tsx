@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactElement, type SetStateAction } f
 import axios from "axios";
 import type { AuthUser } from "../App";
 import { useAuthInQuery, useAuthUpQuery, useCheckMe } from '../api/auth/mutate';
+import { useSeedListCache } from '../api/user/query';
 import { useNavigate } from "react-router-dom";
 import Dither from "../components/Dither";
 import DitherBranches from "../components/DitherBranches";
@@ -81,9 +82,11 @@ const Field = ({ label, value, onValueChange, type = "text", placeholder, title,
 
 const Auth = ({ user, setUser }: AuthProps) => {
     const { data: meReqData, isSuccess: meIsSuccess, isError: meIsError } = useCheckMe();
+    const seedListCache = useSeedListCache();
 
     useEffect(() => {
         if (meIsSuccess && meReqData?.data.status) {
+            seedListCache(meReqData);
             setUser({ userName: meReqData.data.payload.userName, profilePic: getProfilePicPath(meReqData.data.payload.profilePic), email: meReqData.data.payload.email });
         }
     }, [meReqData, meIsSuccess, meIsError])
@@ -130,13 +133,14 @@ const Auth = ({ user, setUser }: AuthProps) => {
                     userName, password, rememberMe
                 }, {
                 onSuccess: (data) => {
+                    seedListCache(data);
                     setUser({
                         userName: data.data.payload.userName,
                         profilePic: getProfilePicPath(data.data.payload.profilePic),
                         email: data.data.payload.email
                     });
                     setErrorMessage("");
-                    setUserError(false);   
+                    setUserError(false);
                 }, onError: (err) => {
                     setUserError(true);
                     setErrorMessage(authErrorMessage(err, "That didn’t match our records. Please try again."));
@@ -179,6 +183,7 @@ const Auth = ({ user, setUser }: AuthProps) => {
                 profilePic: profilePic !== "" ? profilePic : "b1"
             }, {
             onSuccess: (data) => {
+                seedListCache(data);
                 setUser({ userName: data.data.payload.userName, profilePic: getProfilePicPath(data.data.payload.profilePic), email: data.data.payload.email });
                 setErrorMessage("");
                 setUserError(false);
@@ -219,7 +224,8 @@ const Auth = ({ user, setUser }: AuthProps) => {
                 password: 'Qwer1234+-*/',
                 rememberMe: true,
             }, {
-            onSuccess: () => {
+            onSuccess: (data) => {
+                seedListCache(data);
                 setUser({
                     userName: 'guest',
                     profilePic: getProfilePicPath('b1'),
