@@ -13,4 +13,10 @@ const chatHistory = atom<message[] | null>({
     default : null
 })
 
+const activeConversationId = atom<number | null>({
+    key : "activeConversationId",
+    default : null
+})
+
 export const useChatHistory = () => useRecoilState(chatHistory);
+export const useActiveConversationId = () => useRecoilState(activeConversationId);

@@ -23,6 +23,20 @@ const fetchContentCommunity = async (pageParam: number, communityId: number) => 
     return res.data;
 }
 
+
+const getConversations = () => {
+    return axios.get(`${import.meta.env.VITE_BASE_URL}/user/conversations`, {
+        withCredentials: true
+    }).then(res => res.data)
+}
+
+
+const getConversation = (conversationId: number) => {
+    return axios.get(`${import.meta.env.VITE_BASE_URL}/user/conversation?conversationId=${conversationId}`, {
+        withCredentials: true
+    }).then(res => res.data)
+}
+
  
 
 
@@ -82,10 +96,32 @@ export const useFetchQueryCommunity = ({ communityId }: { communityId: number })
         refetchIntervalInBackground: false,
         staleTime: 1000 * 60 * 5,  
         gcTime: 1000 * 60 * 10, 
-        refetchOnWindowFocus: true,  
+        refetchOnWindowFocus: true,
         refetchOnMount: false,
 
         getNextPageParam: (lastPage, allPages) =>
             lastPage.payload.more ? allPages.length + 1 : undefined
     });
 };
+
+
+/* Used once on mount to find the most recently updated conversation so a page
+   refresh can restore it without a sidebar. staleTime:Infinity since the list
+   only needs to be read once per app load, not kept fresh. */
+export const useGetConversationsQuery = () => {
+    return useQuery({
+        queryKey: ['conversations'],
+        queryFn: getConversations,
+        staleTime: Infinity
+    })
+}
+
+
+export const useGetConversationQuery = (conversationId: number | null) => {
+    return useQuery({
+        queryKey: ['conversation', conversationId],
+        queryFn: () => getConversation(conversationId as number),
+        enabled: conversationId !== null,
+        staleTime: Infinity
+    })
+}

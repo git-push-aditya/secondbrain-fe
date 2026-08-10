@@ -1,7 +1,6 @@
 import { QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from 'axios';
 import type { vote } from "../../components/communityCard";
-import type { message } from "../../recoil/chatStates";
 
 //////////query paramerets types
 interface addContentType {
@@ -153,10 +152,9 @@ const getCommunityMembers = async (communityId: number) => {
 }
 
 
-const getChatbot = async (lastSevenMessages: message[]) => {
-    const refinedMesseges = lastSevenMessages.map((prev) => ({role : prev.role, content : prev.content, toStream : prev.toStream}))
+const getChatbot = async ({ conversationId, content }: { conversationId?: number; content: string }) => {
     return axios.post(`${import.meta.env.VITE_BASE_URL}/user/chatbot`, {
-        lastSevenMessages : refinedMesseges
+        conversationId, content
     }, {
         withCredentials: true
     }).then(res => res.data)
@@ -316,7 +314,7 @@ export const useGetCommunityMembers = () => {
 }
 
 export const useChatBot = () => {
-    return useMutation<any, Error, { lastSevenMessages: message[] }>({
-        mutationFn: ({ lastSevenMessages }) => getChatbot(lastSevenMessages)
+    return useMutation<any, Error, { conversationId?: number; content: string }>({
+        mutationFn: (body) => getChatbot(body)
     })
 }

@@ -2,13 +2,11 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import axios from "axios";
 import { BlockIcon, BottomArrow } from "../icons/commonIcons";
 import { LiquidMetalButton } from "./ui/liquid-metal-button";
-import { useChatHistory } from "../recoil/chatStates";
+import { useActiveConversationId, useChatHistory } from "../recoil/chatStates";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChatBot } from "../api/user/mutate";
-import type { message } from "../recoil/chatStates";
+import { useGetConversationQuery, useGetConversationsQuery } from "../api/user/query";
 import MessageBubble from "./messageBubble";
-
-const ttl = 2 * 24 * 60 * 60 * 1000;
 
 export interface cardContent {
     title: string;
@@ -29,11 +27,16 @@ export interface cardContent {
 export const ChatBot = () => {
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const [chatHistory, setChatHistory] = useChatHistory();
+    const [activeConversationId, setActiveConversationId] = useActiveConversationId();
     useEffect(() => { inputRef?.current?.focus() }, []);
-    const recentChat = useRef<HTMLDivElement | null>(null); 
+    const recentChat = useRef<HTMLDivElement | null>(null);
 
     const [buttonVisible, setButtonVisible] = useState<Boolean>(true);
     const { mutateAsync, isPending } = useChatBot();
+
+    const { data: conversationsData } = useGetConversationsQuery();
+    const { data: conversationData } = useGetConversationQuery(activeConversationId);
+    const initialHistoryLoaded = useRef(false);
 
 
     useEffect(() => {
@@ -59,37 +62,42 @@ export const ChatBot = () => {
 
 
 
+    /* Auto-load the most recently updated conversation on mount so a page
+       refresh doesn't lose the current chat. Only adopts the list's id when
+       nothing is active yet, so it never clobbers a conversation already in
+       progress (e.g. after a tab switch remounts this component). */
     useEffect(() => {
-        const rawPastChats = localStorage.getItem("pastChats");
-        if (!rawPastChats) {
-            setChatHistory(null);  
-            return;
+        if (activeConversationId !== null) return;
+        const list = conversationsData?.payload?.conversations;
+        if (list && list.length > 0) {
+            setActiveConversationId(list[0].id);
         }
+    }, [conversationsData, activeConversationId, setActiveConversationId]);
 
-        try {
-            const parsed = JSON.parse(rawPastChats);
-            if (parsed.expiry && parsed.expiry > Date.now()) {
-                setChatHistory(parsed.value);
-            } else { 
-                localStorage.removeItem("pastChats");
-                setChatHistory(null);
-            }
-        } catch (err) {
-            console.error("Failed to parse pastChats:", err);
-            setChatHistory(null);
-        }
-    }, []);
-
-
+    /* Hydrates chatHistory from the loaded conversation exactly once. Guarded
+       on chatHistory === null so it can't stomp the optimistic messages of a
+       chat the user already started while this fetch was in flight (e.g. the
+       very first message of a brand-new conversation). Historical messages
+       only carry contentRefId, not the inflated citation card, so they render
+       without a source card — only the live turn just answered gets one. */
     useEffect(() => {
-        const now = new Date;
-        const pastChats = {
-            value: chatHistory,
-            expiry: now.getTime() + ttl,
-        }
+        if (!conversationData || initialHistoryLoaded.current) return;
+        initialHistoryLoaded.current = true;
+        if (chatHistory !== null) return;
 
-        localStorage.setItem("pastChats", JSON.stringify(pastChats))
-    }, [chatHistory])
+        const messages = conversationData.payload?.messages ?? [];
+        if (messages.length === 0) return;
+
+        setChatHistory(messages.map((m: { role: "user" | "assistant"; content: string }) => ({
+            role: m.role,
+            content: m.content,
+            toStream: false,
+            cardContent: null
+        })));
+        // chatHistory is read to decide whether to hydrate, not to re-trigger
+        // hydration on every change, so it's deliberately left out of deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [conversationData]);
 
 
     const handleMessage = async () => {
@@ -104,11 +112,14 @@ export const ChatBot = () => {
             { role: "assistant", content: "", toStream: false, cardContent: null }
         ]);
 
-        const lastSevenMessages: message[] = [...chatHistory?.slice(-6) ?? [], { role: "user", content: userMessage, toStream: false, cardContent :null  }];
-
-
         try {
-            const data = await mutateAsync({ lastSevenMessages });
+            const data = await mutateAsync({
+                conversationId: activeConversationId ?? undefined,
+                content: userMessage
+            });
+
+            setActiveConversationId(data.payload.conversationId);
+
             setChatHistory((prev) => {
                 const updated = [...(prev ?? [])];
                 updated[updated.length - 1] = {
@@ -125,8 +136,11 @@ export const ChatBot = () => {
             /* The empty assistant message was appended before the request. Leaving
                it empty means `responding` (content === "") never goes false, so the
                thinking trace spins forever and the failure is invisible. Every
-               failure mode has to land here — 401, 5xx, network drop alike. */
+               failure mode has to land here — 401, 404, 5xx, network drop alike. */
             const status = axios.isAxiosError(err) ? err.response?.status : undefined;
+
+            // stale/deleted conversationId: drop it so the next send starts fresh
+            if (status === 404) setActiveConversationId(null);
 
             setChatHistory((prev) => {
                 const updated = [...(prev ?? [])];
@@ -134,6 +148,8 @@ export const ChatBot = () => {
                     role: "assistant",
                     content: status === 401
                         ? "Your session expired — log in again to keep chatting."
+                        : status === 404
+                        ? "That conversation is gone. Send your message again to start a new one."
                         : "That request didn't go through. Try sending it again.",
                     toStream: false,
                     cardContent: null
