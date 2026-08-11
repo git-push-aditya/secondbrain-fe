@@ -8,6 +8,7 @@ SecondBrain is a web application for saving, organizing, and querying personal l
 
 - Save links into collections, tagged and searchable
 - Ask questions against your own saved content, answered from embeddings of the pages you saved
+- DeepDive chat history: conversations persist to the backend, with a ChatGPT-style sidebar to start a new chat or switch back to a past one
 - Share a collection through a public link, or revoke it
 - Pool links with other users in a shared community
 - Responsive across mobile and desktop

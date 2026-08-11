@@ -4,7 +4,7 @@ import SideBar from "../components/sideBar";
 import Modal from "../components/modal";
 import { AnimatePresence, motion } from "framer-motion";
 import type { AuthUser } from "../App";
-import { ChatBot } from "../components/Chatbot";
+import { DeepDivePane } from "../components/deepDivePane";
 import { useSideBarAtom, useTabAtom } from "../recoil/clientStates";
 import { CloseSideBar, OpenSideBar, ShareIcon } from "../icons/commonIcons";
 import { LatticeMark } from "../components/sideBar";
@@ -159,7 +159,7 @@ const Dashboard = ({ user, setUser, layout, setLayout }: { user: AuthUser | null
             {sidebar && <div onClick={toggleSideBar} className="absolute inset-0 z-20 bg-black/20 lg:hidden" />}
 
             <main className="relative min-w-0 flex-1 overflow-y-auto bg-[#FBFBF9] scrollbarMC">
-                {tab === 'chatbot' ? <ChatBot /> : <MainBlock setModalNeededBy={setModalNeededBy} user={user} layout={layout} setLayout={setLayout} />}
+                {tab === 'chatbot' ? <DeepDivePane /> : <MainBlock setModalNeededBy={setModalNeededBy} user={user} layout={layout} setLayout={setLayout} />}
             </main>
         </div>
     </div>

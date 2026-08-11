@@ -314,7 +314,13 @@ export const useGetCommunityMembers = () => {
 }
 
 export const useChatBot = () => {
+    const queryClient = useQueryClient();
     return useMutation<any, Error, { conversationId?: number; content: string }>({
-        mutationFn: (body) => getChatbot(body)
+        mutationFn: (body) => getChatbot(body),
+        // covers both a brand-new conversation showing up in the list and an
+        // existing one bumping to the top after its updatedAt changes
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['conversations'] });
+        }
     })
 }

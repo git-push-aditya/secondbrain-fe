@@ -58,11 +58,11 @@ const DeepDiveIcon = () => (
     </svg>
 );
 
-const groupLabel = "px-3 pt-4 pb-1.5 text-[0.62rem] font-[500] uppercase tracking-[0.09em] text-[#A1A1AA]";
-const rowBase = "flex w-full cursor-pointer items-center gap-2.5 rounded-md border px-2.5 py-[0.42rem] text-left text-[0.82rem] transition-colors";
-const rowOn = "border-[#E7E7E9] bg-[#F4F4F5] text-[#18181B] font-[550]";
-const rowOff = "border-transparent text-[#3F3F46] font-[450] hover:bg-[#FAFAFA]";
-const pill = "flex w-full cursor-pointer items-center gap-2.5 rounded-md border border-[#E7E7E9] px-2.5 py-[0.42rem] text-left text-[0.82rem] font-[450] text-[#52525B] transition-colors hover:bg-[#FAFAFA]";
+export const groupLabel = "px-3 pt-4 pb-1.5 text-[0.62rem] font-[500] uppercase tracking-[0.09em] text-[#A1A1AA]";
+export const rowBase = "flex w-full cursor-pointer items-center gap-2.5 rounded-md border px-2.5 py-[0.42rem] text-left text-[0.82rem] transition-colors";
+export const rowOn = "border-[#E7E7E9] bg-[#F4F4F5] text-[#18181B] font-[550]";
+export const rowOff = "border-transparent text-[#3F3F46] font-[450] hover:bg-[#FAFAFA]";
+export const pill = "flex w-full cursor-pointer items-center gap-2.5 rounded-md border border-[#E7E7E9] px-2.5 py-[0.42rem] text-left text-[0.82rem] font-[450] text-[#52525B] transition-colors hover:bg-[#FAFAFA]";
 
 const SideBar = ({ setModalNeededBy, setUser, collapsed, onToggle }: sideBarTypes) => {
 

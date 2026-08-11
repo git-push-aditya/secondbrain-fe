@@ -36,7 +36,9 @@ export const ChatBot = () => {
 
     const { data: conversationsData } = useGetConversationsQuery();
     const { data: conversationData } = useGetConversationQuery(activeConversationId);
-    const initialHistoryLoaded = useRef(false);
+    const autoRestoreAttempted = useRef(false);
+    const hydratedConversationId = useRef<number | null>(null);
+    const skipHydrationForId = useRef<number | null>(null);
 
 
     useEffect(() => {
@@ -63,41 +65,57 @@ export const ChatBot = () => {
 
 
     /* Auto-load the most recently updated conversation on mount so a page
-       refresh doesn't lose the current chat. Only adopts the list's id when
-       nothing is active yet, so it never clobbers a conversation already in
-       progress (e.g. after a tab switch remounts this component). */
+       refresh doesn't lose the current chat. Runs at most once: without the
+       ref guard, a "New chat" click (which nulls activeConversationId) would
+       make this effect fire again and drag the user right back into the old
+       conversation. Also bails if chatHistory is already non-null, since that
+       means the user started typing a brand-new chat before the list loaded —
+       otherwise this would race handleMessage and steal activeConversationId
+       out from under the message that's already in flight. */
     useEffect(() => {
-        if (activeConversationId !== null) return;
+        if (autoRestoreAttempted.current) return;
+        if (activeConversationId !== null || chatHistory !== null) return;
         const list = conversationsData?.payload?.conversations;
-        if (list && list.length > 0) {
-            setActiveConversationId(list[0].id);
-        }
-    }, [conversationsData, activeConversationId, setActiveConversationId]);
+        if (!list) return; // wait for the list before giving up on restoring
+        autoRestoreAttempted.current = true;
+        if (list.length > 0) setActiveConversationId(list[0].id);
+    }, [conversationsData, activeConversationId, chatHistory, setActiveConversationId]);
 
-    /* Hydrates chatHistory from the loaded conversation exactly once. Guarded
-       on chatHistory === null so it can't stomp the optimistic messages of a
-       chat the user already started while this fetch was in flight (e.g. the
-       very first message of a brand-new conversation). Historical messages
-       only carry contentRefId, not the inflated citation card, so they render
-       without a source card — only the live turn just answered gets one. */
+    /* Hydrates chatHistory whenever the active conversation actually changes
+       (switching in the history panel, or the auto-restore above), keyed on
+       conversation id rather than "has this ever run" so picking a different
+       past conversation re-hydrates instead of being a no-op. Historical
+       messages only carry contentRefId, not the inflated citation card, so
+       they render without a source card — only the live turn just answered
+       gets one.
+
+       skipHydrationForId covers the id handleMessage just assigned: chatHistory
+       there is already authoritative (it has the citation card the hydrated,
+       card-less version doesn't), so the background conversation fetch that
+       follows must not overwrite it. */
     useEffect(() => {
-        if (!conversationData || initialHistoryLoaded.current) return;
-        initialHistoryLoaded.current = true;
-        if (chatHistory !== null) return;
+        if (activeConversationId === null) {
+            // lets a later re-selection of the same conversation re-hydrate
+            hydratedConversationId.current = null;
+            return;
+        }
+        if (hydratedConversationId.current === activeConversationId) return;
+        if (skipHydrationForId.current === activeConversationId) {
+            hydratedConversationId.current = activeConversationId;
+            skipHydrationForId.current = null;
+            return;
+        }
+        if (!conversationData) return;
+        hydratedConversationId.current = activeConversationId;
 
         const messages = conversationData.payload?.messages ?? [];
-        if (messages.length === 0) return;
-
-        setChatHistory(messages.map((m: { role: "user" | "assistant"; content: string }) => ({
+        setChatHistory(messages.length === 0 ? null : messages.map((m: { role: "user" | "assistant"; content: string }) => ({
             role: m.role,
             content: m.content,
             toStream: false,
             cardContent: null
         })));
-        // chatHistory is read to decide whether to hydrate, not to re-trigger
-        // hydration on every change, so it's deliberately left out of deps
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [conversationData]);
+    }, [activeConversationId, conversationData, setChatHistory]);
 
 
     const handleMessage = async () => {
@@ -119,6 +137,7 @@ export const ChatBot = () => {
             });
 
             setActiveConversationId(data.payload.conversationId);
+            skipHydrationForId.current = data.payload.conversationId;
 
             setChatHistory((prev) => {
                 const updated = [...(prev ?? [])];
