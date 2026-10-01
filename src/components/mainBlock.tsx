@@ -362,6 +362,10 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                     </div>
 
                     {!community ? <>
+                        <button onClick={() => setModalNeededBy("addContent")}
+                            className={`${act} border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white`}>
+                            [ add content ]
+                        </button>
                         {!tab.startsWith("dashboard") &&
                             <button onClick={deleteCollection} disabled={deleting} className={danger}>
                                 {deleting ? <Loader style="h-3 w-8 text-current" dimh="12" dimw="34" /> : "[ delete workspace ]"}
