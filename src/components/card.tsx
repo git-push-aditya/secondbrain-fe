@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactElement } from "react";
+import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { InstagramIcon, RedditIcon, TwitterIcon, WebIcon, WebPageDisplay, YoutubeIcon } from "../icons/particularIcons";
 import { RedirectIcon } from "../icons/commonIcons";
 import Tag from "./tags";
@@ -27,6 +27,8 @@ export interface cardProp {
     layout?: "grid" | "list";
     shared: boolean;
     collectionId: number;
+    /** community cards: poster line and vote buttons, which replace the tag row */
+    extra?: { byline: ReactNode; votes: ReactNode };
 }
 
 
@@ -107,7 +109,7 @@ interface layoutCard extends cardProp {
     shareClicked: (link: string) => void;
 }
 
-const CardElement = React.memo(({ title, collectionId, shared, cardType, layout, id, note, tags, createdAt, link }: cardProp) => {
+export const CardElement = React.memo(({ title, collectionId, shared, cardType, layout, id, note, tags, createdAt, link, extra }: cardProp) => {
 
     const [deleteId, setDeleteId] = useDeleteID();
     const [popUpMessage, setPopUpMessage] = usePopUpMessage();
@@ -132,15 +134,15 @@ const CardElement = React.memo(({ title, collectionId, shared, cardType, layout,
     }
 
     return layout === "grid" ?
-        <GridStyle shared={shared} collectionId={collectionId} title={title} deleteCard={deleteCard} cardType={cardType} note={note} tags={tags} createdAt={formattedDate} link={link} layout={"grid"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} id={id} shareClicked={shareClicked} />
+        <GridStyle shared={shared} collectionId={collectionId} title={title} deleteCard={deleteCard} cardType={cardType} note={note} tags={tags} createdAt={formattedDate} link={link} extra={extra} layout={"grid"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} id={id} shareClicked={shareClicked} />
         :
-        <ListStyle shared={shared} title={title} deleteCard={deleteCard} collectionId={collectionId} cardType={cardType} note={note} tags={tags} createdAt={formattedDate} id={id} link={link} layout={"list"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} shareClicked={shareClicked} />
+        <ListStyle shared={shared} title={title} deleteCard={deleteCard} collectionId={collectionId} cardType={cardType} note={note} tags={tags} createdAt={formattedDate} id={id} link={link} extra={extra} layout={"list"} deletClicked={deletClicked} setDeleteClicked={setDeleteClicked} shareClicked={shareClicked} />
 
 })
 
 
 
-const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, shareClicked, cardType, note, tags, createdAt, link }: layoutCard) => {
+const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, shareClicked, cardType, note, tags, createdAt, link, extra }: layoutCard) => {
 
     // The PaperCard frame outside owns the border and background, so nothing here
     // carries chrome of its own.
@@ -297,11 +299,12 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
                     the scrolling area above, so on a card with an embed they were
                     pushed past the bottom edge. */}
                 <div className="shrink-0 px-2 pb-2">
-                    {!shared &&
+                    {(!shared || extra) &&
                         <div className="cursor-default pb-1 text-[0.6rem] font-[500] text-slate-400">
                             Added on {createdAt}
                         </div>
                     }
+                    {extra ? <div className="flex items-center justify-between gap-2">{extra.byline}{extra.votes}</div> :
                     <div className="flex items-center gap-1.5 justify-start overflow-x-auto scrollbar-hidden">
                     {tags?.length != 0 ? tags?.map((tag, idx) => (
                         <Tag key={idx}
@@ -315,7 +318,7 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
                             id={cardType.toLowerCase()}
                             style="text-[0.66rem] px-2 py-[0.15rem]"
                         />}
-                    </div>
+                    </div>}
                 </div>
             </div>
 
@@ -333,7 +336,7 @@ const GridStyle = ({ title, shared, deletClicked, deleteCard, setDeleteClicked, 
 
 
 
-const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked, cardType, note, tags, createdAt, link, deleteCard }: layoutCard) => {
+const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked, cardType, note, tags, createdAt, link, deleteCard, extra }: layoutCard) => {
     const [glancing, setGlancing] = useState(false);
 
     return <motion.div
@@ -352,6 +355,7 @@ const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked
 
         <div className="min-w-0 flex-1">
             <div className="flex min-w-0 items-center gap-2">
+                {extra?.byline}
                 <span className="truncate font-cardTitleHeading text-[0.92rem] font-[600] text-[#141418]">{title}</span>
                 <div className="hidden shrink-0 items-center gap-1.5 overflow-x-auto scrollbar-hidden sm:flex">
                     {tags?.map((tag, idx) => (
@@ -393,6 +397,7 @@ const ListStyle = ({ title, shared, deletClicked, setDeleteClicked, shareClicked
                     transition={{ duration: 0.2 }}
                     className="flex shrink-0 items-center gap-2.5"
                 >
+                    {extra?.votes}
                     <CardMenu showDelete={!shared}
                         onShare={() => shareClicked(link)}
                         onDelete={() => setDeleteClicked((prev) => !prev)} />

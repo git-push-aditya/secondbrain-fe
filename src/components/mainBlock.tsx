@@ -432,8 +432,8 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                                         ? <PaperCard key={cardData.content.id} i={cardData.content.id} type={cardData.content.type}>{card}</PaperCard>
                                         : <Fragment key={cardData.content.id}>{card}</Fragment>;
                                 })
-                                : visibleCommunity.map((cardData: any) => (
-                                    <CommunityCard
+                                : visibleCommunity.map((cardData: any) => {
+                                    const card = <CommunityCard
                                         key={cardData.content.id}
                                         createdAt={cardData.content.createdAt}
                                         title={cardData.content.title}
@@ -449,8 +449,12 @@ const MainBlock = ({ setModalNeededBy, layout, setLayout, user }: ChildProps) =>
                                         downVoteCount={cardData.downVotes}
                                         usersVote={cardData.usersVote}
                                         profilePic={cardData.content.user.profilePic}
-                                    />
-                                ))
+                                    />;
+
+                                    return layout === "grid"
+                                        ? <PaperCard key={cardData.content.id} i={cardData.content.id} type={cardData.content.type}>{card}</PaperCard>
+                                        : <Fragment key={cardData.content.id}>{card}</Fragment>;
+                                })
                             }
                         </div>
                     </div>
